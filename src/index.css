@@ -26,3 +26,24 @@ button {
   background:
     radial-gradient(120% 80% at 50% 0%, #14274a 0%, #0a1628 55%, #060e1c 100%);
 }
+
+@keyframes fireworkBurst {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes floatIntense {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes undoProgress {
+  0% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
