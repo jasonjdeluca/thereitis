@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  background: #0a1628;
+  color: #f5efe0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  margin: 0;
+  overscroll-behavior-y: none;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bg-radial-navy {
+  background:
+    radial-gradient(120% 80% at 50% 0%, #14274a 0%, #0a1628 55%, #060e1c 100%);
+}
