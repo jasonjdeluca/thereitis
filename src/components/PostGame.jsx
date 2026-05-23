@@ -2,7 +2,17 @@ import { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { TIER } from "../lib/phrases";
 
-export default function PostGame({ grid, score, didBingo, didBlackout, onPlayAgain }) {
+const MEDALS = ["🥇", "🥈", "🥉"];
+
+export default function PostGame({
+  grid,
+  score,
+  didBingo,
+  didBlackout,
+  onPlayAgain,
+  players,
+  currentPlayerId,
+}) {
   const cardRef = useRef(null);
   const [busy, setBusy] = useState(false);
 
@@ -20,6 +30,11 @@ export default function PostGame({ grid, score, didBingo, didBlackout, onPlayAga
       ? "THERE IT IS."
       : "Game Over";
 
+  const sorted =
+    players && players.length > 1
+      ? [...players].sort((a, b) => (b.score || 0) - (a.score || 0))
+      : [];
+
   async function share() {
     if (!cardRef.current) return;
     try {
@@ -31,7 +46,9 @@ export default function PostGame({ grid, score, didBingo, didBlackout, onPlayAga
       });
       canvas.toBlob(async (blob) => {
         if (!blob) return;
-        const file = new File([blob], "there-it-is.png", { type: "image/png" });
+        const file = new File([blob], "there-it-is.png", {
+          type: "image/png",
+        });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({
@@ -64,7 +81,9 @@ export default function PostGame({ grid, score, didBingo, didBlackout, onPlayAga
           className="rounded-3xl bg-navy-2/80 border border-gold/40 p-6 shadow-2xl"
         >
           <div className="text-center">
-            <div className="text-3xl mb-1" aria-hidden>🏨</div>
+            <div className="text-3xl mb-1" aria-hidden>
+              🏨
+            </div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-cream/60">
               Hilton · Q2 2026
             </div>
@@ -109,6 +128,49 @@ export default function PostGame({ grid, score, didBingo, didBlackout, onPlayAga
             There It Is<span className="text-gold">.</span>
           </div>
         </div>
+
+        {sorted.length > 0 && (
+          <div className="mt-6 rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
+            <div className="text-[10px] uppercase tracking-[0.3em] text-cream/50 mb-3 text-center">
+              Session Leaderboard
+            </div>
+            <div className="space-y-2">
+              {sorted.map((player, i) => {
+                const isMe = player.id === currentPlayerId;
+                const medal = i < 3 ? MEDALS[i] : null;
+                return (
+                  <div
+                    key={player.id}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2 ${
+                      isMe
+                        ? "bg-gold/10 border border-gold/30"
+                        : "bg-cream/5"
+                    }`}
+                  >
+                    <span className="w-6 text-center text-sm">
+                      {medal || (
+                        <span className="text-cream/40">{i + 1}</span>
+                      )}
+                    </span>
+                    <span
+                      className={`flex-1 text-sm ${isMe ? "text-gold font-semibold" : "text-cream"}`}
+                    >
+                      {player.display_name}
+                      {isMe && (
+                        <span className="text-cream/40 text-xs ml-1">
+                          (you)
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-sm text-cream/70 tabular-nums font-semibold">
+                      {(player.score || 0).toLocaleString()}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="fixed bottom-0 inset-x-0 z-30 bg-navy-2/95 backdrop-blur border-t border-cream/10 pb-[env(safe-area-inset-bottom)]">

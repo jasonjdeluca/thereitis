@@ -2,6 +2,13 @@ import { TIER } from "../lib/phrases";
 
 function sizeClass(phrase) {
   const len = phrase.length;
+  const longestWord = Math.max(...phrase.split(/[\s\-]/).map((w) => w.length));
+
+  if (longestWord > 10) {
+    if (len <= 14) return "text-[10px] leading-snug";
+    return "text-[9px] leading-snug";
+  }
+
   if (len <= 8) return "text-[13px] leading-tight";
   if (len <= 12) return "text-[12px] leading-tight";
   if (len <= 16) return "text-[11px] leading-tight";

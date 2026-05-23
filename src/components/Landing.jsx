@@ -35,8 +35,16 @@ export default function Landing({ onStart }) {
         </button>
       </main>
 
-      <footer className="pb-8 text-center text-[10px] uppercase tracking-[0.28em] text-cream/30">
-        tap to mark phrases as they're said
+      <footer className="pb-8 text-center space-y-6">
+        <div className="text-[10px] uppercase tracking-[0.28em] text-cream/30">
+          tap to mark phrases as they're said
+        </div>
+        <p className="text-xs text-cream/40 max-w-sm mx-auto px-4 pb-[env(safe-area-inset-bottom)]">
+          Independent hobby project for entertainment purposes. Not affiliated
+          with any company included. No gambling, please. Just the same phrases
+          you've heard a bunch of times on these calls, finally on a bingo card.
+          May improve your listening skills. Don't sue us. 😊
+        </p>
       </footer>
     </div>
   );
