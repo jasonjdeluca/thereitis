@@ -1,8 +1,26 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { TIER } from "../lib/phrases";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
+
+function isMobile() {
+  return (
+    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints > 0 && window.innerWidth < 768)
+  );
+}
+
+function downloadBlob(blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "thereitis-result.png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
 
 export default function PostGame({
   grid,
@@ -15,6 +33,13 @@ export default function PostGame({
 }) {
   const cardRef = useRef(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!error) return;
+    const id = setTimeout(() => setError(null), 4000);
+    return () => clearTimeout(id);
+  }, [error]);
 
   const markedPhrases = [];
   for (let r = 0; r < 5; r++) {
@@ -36,38 +61,46 @@ export default function PostGame({
       : [];
 
   async function share() {
-    if (!cardRef.current) return;
+    if (!cardRef.current || busy) return;
+    setBusy(true);
+    setError(null);
     try {
-      setBusy(true);
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: "#0A1628",
         scale: 2,
         useCORS: true,
       });
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        const file = new File([blob], "there-it-is.png", {
+
+      const blob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/png"),
+      );
+
+      if (!blob) {
+        setError("Could not save card — try a screenshot instead.");
+        return;
+      }
+
+      if (isMobile() && navigator.canShare) {
+        const file = new File([blob], "thereitis-result.png", {
           type: "image/png",
         });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        if (navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({
               files: [file],
               title: "There It Is",
               text: `I scored ${score.toLocaleString()} on the earnings call.`,
             });
-          } catch {
-            // user cancelled
+            return;
+          } catch (e) {
+            if (e.name === "AbortError") return;
           }
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "there-it-is.png";
-          a.click();
-          URL.revokeObjectURL(url);
         }
-      }, "image/png");
+      }
+
+      downloadBlob(blob);
+    } catch {
+      setError("Could not save card — try a screenshot instead.");
     } finally {
       setBusy(false);
     }
@@ -75,6 +108,14 @@ export default function PostGame({
 
   return (
     <div className="bg-radial-navy min-h-full flex flex-col">
+      {error && (
+        <div className="fixed top-3 inset-x-0 z-40 flex justify-center px-3 pointer-events-none">
+          <div className="animate-toastIn rounded-full bg-navy-2/95 border border-gold/60 shadow-gold px-4 py-2 text-sm text-cream max-w-xs text-center">
+            {error}
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 px-5 pt-8 pb-32 max-w-md mx-auto w-full">
         <div
           ref={cardRef}
