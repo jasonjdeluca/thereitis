@@ -54,6 +54,7 @@ export default function App() {
       {view === "game" && session && (
         <Game
           sessionId={session.sessionId}
+          sessionCode={session.sessionCode}
           playerId={session.playerId}
           displayName={session.displayName}
           isCreator={session.isCreator}

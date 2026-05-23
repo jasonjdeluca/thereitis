@@ -14,9 +14,11 @@ const STREAK_TIMEOUT_MS = 5 * 60 * 1000;
 const TRINITY_WINDOW_MS = 2 * 60 * 1000;
 const BINGO_BONUS = 500;
 const BLACKOUT_BONUS = 2000;
+const UNDO_WINDOW_MS = 4000;
 
 export default function Game({
   sessionId,
+  sessionCode,
   playerId,
   displayName,
   isCreator,
@@ -38,6 +40,8 @@ export default function Game({
   const [players, setPlayers] = useState([]);
   const [playerCount, setPlayerCount] = useState(1);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [undoPending, setUndoPending] = useState(null);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const toastIdRef = useRef(0);
   const trinityTimesRef = useRef({});
@@ -46,6 +50,8 @@ export default function Game({
   const playersRef = useRef([]);
   const lastFeedTimeRef = useRef({});
   const bingoCountRef = useRef(0);
+  const undoTimerRef = useRef(null);
+  const blackoutTimerRef = useRef(null);
 
   useEffect(() => {
     playersRef.current = players;
@@ -203,6 +209,13 @@ export default function Game({
     return () => clearTimeout(id);
   }, [streak, lastMarkAt]);
 
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+      if (blackoutTimerRef.current) clearTimeout(blackoutTimerRef.current);
+    };
+  }, []);
+
   const onLineCells = useMemo(() => {
     const set = new Set();
     for (const key of completedLines) {
@@ -216,12 +229,99 @@ export default function Game({
   function pushToast(text) {
     const id = ++toastIdRef.current;
     setToasts((prev) => [...prev, { id, text }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200);
+    setTimeout(
+      () => setToasts((prev) => prev.filter((t) => t.id !== id)),
+      3200,
+    );
+  }
+
+  function commitPending(pending) {
+    supabase
+      .from("marks")
+      .insert({
+        session_id: sessionId,
+        player_id: playerId,
+        phrase: pending.phrase,
+        points_awarded: pending.scoreDelta,
+        streak_count: pending.nextStreak,
+      })
+      .then(({ error }) => {
+        if (error) console.error("Failed to write mark:", error);
+      });
+
+    supabase
+      .from("players")
+      .update({
+        score: pending.newScore,
+        marked_squares: pending.markedSquares,
+        bingo_count: pending.newBingoCount,
+        blackout: pending.isBlackout,
+      })
+      .eq("id", playerId)
+      .then(({ error }) => {
+        if (error) console.error("Failed to update player:", error);
+      });
+  }
+
+  function handleUndo() {
+    if (!undoPending) return;
+    const { snapshot } = undoPending;
+
+    setGrid(snapshot.grid);
+    setScore(snapshot.score);
+    setStreak(snapshot.streak);
+    setLastMarkAt(snapshot.lastMarkAt);
+    setCompletedLines(snapshot.completedLines);
+    setDidBingo(snapshot.didBingo);
+    setDidBlackout(snapshot.didBlackout);
+    bingoCountRef.current = snapshot.bingoCount;
+    trinityTimesRef.current = snapshot.trinityTimes;
+    trinityFiredRef.current = snapshot.trinityFired;
+    setPlayers(snapshot.players);
+    setCelebration(null);
+
+    if (blackoutTimerRef.current) {
+      clearTimeout(blackoutTimerRef.current);
+      blackoutTimerRef.current = null;
+    }
+
+    clearTimeout(undoTimerRef.current);
+    undoTimerRef.current = null;
+    setUndoPending(null);
+  }
+
+  function flushPending() {
+    if (undoPending) {
+      commitPending(undoPending);
+      clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+      setUndoPending(null);
+    }
   }
 
   function tapCell(r, c) {
     const cell = grid[r][c];
     if (cell.isFree || cell.marked) return;
+
+    if (undoPending) {
+      commitPending(undoPending);
+      clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+    }
+
+    const snapshot = {
+      grid,
+      score,
+      streak,
+      lastMarkAt,
+      completedLines,
+      didBingo,
+      didBlackout,
+      bingoCount: bingoCountRef.current,
+      trinityTimes: { ...trinityTimesRef.current },
+      trinityFired: trinityFiredRef.current,
+      players: [...players],
+    };
 
     const now = Date.now();
 
@@ -297,19 +397,6 @@ export default function Game({
       ),
     );
 
-    supabase
-      .from("marks")
-      .insert({
-        session_id: sessionId,
-        player_id: playerId,
-        phrase: cell.phrase,
-        points_awarded: scoreDelta,
-        streak_count: nextStreak,
-      })
-      .then(({ error }) => {
-        if (error) console.error("Failed to write mark:", error);
-      });
-
     const markedSquares = [];
     for (let ri = 0; ri < 5; ri++) {
       for (let ci = 0; ci < 5; ci++) {
@@ -317,28 +404,74 @@ export default function Game({
       }
     }
 
-    supabase
-      .from("players")
-      .update({
-        score: newScore,
-        marked_squares: markedSquares,
-        bingo_count: newBingoCount,
-        blackout: blackoutHit || didBlackout,
-      })
-      .eq("id", playerId)
-      .then(({ error }) => {
-        if (error) console.error("Failed to update player:", error);
-      });
+    const pending = {
+      snapshot,
+      phrase: cell.phrase,
+      scoreDelta,
+      nextStreak,
+      newScore,
+      newBingoCount,
+      isBlackout: blackoutHit || didBlackout,
+      markedSquares,
+      timestamp: now,
+    };
+
+    setUndoPending(pending);
+
+    undoTimerRef.current = setTimeout(() => {
+      commitPending(pending);
+      setUndoPending((cur) =>
+        cur && cur.timestamp === pending.timestamp
+          ? { ...cur, fading: true }
+          : cur,
+      );
+      setTimeout(
+        () =>
+          setUndoPending((cur) =>
+            cur && cur.timestamp === pending.timestamp ? null : cur,
+          ),
+        300,
+      );
+      undoTimerRef.current = null;
+    }, UNDO_WINDOW_MS);
 
     if (blackoutHit) {
-      setTimeout(() => {
+      blackoutTimerRef.current = setTimeout(() => {
         setCelebration(null);
+        commitPending(pending);
+        if (undoTimerRef.current) {
+          clearTimeout(undoTimerRef.current);
+          undoTimerRef.current = null;
+        }
+        setUndoPending(null);
         setPostGame(true);
+        blackoutTimerRef.current = null;
       }, 2400);
     }
   }
 
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(sessionCode);
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 1500);
+    } catch {
+      // clipboard not available
+    }
+  }
+
+  function handleExit() {
+    flushPending();
+    onExit();
+  }
+
+  function handleShare() {
+    flushPending();
+    setPostGame(true);
+  }
+
   async function endGame() {
+    flushPending();
     if (isCreator) {
       await supabase
         .from("sessions")
@@ -379,7 +512,7 @@ export default function Game({
 
       <header className="pt-5 pb-3 px-5 flex items-center justify-between">
         <button
-          onClick={onExit}
+          onClick={handleExit}
           className="text-cream/50 text-xs uppercase tracking-[0.3em] active:text-cream"
         >
           ← Exit
@@ -391,6 +524,22 @@ export default function Game({
           <div className="text-[9px] uppercase tracking-[0.3em] text-cream/50 mt-1">
             Q2 2026
           </div>
+          <div className="flex items-center justify-center gap-1 mt-0.5">
+            <span className="text-xs text-cream/50">
+              Code: {sessionCode}
+            </span>
+            <button
+              onClick={copyCode}
+              className="text-cream/50 active:text-gold text-xs transition"
+              aria-label="Copy session code"
+            >
+              {codeCopied ? (
+                <span className="text-gold text-[10px]">Copied!</span>
+              ) : (
+                <span aria-hidden>📋</span>
+              )}
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-1.5 text-cream/70 text-xs">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -400,9 +549,7 @@ export default function Game({
         </div>
       </header>
 
-      <LiveFeed entries={feedEntries} />
-
-      <main className="px-3 sm:px-5 flex-1 flex items-start justify-center">
+      <main className="px-3 sm:px-5 flex-1 flex flex-col items-center">
         <div
           className={`w-full max-w-md rounded-2xl bg-navy-2/40 p-2 border border-cream/5 ${boardPulse}`}
         >
@@ -419,12 +566,47 @@ export default function Game({
             )}
           </div>
         </div>
+
+        <div className="w-full max-w-md">
+          <LiveFeed entries={feedEntries} />
+        </div>
       </main>
+
+      {undoPending && (
+        <div className="fixed bottom-[68px] inset-x-0 z-[35] flex justify-center px-4 pointer-events-none">
+          <div
+            key={undoPending.timestamp}
+            className={`pointer-events-auto w-full max-w-[280px] rounded-xl bg-navy-2/95 border border-gold/40 shadow-gold overflow-hidden ${
+              undoPending.fading ? "animate-undoOut" : "animate-undoIn"
+            }`}
+          >
+            <div className="px-4 py-2.5 flex items-center justify-between gap-2">
+              <span className="text-sm text-cream truncate">
+                {undoPending.phrase} marked &middot;
+              </span>
+              <button
+                onClick={handleUndo}
+                className="text-gold font-bold text-sm shrink-0 active:scale-95"
+              >
+                Undo
+              </button>
+            </div>
+            <div className="h-0.5 bg-gold/20">
+              <div
+                className="h-full bg-gold origin-left"
+                style={{
+                  animation: `undoProgress ${UNDO_WINDOW_MS}ms linear forwards`,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <Toolbar
         score={score}
         streak={streak}
-        onShare={() => setPostGame(true)}
+        onShare={handleShare}
         onEnd={endGame}
         onLeaderboard={() => setShowLeaderboard(true)}
       />

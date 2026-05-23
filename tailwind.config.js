@@ -46,6 +46,31 @@ export default {
           "40%": { transform: "scale(1.15)", opacity: "1" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        fireworkBurst: {
+          "0%": { transform: "scale(0)", opacity: "0" },
+          "60%": { transform: "scale(1.2)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
+        floatIntense: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        undoIn: {
+          "0%": { transform: "translateY(20px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        undoOut: {
+          "0%": { transform: "translateY(0)", opacity: "1" },
+          "100%": { transform: "translateY(-10px)", opacity: "0" },
+        },
+        undoProgress: {
+          "0%": { transform: "scaleX(1)" },
+          "100%": { transform: "scaleX(0)" },
+        },
       },
       animation: {
         pop: "pop 200ms ease-out",
@@ -54,6 +79,8 @@ export default {
         nearmiss: "nearmiss 1.6s ease-in-out infinite",
         toastIn: "toastIn 220ms ease-out",
         celebrate: "celebrate 600ms cubic-bezier(.2,.9,.3,1.2)",
+        undoIn: "undoIn 220ms ease-out",
+        undoOut: "undoOut 300ms ease-in forwards",
       },
     },
   },

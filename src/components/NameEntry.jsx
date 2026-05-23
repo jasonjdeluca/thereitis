@@ -77,7 +77,7 @@ export default function NameEntry({ onSessionCreated, onSessionJoined, onBack })
         <div className="w-full max-w-sm space-y-5">
           <div>
             <label className="block text-[10px] uppercase tracking-[0.3em] text-cream/50 mb-2">
-              Your Name
+              Your Alias
             </label>
             <input
               type="text"
@@ -88,6 +88,9 @@ export default function NameEntry({ onSessionCreated, onSessionJoined, onBack })
               autoComplete="off"
               className="w-full rounded-xl bg-navy-2/80 border border-cream/10 text-cream px-4 py-3 text-lg placeholder:text-cream/30 focus:outline-none focus:border-gold/60 transition"
             />
+            <p className="mt-1.5 text-xs italic text-cream/50">
+              Be creative — no real names needed
+            </p>
           </div>
 
           <button
@@ -95,7 +98,7 @@ export default function NameEntry({ onSessionCreated, onSessionJoined, onBack })
             disabled={!canCreate || loading}
             className="w-full rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99] transition disabled:opacity-40"
           >
-            {loading === "create" ? "Creating…" : "Create Session"}
+            {loading === "create" ? "Starting…" : "Start a Game"}
           </button>
 
           {mode !== "join" ? (
@@ -104,7 +107,7 @@ export default function NameEntry({ onSessionCreated, onSessionJoined, onBack })
               disabled={!canCreate}
               className="w-full rounded-2xl border border-cream/20 text-cream py-3 font-semibold active:scale-[0.99] transition disabled:opacity-40"
             >
-              Join Session
+              Join a Friend's Game
             </button>
           ) : (
             <div className="space-y-3">
@@ -124,7 +127,7 @@ export default function NameEntry({ onSessionCreated, onSessionJoined, onBack })
                 disabled={!canJoin || loading}
                 className="w-full rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] transition disabled:opacity-40"
               >
-                {loading === "join" ? "Joining…" : "Join Session"}
+                {loading === "join" ? "Joining…" : "Join a Friend's Game"}
               </button>
             </div>
           )}
