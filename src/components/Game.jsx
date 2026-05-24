@@ -21,7 +21,6 @@ export default function Game({
   sessionCode,
   playerId,
   displayName,
-  isCreator,
   initialCard,
   onExit,
   onPlayAgain,
@@ -470,14 +469,8 @@ export default function Game({
     setPostGame(true);
   }
 
-  async function endGame() {
+  function endGame() {
     flushPending();
-    if (isCreator) {
-      await supabase
-        .from("sessions")
-        .update({ status: "ended", ended_at: new Date().toISOString() })
-        .eq("id", sessionId);
-    }
     setPostGame(true);
   }
 

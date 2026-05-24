@@ -50,7 +50,6 @@ export default function NameEntry({ onSessionCreated, onSessionJoined, onBack })
         playerId: result.player.id,
         displayName: name.trim(),
         card: result.card,
-        sessionStatus: result.session.status,
       });
     } catch {
       setError("Failed to join session. Try again.");

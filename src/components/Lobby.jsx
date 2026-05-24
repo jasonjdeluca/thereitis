@@ -1,19 +1,38 @@
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabase";
 
+const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
+
 export default function Lobby({
   sessionId,
   sessionCode,
   playerId,
   displayName,
-  isCreator,
-  onGameStart,
+  onStartPlaying,
   onExit,
 }) {
   const [players, setPlayers] = useState([]);
   const [copied, setCopied] = useState(false);
-  const [starting, setStarting] = useState(false);
+  const [expired, setExpired] = useState(false);
   const channelRef = useRef(null);
+
+  useEffect(() => {
+    async function checkExpiry() {
+      const { data } = await supabase
+        .from("sessions")
+        .select("created_at, status")
+        .eq("id", sessionId)
+        .single();
+
+      if (data) {
+        const age = Date.now() - new Date(data.created_at).getTime();
+        if (age > SIX_HOURS_MS || data.status === "ended") {
+          setExpired(true);
+        }
+      }
+    }
+    checkExpiry();
+  }, [sessionId]);
 
   useEffect(() => {
     const channel = supabase.channel(`lobby:${sessionId}`);
@@ -29,21 +48,6 @@ export default function Lobby({
       setPlayers(list);
     });
 
-    channel.on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "sessions",
-        filter: `id=eq.${sessionId}`,
-      },
-      (payload) => {
-        if (payload.new.status === "active") {
-          onGameStart();
-        }
-      },
-    );
-
     channel.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
         await channel.track({
@@ -58,16 +62,7 @@ export default function Lobby({
     return () => {
       channel.unsubscribe();
     };
-  }, [sessionId, playerId, displayName, onGameStart]);
-
-  async function handleStart() {
-    setStarting(true);
-    await supabase
-      .from("sessions")
-      .update({ status: "active" })
-      .eq("id", sessionId);
-    onGameStart();
-  }
+  }, [sessionId, playerId, displayName]);
 
   async function handleCopy() {
     const text = `Join my There It Is session! Go to thereitis.live and enter code: ${sessionCode}`;
@@ -78,6 +73,28 @@ export default function Lobby({
     } catch {
       // clipboard not available
     }
+  }
+
+  if (expired) {
+    return (
+      <div className="bg-radial-navy min-h-full flex flex-col items-center justify-center px-6">
+        <div className="text-center space-y-4">
+          <div className="text-3xl">⏰</div>
+          <h2 className="font-display text-xl font-bold text-cream">
+            Session Expired
+          </h2>
+          <p className="text-cream/60 text-sm">
+            This session has been inactive for over 6 hours.
+          </p>
+          <button
+            onClick={onExit}
+            className="mt-4 rounded-2xl bg-gold text-navy px-6 py-3 font-semibold active:scale-[0.99] transition"
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -133,19 +150,16 @@ export default function Lobby({
             </div>
           </div>
 
-          {isCreator ? (
-            <button
-              onClick={handleStart}
-              disabled={starting}
-              className="w-full rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99] transition disabled:opacity-50"
-            >
-              {starting ? "Starting…" : "Start Game"}
-            </button>
-          ) : (
-            <div className="text-cream/40 text-sm">
-              Waiting for host to start the game…
-            </div>
-          )}
+          <button
+            onClick={onStartPlaying}
+            className="w-full rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99] transition"
+          >
+            I'm Ready — Start Playing
+          </button>
+
+          <p className="text-cream/40 text-[11px]">
+            Share the code above — friends can join anytime, even after you start
+          </p>
         </div>
       </main>
     </div>

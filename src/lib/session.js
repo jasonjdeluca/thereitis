@@ -2,6 +2,7 @@ import { supabase } from "./supabase";
 import { generateCard } from "./card";
 
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 function generateCode() {
   let code = "";
@@ -17,7 +18,7 @@ export async function createSession(displayName) {
 
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
-    .insert({ session_code: code, status: "lobby", player_count: 1 })
+    .insert({ session_code: code, status: "active", player_count: 1 })
     .select()
     .single();
 
@@ -50,6 +51,11 @@ export async function joinSession(code, displayName) {
 
   if (sessionError || !session) {
     return { error: "Session not found — check the code and try again" };
+  }
+
+  const age = Date.now() - new Date(session.created_at).getTime();
+  if (age > SIX_HOURS_MS || session.status === "ended") {
+    return { error: "This session has expired — start a new one" };
   }
 
   const card = generateCard();

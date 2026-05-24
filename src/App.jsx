@@ -9,13 +9,17 @@ export default function App() {
   const [session, setSession] = useState(null);
 
   function handleSessionCreated(data) {
-    setSession({ ...data, isCreator: true });
+    setSession(data);
     setView("lobby");
   }
 
   function handleSessionJoined(data) {
-    setSession({ ...data, isCreator: false });
-    setView(data.sessionStatus === "active" ? "game" : "lobby");
+    setSession(data);
+    setView("lobby");
+  }
+
+  function handleStartPlaying() {
+    setView("game");
   }
 
   function handleExit() {
@@ -46,8 +50,7 @@ export default function App() {
           sessionCode={session.sessionCode}
           playerId={session.playerId}
           displayName={session.displayName}
-          isCreator={session.isCreator}
-          onGameStart={() => setView("game")}
+          onStartPlaying={handleStartPlaying}
           onExit={handleExit}
         />
       )}
@@ -57,7 +60,6 @@ export default function App() {
           sessionCode={session.sessionCode}
           playerId={session.playerId}
           displayName={session.displayName}
-          isCreator={session.isCreator}
           initialCard={session.card}
           onExit={handleExit}
           onPlayAgain={handlePlayAgain}
