@@ -43,10 +43,18 @@ function correctText(q) {
   return col ? q[col] : q.correct_answer;
 }
 
+const RESULT_LINES = [
+  "Were you even on the call? 📵",
+  "You caught one. Barely. 😬",
+  "Attendance noted. Attention, less so.",
+  "You were in the room. Mentally, unclear.",
+  "Solid. You were probably taking notes.",
+  "You were listening. Suspiciously closely.",
+  "Eagle ears. Have you considered a career in IR? 🎯",
+];
+
 function resultLine(score) {
-  if (score <= 2) return "Not bad.";
-  if (score <= 4) return "You were listening.";
-  return "Eagle ears.";
+  return RESULT_LINES[score] || RESULT_LINES[0];
 }
 
 export default function TriviaQuiz({ onBack }) {

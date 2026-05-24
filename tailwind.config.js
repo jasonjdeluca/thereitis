@@ -72,6 +72,14 @@ export default {
           "0%": { width: "100%" },
           "100%": { width: "0%" },
         },
+        tooltipIn: {
+          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        tooltipOut: {
+          "0%": { opacity: "1", transform: "translateY(0)" },
+          "100%": { opacity: "0", transform: "translateY(6px)" },
+        },
       },
       animation: {
         pop: "pop 200ms ease-out",
@@ -85,6 +93,8 @@ export default {
         badgeIn: "badgeIn 500ms cubic-bezier(.2,.9,.3,1.2) both",
         goldBurst: "goldBurst 600ms ease-out",
         "pulse-subtle": "pulseSubtle 2s ease-in-out infinite",
+        tooltipIn: "tooltipIn 300ms ease-out forwards",
+        tooltipOut: "tooltipOut 300ms ease-in forwards",
       },
     },
   },

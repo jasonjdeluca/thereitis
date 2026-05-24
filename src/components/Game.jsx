@@ -52,6 +52,7 @@ export default function Game({
   const [codeCopied, setCodeCopied] = useState(false);
   const [ceoMode, setCeoMode] = useState(false);
   const [inSyncFired, setInSyncFired] = useState(false);
+  const [ceoTooltip, setCeoTooltip] = useState(null);
 
   const toastIdRef = useRef(0);
   const trinityTimesRef = useRef({});
@@ -77,6 +78,24 @@ export default function Game({
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (localStorage.getItem("ceo_mode_tooltip_seen")) return;
+    const showTimer = setTimeout(() => setCeoTooltip("visible"), 1500);
+    return () => clearTimeout(showTimer);
+  }, []);
+
+  useEffect(() => {
+    if (ceoTooltip !== "visible") return;
+    const autoTimer = setTimeout(() => dismissCeoTooltip(), 6000);
+    return () => clearTimeout(autoTimer);
+  }, [ceoTooltip]);
+
+  function dismissCeoTooltip() {
+    setCeoTooltip("fading");
+    localStorage.setItem("ceo_mode_tooltip_seen", "1");
+    setTimeout(() => setCeoTooltip(null), 300);
+  }
 
   function resetSilenceTimer() {
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
@@ -754,7 +773,7 @@ export default function Game({
         </div>
       </header>
 
-      <div className="flex justify-center mb-2">
+      <div className="flex justify-center mb-2 relative">
         <button
           onClick={toggleCeoMode}
           className={`text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full border transition ${
@@ -766,6 +785,28 @@ export default function Game({
           {ceoMode ? "CEO Mode ✓" : "CEO Mode"}
         </button>
       </div>
+
+      {ceoTooltip && (
+        <div className={`flex justify-center px-5 mb-2 ${
+          ceoTooltip === "fading" ? "animate-tooltipOut" : "animate-tooltipIn"
+        }`}>
+          <div className="w-full max-w-md rounded-xl bg-navy-2/95 border border-gold/50 shadow-gold px-4 py-3">
+            <div className="flex flex-col items-center text-center gap-2">
+              <span className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-gold/50 -mt-5" />
+              <p className="text-xs text-cream/80 leading-relaxed">
+                CEO Mode reshuffles your card with phrases most likely heard
+                from the top of the call. Optional — tap anytime to try it.
+              </p>
+              <button
+                onClick={dismissCeoTooltip}
+                className="text-gold text-xs font-semibold active:scale-95 transition"
+              >
+                Got it →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="px-3 sm:px-5 flex-1 flex flex-col items-center">
         <div
