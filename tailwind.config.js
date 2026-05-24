@@ -64,6 +64,14 @@ export default {
           "50%": { boxShadow: "0 0 20px 8px rgba(212,175,55,0.6)" },
           "100%": { boxShadow: "0 0 0 0 rgba(212,175,55,0)" },
         },
+        pulseSubtle: {
+          "0%, 100%": { borderColor: "rgba(168,85,247,0.3)" },
+          "50%": { borderColor: "rgba(168,85,247,0.7)" },
+        },
+        countdownShrink: {
+          "0%": { width: "100%" },
+          "100%": { width: "0%" },
+        },
       },
       animation: {
         pop: "pop 200ms ease-out",
@@ -76,6 +84,7 @@ export default {
         undoOut: "undoOut 300ms ease-in forwards",
         badgeIn: "badgeIn 500ms cubic-bezier(.2,.9,.3,1.2) both",
         goldBurst: "goldBurst 600ms ease-out",
+        "pulse-subtle": "pulseSubtle 2s ease-in-out infinite",
       },
     },
   },

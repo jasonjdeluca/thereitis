@@ -1,4 +1,4 @@
-export default function Landing({ onStart }) {
+export default function Landing({ onStart, onTrivia }) {
   return (
     <div className="bg-radial-navy min-h-full flex flex-col">
       <header className="pt-10 pb-6 px-6 text-center">
@@ -10,7 +10,7 @@ export default function Landing({ onStart }) {
         </p>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-6">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 gap-6">
         <button
           onClick={onStart}
           className="group w-full max-w-sm rounded-3xl bg-navy-2/80 backdrop-blur border border-cream/10 p-6 text-left shadow-2xl hover:border-gold/60 active:scale-[0.99] transition"
@@ -33,12 +33,32 @@ export default function Landing({ onStart }) {
             Start Game
           </div>
         </button>
+
+        <p className="max-w-sm text-center text-xs italic text-cream/40 px-2">
+          Tap a square every time you hear the phrase. First to bingo wins
+          bragging rights — and the quiet satisfaction of knowing exactly what
+          was coming.
+        </p>
+
+        <div className="w-full max-w-sm border-t border-gold/20" />
+
+        <div className="w-full max-w-sm text-center space-y-3">
+          <h3 className="font-display text-lg font-bold text-cream">
+            Think you were paying attention?
+          </h3>
+          <p className="text-xs text-cream/50">
+            Every question pulled from real calls. No spreadsheets required.
+          </p>
+          <button
+            onClick={onTrivia}
+            className="w-full rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] transition"
+          >
+            Test Your Knowledge →
+          </button>
+        </div>
       </main>
 
       <footer className="pb-8 text-center space-y-6">
-        <div className="text-[10px] uppercase tracking-[0.28em] text-cream/30">
-          tap to mark phrases as they're said
-        </div>
         <p className="text-xs text-cream/40 max-w-sm mx-auto px-4 pb-[env(safe-area-inset-bottom)]">
           Independent hobby project for entertainment purposes. Not affiliated
           with any company included. No gambling, please. Just the same phrases

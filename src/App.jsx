@@ -5,9 +5,11 @@ import Lobby from "./components/Lobby";
 import Game from "./components/Game";
 import Admin from "./components/Admin";
 import Predictions from "./components/Predictions";
+import TriviaQuiz from "./components/TriviaQuiz";
 
 function getInitialView() {
   if (window.location.pathname === "/gate") return "admin";
+  if (window.location.pathname === "/trivia") return "trivia";
   return "landing";
 }
 
@@ -59,7 +61,13 @@ export default function App() {
   return (
     <div className="min-h-full">
       {view === "landing" && (
-        <Landing onStart={() => setView("nameEntry")} />
+        <Landing
+          onStart={() => setView("nameEntry")}
+          onTrivia={() => setView("trivia")}
+        />
+      )}
+      {view === "trivia" && (
+        <TriviaQuiz onBack={() => setView("landing")} />
       )}
       {view === "nameEntry" && (
         <NameEntry

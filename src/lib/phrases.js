@@ -93,9 +93,9 @@ export const CEO_MODE_PHRASES = [
 ];
 
 export const CEO_TIER = {
-  hot: { dot: "🔥", points: 100, label: "hot" },
-  warm: { dot: "⚡", points: 150, label: "warm" },
-  cold: { dot: "❄️", points: 300, label: "cold" },
+  hot: { dot: "🔥", points: 50, label: "hot" },
+  warm: { dot: "⚡", points: 75, label: "warm" },
+  cold: { dot: "❄️", points: 150, label: "cold" },
   free: { dot: "", points: 0, label: "free" },
 };
 

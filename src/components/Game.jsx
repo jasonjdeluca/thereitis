@@ -8,6 +8,7 @@ import Toolbar from "./Toolbar";
 import Toast from "./Toast";
 import Celebration from "./Celebration";
 import PostGame from "./PostGame";
+import WordOfTheCall from "./WordOfTheCall";
 import LiveFeed from "./LiveFeed";
 import Leaderboard from "./Leaderboard";
 
@@ -20,11 +21,6 @@ const SILENCE_TIMEOUT_MS = 5 * 60 * 1000;
 const IN_SYNC_WINDOW_MS = 30 * 1000;
 const IN_SYNC_THRESHOLD = 5;
 const EVERYONE_HEARD_WINDOW_MS = 30 * 1000;
-
-function getCeoUnlocked() {
-  const count = parseInt(localStorage.getItem("thereitis_session_count") || "0", 10);
-  return count >= 3;
-}
 
 export default function Game({
   sessionId,
@@ -46,6 +42,7 @@ export default function Game({
   const [celebration, setCelebration] = useState(null);
   const [didBingo, setDidBingo] = useState(false);
   const [didBlackout, setDidBlackout] = useState(false);
+  const [voting, setVoting] = useState(false);
   const [postGame, setPostGame] = useState(false);
   const [feedEntries, setFeedEntries] = useState([]);
   const [players, setPlayers] = useState([]);
@@ -604,17 +601,13 @@ export default function Game({
           undoTimerRef.current = null;
         }
         setUndoPending(null);
-        setPostGame(true);
+        setVoting(true);
         blackoutTimerRef.current = null;
       }, 2400);
     }
   }
 
   function toggleCeoMode() {
-    if (!getCeoUnlocked()) {
-      pushToast("Play 3 sessions to unlock CEO Mode");
-      return;
-    }
     const next = !ceoMode;
     setCeoMode(next);
     if (next) {
@@ -658,26 +651,31 @@ export default function Game({
 
   function handleExit() {
     flushPending();
-    incrementSessionCount();
     onExit();
   }
 
   function handleShare() {
     flushPending();
-    incrementSessionCount();
-    setPostGame(true);
+    setVoting(true);
   }
 
   function endGame() {
     flushPending();
-    incrementSessionCount();
-    setPostGame(true);
+    setVoting(true);
   }
 
-  function incrementSessionCount() {
-    const key = "thereitis_session_count";
-    const current = parseInt(localStorage.getItem(key) || "0", 10);
-    localStorage.setItem(key, String(current + 1));
+  if (voting) {
+    return (
+      <WordOfTheCall
+        sessionId={sessionId}
+        playerId={playerId}
+        playerCount={playerCount}
+        onComplete={() => {
+          setVoting(false);
+          setPostGame(true);
+        }}
+      />
+    );
   }
 
   if (postGame) {
@@ -728,6 +726,9 @@ export default function Game({
           <div className="text-[9px] uppercase tracking-[0.3em] text-cream/50 mt-1">
             Q2 2026
           </div>
+          <div className={`text-[9px] mt-0.5 ${ceoMode ? "text-gold" : "text-cream/40"}`}>
+            {ceoMode ? "CEO Mode 👔" : "Standard"}
+          </div>
           <div className="flex items-center justify-center gap-1 mt-0.5">
             <span className="text-xs text-cream/50">
               Code: {sessionCode}
@@ -759,9 +760,7 @@ export default function Game({
           className={`text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full border transition ${
             ceoMode
               ? "bg-gold/20 border-gold/60 text-gold font-semibold"
-              : getCeoUnlocked()
-                ? "border-cream/20 text-cream/60 active:border-gold/40"
-                : "border-cream/10 text-cream/30 opacity-60"
+              : "border-cream/20 text-cream/60 active:border-gold/40"
           }`}
         >
           {ceoMode ? "CEO Mode ✓" : "CEO Mode"}
