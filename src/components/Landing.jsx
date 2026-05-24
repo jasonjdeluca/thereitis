@@ -40,18 +40,21 @@ export default function Landing({ onStart, onTrivia }) {
           was coming.
         </p>
 
-        <div className="w-full max-w-sm border-t border-gold/20" />
+        <div className="w-full max-w-sm border-t border-gold/20 mt-4" />
 
-        <div className="w-full max-w-sm text-center space-y-3">
+        <div className="w-full max-w-sm text-center space-y-3 py-4">
+          <p className="text-xs uppercase tracking-[0.32em] text-gold/60">
+            Call Trivia
+          </p>
           <h3 className="font-display text-lg font-bold text-cream">
-            Think you were paying attention?
+            🧠 Think you were paying attention?
           </h3>
           <p className="text-xs text-cream/50">
             Every question pulled from real calls. No spreadsheets required.
           </p>
           <button
             onClick={onTrivia}
-            className="w-full rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] transition"
+            className="w-full rounded-2xl border border-gold/60 bg-gold/10 text-cream py-3 text-base font-semibold active:scale-[0.99] transition hover:bg-gold/20"
           >
             Test Your Knowledge →
           </button>

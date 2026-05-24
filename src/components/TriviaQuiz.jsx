@@ -36,6 +36,11 @@ function selectQuestions(pool) {
   return shuffle(selected).slice(0, QUESTION_COUNT);
 }
 
+function answersMatch(a, b) {
+  if (!a || !b) return false;
+  return a.toLowerCase() === b.toLowerCase();
+}
+
 function resultLine(score) {
   if (score <= 2) return "Not bad.";
   if (score <= 4) return "You were listening.";
@@ -153,7 +158,7 @@ export default function TriviaQuiz({ onBack }) {
 
   if (done) {
     const score = answers.reduce((acc, ans, i) => {
-      return acc + (ans === questions[i]?.correct_answer ? 1 : 0);
+      return acc + (answersMatch(ans, questions[i]?.correct_answer) ? 1 : 0);
     }, 0);
 
     return (
@@ -179,7 +184,7 @@ export default function TriviaQuiz({ onBack }) {
             <div className="space-y-3 text-left">
               {questions.map((q, i) => {
                 const userAns = answers[i];
-                const correct = userAns === q.correct_answer;
+                const correct = answersMatch(userAns, q.correct_answer);
                 return (
                   <div
                     key={i}
@@ -269,14 +274,17 @@ export default function TriviaQuiz({ onBack }) {
 
           <div className="space-y-3">
             {options.map((option, i) => {
-              const isCorrect = option === q.correct_answer;
+              const isCorrect = answersMatch(option, q.correct_answer);
               const isSelected = selectedAnswer === option;
+              const playerWasRight = answersMatch(selectedAnswer, q.correct_answer);
 
               let cardStyle =
                 "bg-navy-2/80 border-cream/10 text-cream active:scale-[0.99]";
               if (revealed) {
-                if (isCorrect) {
+                if (isCorrect && (playerWasRight || timedOut)) {
                   cardStyle = "bg-green-500/20 border-green-400/60 text-green-200";
+                } else if (isCorrect && !playerWasRight) {
+                  cardStyle = "bg-gold/20 border-gold/60 text-gold";
                 } else if (isSelected && !isCorrect) {
                   cardStyle = "bg-red-500/20 border-red-400/60 text-red-200";
                 } else {
