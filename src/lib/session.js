@@ -12,13 +12,16 @@ function generateCode() {
   return code;
 }
 
-export async function createSession(displayName) {
+export async function createSession(displayName, companyId) {
   const code = generateCode();
   const card = generateCard();
 
+  const row = { session_code: code, status: "active", player_count: 1 };
+  if (companyId) row.company_id = companyId;
+
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
-    .insert({ session_code: code, status: "active", player_count: 1 })
+    .insert(row)
     .select()
     .single();
 

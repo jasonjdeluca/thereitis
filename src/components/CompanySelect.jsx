@@ -1,0 +1,173 @@
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+
+const COMPANY_ORDER = ["hilton", "marriott", "hyatt", "ihg", "wyndham", "choice"];
+
+const TICKERS = {
+  hilton: "HLT",
+  marriott: "MAR",
+  hyatt: "H",
+  ihg: "IHG",
+  wyndham: "WH",
+  choice: "CHH",
+};
+
+function CountdownDisplay({ nextEarningsDate }) {
+  const [display, setDisplay] = useState("");
+
+  useEffect(() => {
+    if (!nextEarningsDate) {
+      setDisplay(null);
+      return;
+    }
+
+    function tick() {
+      const now = Date.now();
+      const target = new Date(nextEarningsDate).getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        setDisplay("Call Complete");
+        return;
+      }
+
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+
+      setDisplay(`${days} days · ${hours} hours · ${minutes} minutes`);
+    }
+
+    tick();
+    const id = setInterval(tick, 60000);
+    return () => clearInterval(id);
+  }, [nextEarningsDate]);
+
+  if (!nextEarningsDate) {
+    return <span className="text-cream/40">&mdash; Coming Soon</span>;
+  }
+
+  if (display === "Call Complete") {
+    return <span className="text-cream/40">Call Complete</span>;
+  }
+
+  return <span className="text-gold">{display}</span>;
+}
+
+export default function CompanySelect({ onSelectCompany, onBack }) {
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase
+        .from("companies")
+        .select("*");
+
+      if (data) {
+        const sorted = COMPANY_ORDER
+          .map((id) => data.find((c) => c.id === id))
+          .filter(Boolean);
+        setCompanies(sorted);
+      }
+      setLoading(false);
+    }
+    load();
+
+    const channel = supabase
+      .channel("companies-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "companies" },
+        (payload) => {
+          const updated = payload.new;
+          setCompanies((prev) =>
+            prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c)),
+          );
+        },
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
+
+  return (
+    <div className="bg-radial-navy min-h-full flex flex-col">
+      <header className="pt-10 pb-6 px-6 text-center">
+        <h1 className="font-display text-4xl sm:text-5xl font-black tracking-tight text-cream">
+          There It Is<span className="text-gold">.</span>
+        </h1>
+        <p className="mt-2 text-xs uppercase tracking-[0.32em] text-cream/60">
+          Pick a Company
+        </p>
+      </header>
+
+      <main className="flex-1 px-6 pb-10">
+        <div className="max-w-sm mx-auto">
+          {loading ? (
+            <div className="text-cream/40 text-sm text-center py-10">
+              Loading companies...
+            </div>
+          ) : (
+            <div className="space-y-0">
+              {companies.map((company, i) => (
+                <div key={company.id}>
+                  {i > 0 && (
+                    <div className="border-t border-gold/20 my-0" />
+                  )}
+                  <div className="py-5">
+                    <div className="flex items-start gap-4">
+                      <div className="text-4xl leading-none select-none" aria-hidden>
+                        {company.emoji}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-display text-xl font-bold text-cream">
+                          {company.name}{" "}
+                          <span className="text-cream/40 font-sans text-sm font-normal">
+                            ({TICKERS[company.id]})
+                          </span>
+                        </div>
+                        <div className="mt-1 text-sm text-cream/60">
+                          {company.call_identifier || "Next call not yet scheduled"}
+                        </div>
+                        <div className="mt-2 text-xs">
+                          <CountdownDisplay nextEarningsDate={company.next_earnings_date} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      {company.is_active ? (
+                        <button
+                          onClick={() => onSelectCompany(company)}
+                          className="w-full rounded-2xl bg-gold py-3 text-center font-semibold text-navy tracking-wide active:bg-gold-bright active:scale-[0.99] transition"
+                        >
+                          Start a Game &rarr;
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          className="w-full rounded-2xl bg-cream/10 py-3 text-center font-semibold text-cream/30 tracking-wide cursor-not-allowed"
+                        >
+                          Coming Soon
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            onClick={onBack}
+            className="w-full mt-6 text-cream/40 text-xs uppercase tracking-[0.3em] py-2 active:text-cream transition"
+          >
+            &larr; Back
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+}

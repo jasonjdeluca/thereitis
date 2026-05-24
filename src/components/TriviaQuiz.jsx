@@ -57,7 +57,7 @@ function resultLine(score) {
   return RESULT_LINES[score] || RESULT_LINES[0];
 }
 
-export default function TriviaQuiz({ onBack }) {
+export default function TriviaQuiz({ companyId = "hilton", onBack }) {
   const [allQuestions, setAllQuestions] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +77,7 @@ export default function TriviaQuiz({ onBack }) {
       const { data, error: fetchError } = await supabase
         .from("trivia_questions")
         .select("*")
-        .eq("company_id", "hilton")
+        .eq("company_id", companyId)
         .eq("is_active", true);
 
       if (fetchError || !data || data.length === 0) {

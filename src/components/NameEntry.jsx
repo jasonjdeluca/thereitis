@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createSession, joinSession } from "../lib/session";
 
-export default function NameEntry({ onSessionCreated, onSessionJoined, onBack }) {
+export default function NameEntry({ companyId, onSessionCreated, onSessionJoined, onBack }) {
   const [name, setName] = useState(
     () => localStorage.getItem("thereitis_display_name") || "",
   );
@@ -19,7 +19,7 @@ export default function NameEntry({ onSessionCreated, onSessionJoined, onBack })
     setLoading("create");
     setError("");
     try {
-      const result = await createSession(name.trim());
+      const result = await createSession(name.trim(), companyId);
       onSessionCreated({
         sessionId: result.session.id,
         sessionCode: result.session.session_code,

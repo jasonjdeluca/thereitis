@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
 const ADMIN_KEY = "thereitis_admin_auth";
+const COMPANY_ORDER = ["hilton", "marriott", "hyatt", "ihg", "wyndham", "choice"];
 
 function Countdown({ targetDate, timezone }) {
   const [display, setDisplay] = useState("");
@@ -235,8 +236,7 @@ function TriviaSection() {
   );
 }
 
-function CompanyCard() {
-  const [company, setCompany] = useState(null);
+function CompanyCard({ company, onUpdate }) {
   const [earningsDate, setEarningsDate] = useState("");
   const [earningsTime, setEarningsTime] = useState("16:30");
   const [timezone, setTimezone] = useState("America/New_York");
@@ -245,41 +245,31 @@ function CompanyCard() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    async function load() {
-      const { data } = await supabase
-        .from("companies")
-        .select("*")
-        .eq("id", "hilton")
-        .single();
-
-      if (data) {
-        setCompany(data);
-        setCallId(data.call_identifier || "");
-        setTimezone(data.next_earnings_timezone || "America/New_York");
-        if (data.next_earnings_date) {
-          const d = new Date(data.next_earnings_date);
-          setEarningsDate(d.toISOString().split("T")[0]);
-          setEarningsTime(
-            d.toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            }),
-          );
-        }
-      }
+    setCallId(company.call_identifier || "");
+    setTimezone(company.next_earnings_timezone || "America/New_York");
+    if (company.next_earnings_date) {
+      const d = new Date(company.next_earnings_date);
+      setEarningsDate(d.toISOString().split("T")[0]);
+      setEarningsTime(
+        d.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }),
+      );
+    } else {
+      setEarningsDate("");
+      setEarningsTime("16:30");
     }
-    load();
-  }, []);
+  }, [company]);
 
   async function toggleActive() {
-    if (!company) return;
     const next = !company.is_active;
     await supabase
       .from("companies")
       .update({ is_active: next })
-      .eq("id", "hilton");
-    setCompany((c) => ({ ...c, is_active: next }));
+      .eq("id", company.id);
+    onUpdate({ ...company, is_active: next });
   }
 
   async function handleSave() {
@@ -296,21 +286,17 @@ function CompanyCard() {
         next_earnings_timezone: timezone,
         call_identifier: callId,
       })
-      .eq("id", "hilton");
+      .eq("id", company.id);
 
-    setCompany((c) => ({
-      ...c,
+    onUpdate({
+      ...company,
       next_earnings_date: nextDate,
       next_earnings_timezone: timezone,
       call_identifier: callId,
-    }));
+    });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-  }
-
-  if (!company) {
-    return <div className="text-cream/40 text-sm">Loading…</div>;
   }
 
   const previewDate = earningsDate
@@ -321,7 +307,7 @@ function CompanyCard() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-3xl">🏨</span>
+          <span className="text-3xl">{company.emoji}</span>
           <div>
             <div className="text-lg font-bold text-cream">{company.name}</div>
             <div className="text-xs text-cream/50">
@@ -408,6 +394,29 @@ function CompanyCard() {
 }
 
 function AdminPanel() {
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from("companies").select("*");
+      if (data) {
+        const sorted = COMPANY_ORDER
+          .map((id) => data.find((c) => c.id === id))
+          .filter(Boolean);
+        setCompanies(sorted);
+      }
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  function handleUpdate(updated) {
+    setCompanies((prev) =>
+      prev.map((c) => (c.id === updated.id ? updated : c)),
+    );
+  }
+
   return (
     <div className="bg-radial-navy min-h-full pb-12">
       <header className="pt-8 pb-6 px-6 text-center">
@@ -420,9 +429,20 @@ function AdminPanel() {
       </header>
 
       <main className="px-5 max-w-lg mx-auto space-y-6">
-        <section className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
-          <CompanyCard />
-        </section>
+        {loading ? (
+          <div className="text-cream/40 text-sm text-center py-10">
+            Loading companies...
+          </div>
+        ) : (
+          companies.map((company) => (
+            <section
+              key={company.id}
+              className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5"
+            >
+              <CompanyCard company={company} onUpdate={handleUpdate} />
+            </section>
+          ))
+        )}
 
         <section className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
           <h3 className="text-sm font-semibold text-cream mb-4">Stats</h3>

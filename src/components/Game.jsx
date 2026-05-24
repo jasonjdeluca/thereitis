@@ -28,6 +28,8 @@ export default function Game({
   playerId,
   displayName,
   initialCard,
+  companyName,
+  callIdentifier,
   onExit,
   onPlayAgain,
   predictions,
@@ -740,11 +742,13 @@ export default function Game({
         </button>
         <div className="text-center">
           <div className="font-display font-bold text-cream text-lg leading-none">
-            Hilton
+            {companyName || "There It Is"}
           </div>
-          <div className="text-[9px] uppercase tracking-[0.3em] text-cream/50 mt-1">
-            Q2 2026
-          </div>
+          {callIdentifier && (
+            <div className="text-[9px] uppercase tracking-[0.3em] text-cream/50 mt-1">
+              {callIdentifier}
+            </div>
+          )}
           <div className={`text-[9px] mt-0.5 ${ceoMode ? "text-gold" : "text-cream/40"}`}>
             {ceoMode ? "CEO Mode 👔" : "Standard"}
           </div>
