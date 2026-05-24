@@ -3,6 +3,7 @@ import { BADGE_DEFS } from "../lib/badges";
 
 export default function BadgeReveal({ badgeIds }) {
   const [visibleCount, setVisibleCount] = useState(0);
+  const [expanded, setExpanded] = useState({});
 
   useEffect(() => {
     if (!badgeIds || badgeIds.length === 0) return;
@@ -17,6 +18,10 @@ export default function BadgeReveal({ badgeIds }) {
 
   if (!badgeIds || badgeIds.length === 0) return null;
 
+  function toggleBadge(id) {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
   return (
     <div className="mt-6">
       <div className="text-[10px] uppercase tracking-[0.3em] text-cream/50 mb-3 text-center">
@@ -27,17 +32,24 @@ export default function BadgeReveal({ badgeIds }) {
         {badgeIds.slice(0, visibleCount).map((id, i) => {
           const badge = BADGE_DEFS[id];
           if (!badge) return null;
+          const isOpen = !!expanded[id];
           return (
-            <div
+            <button
               key={id}
-              className="animate-badgeIn flex flex-col items-center gap-1 rounded-xl border border-gold/60 bg-navy-2/90 px-3 py-2 min-w-[72px]"
+              onClick={() => toggleBadge(id)}
+              className="animate-badgeIn flex flex-col items-center gap-1 rounded-xl border border-gold/60 bg-navy-2/90 px-3 py-2 min-w-[72px] transition-all active:scale-95"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <span className="text-2xl">{badge.emoji}</span>
               <span className="text-[10px] text-cream font-semibold text-center leading-tight">
                 {badge.name}
               </span>
-            </div>
+              {isOpen && badge.desc && (
+                <span className="text-[9px] text-cream/50 text-center leading-tight mt-0.5">
+                  {badge.desc}
+                </span>
+              )}
+            </button>
           );
         })}
       </div>

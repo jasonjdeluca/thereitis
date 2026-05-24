@@ -1,18 +1,18 @@
 import { TRINITY } from "./phrases";
 
 export const BADGE_DEFS = {
-  called_it: { name: "Called It", emoji: "🎉" },
-  blackout_artist: { name: "Blackout Artist", emoji: "⬛" },
-  eagle_ears: { name: "Eagle Ears", emoji: "👂" },
-  on_fire: { name: "On Fire", emoji: "🔥" },
-  sniper: { name: "Sniper", emoji: "🎯" },
-  in_sync: { name: "In Sync", emoji: "🤝" },
-  psychic: { name: "Psychic", emoji: "🔮" },
-  trinity: { name: "Trinity", emoji: "🔱" },
-  serial_compounder: { name: "Serial Compounder", emoji: "💰" },
-  flywheel: { name: "Flywheel", emoji: "🌀" },
-  filibustered: { name: "Filibustered", emoji: "🎙️" },
-  gonculator: { name: "Gonculator", emoji: "🧪" },
+  called_it: { name: "Called It", emoji: "🎉", desc: "You hit bingo" },
+  blackout_artist: { name: "Blackout Artist", emoji: "⬛", desc: "You marked every square" },
+  eagle_ears: { name: "Eagle Ears", emoji: "👂", desc: "10+ squares marked this session" },
+  on_fire: { name: "On Fire", emoji: "🔥", desc: "5 squares marked in a row" },
+  sniper: { name: "Sniper", emoji: "🎯", desc: "3 cold phrases marked in one session" },
+  in_sync: { name: "In Sync", emoji: "🤝", desc: "5+ players marked the same square simultaneously" },
+  psychic: { name: "Psychic", emoji: "🔮", desc: "All 3 pre-call predictions correct" },
+  trinity: { name: "Trinity", emoji: "🔱", desc: "Brand-Led, Network-Driven, Platform-Enabled — all marked" },
+  serial_compounder: { name: "Serial Compounder", emoji: "💰", desc: "You marked Serial Compounder" },
+  flywheel: { name: "Flywheel", emoji: "🌀", desc: "You marked Flywheel" },
+  filibustered: { name: "Filibustered", emoji: "🎙️", desc: "You marked Filibuster" },
+  gonculator: { name: "Gonculator", emoji: "🧪", desc: "You marked the rarest square on the card" },
 };
 
 export function evaluateBadges({

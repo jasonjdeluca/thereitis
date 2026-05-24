@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 const VOTE_TIMER_SECONDS = 15;
+const SAFETY_NET_SECONDS = 20;
 
 export default function WordOfTheCall({
   sessionId,
@@ -13,11 +14,19 @@ export default function WordOfTheCall({
   const [votes, setVotes] = useState({});
   const [myVote, setMyVote] = useState(null);
   const [winner, setWinner] = useState(null);
-  const [elapsed, setElapsed] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(VOTE_TIMER_SECONDS);
+  const [timerDone, setTimerDone] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showSafetyNet, setShowSafetyNet] = useState(false);
   const startRef = useRef(Date.now());
   const animRef = useRef(null);
   const channelRef = useRef(null);
+  const topPhrasesRef = useRef([]);
+  const resolvedRef = useRef(false);
+
+  useEffect(() => {
+    topPhrasesRef.current = topPhrases;
+  }, [topPhrases]);
 
   useEffect(() => {
     async function fetchTopPhrases() {
@@ -98,9 +107,15 @@ export default function WordOfTheCall({
   useEffect(() => {
     function tick() {
       const e = (Date.now() - startRef.current) / 1000;
-      setElapsed(e);
+      const remaining = Math.max(0, Math.ceil(VOTE_TIMER_SECONDS - e));
+      setSecondsLeft(remaining);
+
+      if (e >= SAFETY_NET_SECONDS) {
+        setShowSafetyNet(true);
+      }
 
       if (e >= VOTE_TIMER_SECONDS) {
+        setTimerDone(true);
         resolveWinner();
         return;
       }
@@ -114,20 +129,24 @@ export default function WordOfTheCall({
   }, []);
 
   function resolveWinner() {
+    if (resolvedRef.current) return;
+    resolvedRef.current = true;
     if (animRef.current) cancelAnimationFrame(animRef.current);
 
     setVotes((current) => {
+      const phrases = topPhrasesRef.current;
       const entries = Object.entries(current);
-      if (entries.length === 0 && topPhrases.length > 0) {
-        const w = topPhrases[0];
+      let w;
+      if (entries.length === 0) {
+        w = phrases[0];
+      } else {
+        const sorted = entries.sort((a, b) => b[1] - a[1]);
+        w = sorted[0]?.[0] || phrases[0];
+      }
+      if (w) {
         setWinner(w);
         writeWinner(w);
-        return current;
       }
-      const sorted = entries.sort((a, b) => b[1] - a[1]);
-      const w = sorted[0]?.[0] || topPhrases[0];
-      setWinner(w);
-      writeWinner(w);
       return current;
     });
   }
@@ -160,6 +179,11 @@ export default function WordOfTheCall({
 
     if (error) {
       setMyVote(null);
+      return;
+    }
+
+    if (timerDone) {
+      resolveWinner();
     }
   }
 
@@ -174,7 +198,10 @@ export default function WordOfTheCall({
     }
   }
 
-  const progress = Math.min(elapsed / VOTE_TIMER_SECONDS, 1);
+  const progress = Math.min(
+    (Date.now() - startRef.current) / 1000 / VOTE_TIMER_SECONDS,
+    1,
+  );
   const totalVotes = Object.values(votes).reduce((s, v) => s + v, 0);
 
   if (winner) {
@@ -218,15 +245,20 @@ export default function WordOfTheCall({
             Word of the Call
           </h2>
           <p className="mt-2 text-sm text-cream/60">
-            What was the phrase of the session?
+            Tap the phrase you heard the most today. One vote. Make it count.
           </p>
         </div>
 
-        <div className="h-1 rounded-full bg-cream/10 overflow-hidden">
-          <div
-            className="h-full bg-gold transition-none"
-            style={{ width: `${(1 - progress) * 100}%` }}
-          />
+        <div>
+          <div className="h-1 rounded-full bg-cream/10 overflow-hidden">
+            <div
+              className="h-full bg-gold transition-none"
+              style={{ width: `${(1 - progress) * 100}%` }}
+            />
+          </div>
+          <div className="mt-1.5 text-center text-xs text-cream/40">
+            {timerDone ? "Time's up" : `⏱ ${secondsLeft} second${secondsLeft !== 1 ? "s" : ""} to vote`}
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -253,7 +285,7 @@ export default function WordOfTheCall({
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold">{phrase}</span>
-                  {myVote && count > 0 && (
+                  {totalVotes > 0 && count > 0 && (
                     <span className="text-xs text-cream/40">
                       {count} vote{count !== 1 ? "s" : ""} · {pct}%
                     </span>
@@ -264,10 +296,15 @@ export default function WordOfTheCall({
           })}
         </div>
 
-        {myVote && (
-          <p className="text-center text-xs text-cream/40">
-            Vote cast — waiting for timer...
-          </p>
+        {showSafetyNet && (
+          <div className="text-center">
+            <button
+              onClick={onComplete}
+              className="text-cream/40 text-xs active:text-cream transition"
+            >
+              Continue →
+            </button>
+          </div>
         )}
       </div>
     </div>
