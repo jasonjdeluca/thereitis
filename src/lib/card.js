@@ -1,4 +1,4 @@
-import { HOT, WARM, COLD, TRINITY, FILIBUSTER, FREE_LABEL, tierOf } from "./phrases.js";
+import { HOT, WARM, COLD, TRINITY, FILIBUSTER, FREE_LABEL, tierOf, CEO_MODE_PHRASES } from "./phrases.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -78,6 +78,51 @@ export function generateCard() {
     ...pick(WARM, warmCount),
     ...pick(COLD, coldCount),
   ]);
+
+  let idx = 0;
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      if (grid[r][c] !== null) continue;
+      const phrase = fillers[idx++];
+      grid[r][c] = {
+        phrase,
+        tier: tierOf(phrase),
+        isFree: false,
+        isTrinity: false,
+        isFilibuster: phrase === FILIBUSTER,
+      };
+    }
+  }
+
+  return grid;
+}
+
+export function generateCeoCard() {
+  const grid = Array.from({ length: 5 }, () => Array(5).fill(null));
+
+  grid[2][2] = {
+    phrase: FREE_LABEL,
+    tier: "free",
+    isFree: true,
+    isTrinity: false,
+    isFilibuster: false,
+  };
+
+  const placements = trinityPlacements();
+  const placement = placements[Math.floor(Math.random() * placements.length)];
+  const trinityShuffled = shuffle(TRINITY);
+  placement.forEach(([r, c], i) => {
+    grid[r][c] = {
+      phrase: trinityShuffled[i],
+      tier: "hot",
+      isFree: false,
+      isTrinity: true,
+      isFilibuster: trinityShuffled[i] === FILIBUSTER,
+    };
+  });
+
+  const remaining = CEO_MODE_PHRASES.filter((p) => !TRINITY.includes(p));
+  const fillers = shuffle(remaining).slice(0, 21);
 
   let idx = 0;
   for (let r = 0; r < 5; r++) {

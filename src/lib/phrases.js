@@ -72,6 +72,36 @@ export const TIER = {
   free: { dot: "", points: 0, label: "free" },
 };
 
+export const CEO_MODE_PHRASES = [
+  "Serial Compounder",
+  "Flywheel",
+  "Never Say Never",
+  "Long Long Time",
+  "Early Days",
+  "Don't Overcook It",
+  "Filibuster",
+  "I'd Take The Over",
+  "Green Shoots",
+  "War Is War",
+  "I've Been Consistent",
+  "White Space",
+  "Shots on Goal",
+  "Network Effect",
+  "Brand-Led",
+  "Network-Driven",
+  "Platform-Enabled",
+];
+
+export const CEO_TIER = {
+  hot: { dot: "🔥", points: 100, label: "hot" },
+  warm: { dot: "⚡", points: 150, label: "warm" },
+  cold: { dot: "❄️", points: 300, label: "cold" },
+  free: { dot: "", points: 0, label: "free" },
+};
+
+export const GREAT_QUESTION = "Great Question";
+export const DONT_OVERCOOK = "Don't Overcook It";
+
 export function tierOf(phrase) {
   if (HOT.includes(phrase)) return "hot";
   if (WARM.includes(phrase)) return "warm";

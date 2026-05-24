@@ -54,6 +54,16 @@ export default {
           "0%": { transform: "translateY(0)", opacity: "1" },
           "100%": { transform: "translateY(-10px)", opacity: "0" },
         },
+        badgeIn: {
+          "0%": { transform: "translateY(20px) scale(0.8)", opacity: "0" },
+          "60%": { transform: "translateY(-4px) scale(1.05)", opacity: "1" },
+          "100%": { transform: "translateY(0) scale(1)", opacity: "1" },
+        },
+        goldBurst: {
+          "0%": { boxShadow: "0 0 0 0 rgba(212,175,55,0.8)" },
+          "50%": { boxShadow: "0 0 20px 8px rgba(212,175,55,0.6)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(212,175,55,0)" },
+        },
       },
       animation: {
         pop: "pop 200ms ease-out",
@@ -64,6 +74,8 @@ export default {
         celebrate: "celebrate 600ms cubic-bezier(.2,.9,.3,1.2)",
         undoIn: "undoIn 220ms ease-out",
         undoOut: "undoOut 300ms ease-in forwards",
+        badgeIn: "badgeIn 500ms cubic-bezier(.2,.9,.3,1.2) both",
+        goldBurst: "goldBurst 600ms ease-out",
       },
     },
   },

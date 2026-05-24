@@ -4,6 +4,7 @@ import NameEntry from "./components/NameEntry";
 import Lobby from "./components/Lobby";
 import Game from "./components/Game";
 import Admin from "./components/Admin";
+import Predictions from "./components/Predictions";
 
 function getInitialView() {
   if (window.location.pathname === "/gate") return "admin";
@@ -13,6 +14,7 @@ function getInitialView() {
 export default function App() {
   const [view, setView] = useState(getInitialView);
   const [session, setSession] = useState(null);
+  const [predictions, setPredictions] = useState(null);
 
   function handleSessionCreated(data) {
     setSession(data);
@@ -25,16 +27,28 @@ export default function App() {
   }
 
   function handleStartPlaying() {
+    setView("predictions");
+  }
+
+  function handlePredictionsConfirm(selected) {
+    setPredictions(selected);
+    setView("game");
+  }
+
+  function handlePredictionsSkip() {
+    setPredictions(null);
     setView("game");
   }
 
   function handleExit() {
     setSession(null);
+    setPredictions(null);
     setView("landing");
   }
 
   function handlePlayAgain() {
     setSession(null);
+    setPredictions(null);
     setView("nameEntry");
   }
 
@@ -64,6 +78,14 @@ export default function App() {
           onExit={handleExit}
         />
       )}
+      {view === "predictions" && session && (
+        <Predictions
+          card={session.card}
+          playerId={session.playerId}
+          onConfirm={handlePredictionsConfirm}
+          onSkip={handlePredictionsSkip}
+        />
+      )}
       {view === "game" && session && (
         <Game
           sessionId={session.sessionId}
@@ -73,6 +95,7 @@ export default function App() {
           initialCard={session.card}
           onExit={handleExit}
           onPlayAgain={handlePlayAgain}
+          predictions={predictions}
         />
       )}
     </div>

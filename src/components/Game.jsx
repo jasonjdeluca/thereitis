@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { evaluate, isBlackout, cellsOnLine } from "../lib/bingo";
-import { TIER, TRINITY, FILIBUSTER } from "../lib/phrases";
+import { TIER, TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK, CEO_TIER, CEO_MODE_PHRASES } from "../lib/phrases";
 import { supabase } from "../lib/supabase";
+import { generateCeoCard } from "../lib/card";
 import Tile from "./Tile";
 import Toolbar from "./Toolbar";
 import Toast from "./Toast";
@@ -15,6 +16,15 @@ const TRINITY_WINDOW_MS = 2 * 60 * 1000;
 const BINGO_BONUS = 500;
 const BLACKOUT_BONUS = 2000;
 const UNDO_WINDOW_MS = 4000;
+const SILENCE_TIMEOUT_MS = 5 * 60 * 1000;
+const IN_SYNC_WINDOW_MS = 30 * 1000;
+const IN_SYNC_THRESHOLD = 5;
+const EVERYONE_HEARD_WINDOW_MS = 30 * 1000;
+
+function getCeoUnlocked() {
+  const count = parseInt(localStorage.getItem("thereitis_session_count") || "0", 10);
+  return count >= 3;
+}
 
 export default function Game({
   sessionId,
@@ -24,10 +34,12 @@ export default function Game({
   initialCard,
   onExit,
   onPlayAgain,
+  predictions,
 }) {
   const [grid, setGrid] = useState(initialCard);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
   const [lastMarkAt, setLastMarkAt] = useState(0);
   const [toasts, setToasts] = useState([]);
   const [completedLines, setCompletedLines] = useState([]);
@@ -41,6 +53,8 @@ export default function Game({
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [undoPending, setUndoPending] = useState(null);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [ceoMode, setCeoMode] = useState(false);
+  const [inSyncFired, setInSyncFired] = useState(false);
 
   const toastIdRef = useRef(0);
   const trinityTimesRef = useRef({});
@@ -51,10 +65,32 @@ export default function Game({
   const bingoCountRef = useRef(0);
   const undoTimerRef = useRef(null);
   const blackoutTimerRef = useRef(null);
+  const silenceTimerRef = useRef(null);
+  const silenceFiredRef = useRef(false);
+  const markTimestampsRef = useRef([]);
+  const maxStreakRef = useRef(0);
 
   useEffect(() => {
     playersRef.current = players;
   }, [players]);
+
+  useEffect(() => {
+    resetSilenceTimer();
+    return () => {
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    };
+  }, []);
+
+  function resetSilenceTimer() {
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    silenceFiredRef.current = false;
+    silenceTimerRef.current = setTimeout(() => {
+      if (!silenceFiredRef.current) {
+        silenceFiredRef.current = true;
+        broadcastToast("Unusually quiet call 👀");
+      }
+    }, SILENCE_TIMEOUT_MS);
+  }
 
   useEffect(() => {
     async function fetchPlayers() {
@@ -87,6 +123,12 @@ export default function Game({
       },
       (payload) => {
         const mark = payload.new;
+
+        resetSilenceTimer();
+
+        checkEveryoneHeardThat(mark.phrase, mark.created_at || new Date().toISOString());
+        checkInSync(mark.phrase, mark.player_id, mark.created_at || new Date().toISOString());
+
         if (mark.player_id === playerId) return;
 
         const now = Date.now();
@@ -184,6 +226,10 @@ export default function Game({
       },
     );
 
+    channel.on("broadcast", { event: "toast" }, (payload) => {
+      pushToast(payload.payload.text);
+    });
+
     channel.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
         await channel.track({
@@ -232,6 +278,71 @@ export default function Game({
       () => setToasts((prev) => prev.filter((t) => t.id !== id)),
       3200,
     );
+  }
+
+  function broadcastToast(text) {
+    pushToast(text);
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: "broadcast",
+        event: "toast",
+        payload: { text },
+      });
+    }
+  }
+
+  function checkEveryoneHeardThat(phrase, timestamp) {
+    const now = Date.now();
+    markTimestampsRef.current.push({ phrase, time: now });
+    markTimestampsRef.current = markTimestampsRef.current.filter(
+      (m) => now - m.time <= EVERYONE_HEARD_WINDOW_MS,
+    );
+
+    const activeCount = playersRef.current.length;
+    if (activeCount < 2) return;
+
+    const threshold = Math.ceil(activeCount * 0.75);
+    const recentForPhrase = markTimestampsRef.current.filter(
+      (m) => m.phrase === phrase,
+    );
+
+    const uniquePlayers = new Set();
+    recentForPhrase.forEach(() => uniquePlayers.add(phrase));
+
+    if (recentForPhrase.length >= threshold) {
+      broadcastToast("Everyone heard that one 👀");
+      markTimestampsRef.current = markTimestampsRef.current.filter(
+        (m) => m.phrase !== phrase,
+      );
+    }
+  }
+
+  function checkInSync(phrase, markPlayerId, timestamp) {
+    if (inSyncFired) return;
+    const now = Date.now();
+    const myMarked = [];
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 5; c++) {
+        const cell = grid[r][c];
+        if (cell.marked && cell.markedAt && now - cell.markedAt <= IN_SYNC_WINDOW_MS) {
+          myMarked.push(cell.phrase);
+        }
+      }
+    }
+
+    if (myMarked.includes(phrase)) {
+      const recentMarks = markTimestampsRef.current.filter(
+        (m) => m.phrase === phrase && now - m.time <= IN_SYNC_WINDOW_MS,
+      );
+      if (recentMarks.length >= IN_SYNC_THRESHOLD) {
+        setInSyncFired(true);
+      }
+    }
+  }
+
+  function getPointsForTier(tier) {
+    if (ceoMode) return CEO_TIER[tier]?.points || 0;
+    return TIER[tier]?.points || 0;
   }
 
   function commitPending(pending) {
@@ -330,12 +441,33 @@ export default function Game({
       ),
     );
 
-    const tileScore = TIER[cell.tier].points;
+    resetSilenceTimer();
+
+    let tileScore = getPointsForTier(cell.tier);
+
+    if (cell.phrase === GREAT_QUESTION) {
+      tileScore *= 2;
+      pushToast("Double points! 🎯");
+    }
+
     let scoreDelta = tileScore;
+
+    if (cell.phrase === DONT_OVERCOOK) {
+      broadcastToast("Don't overcook it. 🍳");
+    }
+
+    if (cell.phrase === FILIBUSTER) {
+      pushToast("He warned you. 🎙️");
+    }
 
     const withinStreak =
       lastMarkAt !== 0 && now - lastMarkAt <= STREAK_TIMEOUT_MS;
     const nextStreak = withinStreak ? streak + 1 : 1;
+
+    if (nextStreak > maxStreakRef.current) {
+      maxStreakRef.current = nextStreak;
+      setMaxStreak(nextStreak);
+    }
 
     if (TRINITY.includes(cell.phrase)) {
       trinityTimesRef.current[cell.phrase] = now;
@@ -348,12 +480,15 @@ export default function Game({
         Math.max(...times) - Math.min(...times) <= TRINITY_WINDOW_MS
       ) {
         trinityFiredRef.current = true;
-        pushToast("TRINITY 🔱 There it is, there it is, there it is.");
+        broadcastToast("TRINITY 🔱 There it is, there it is, there it is.");
+        scoreDelta += 750;
       }
     }
 
-    if (cell.phrase === FILIBUSTER) {
-      pushToast("He warned you. 🎙️");
+    let predictionHit = false;
+    if (predictions && predictions.includes(cell.phrase)) {
+      predictionHit = true;
+      scoreDelta += 200;
     }
 
     const { completed } = evaluate(next);
@@ -374,6 +509,32 @@ export default function Game({
       scoreDelta += BLACKOUT_BONUS;
       setDidBlackout(true);
       setCelebration("blackout");
+    }
+
+    if (predictions && predictions.length === 3) {
+      const allMarkedPhrases = [];
+      for (let ri = 0; ri < 5; ri++) {
+        for (let ci = 0; ci < 5; ci++) {
+          if (next[ri][ci].marked && !next[ri][ci].isFree)
+            allMarkedPhrases.push(next[ri][ci].phrase);
+        }
+      }
+      const correctCount = predictions.filter((p) =>
+        allMarkedPhrases.includes(p),
+      ).length;
+      if (correctCount === 3) {
+        const alreadyHadAll =
+          predictions.filter((p) => {
+            for (let ri = 0; ri < 5; ri++)
+              for (let ci = 0; ci < 5; ci++)
+                if (grid[ri][ci].marked && grid[ri][ci].phrase === p) return true;
+            return false;
+          }).length === 3;
+        if (!alreadyHadAll) {
+          scoreDelta += 1000;
+          pushToast("PSYCHIC 🔮 All 3 predictions correct!");
+        }
+      }
     }
 
     const newScore = score + scoreDelta;
@@ -449,6 +610,42 @@ export default function Game({
     }
   }
 
+  function toggleCeoMode() {
+    if (!getCeoUnlocked()) {
+      pushToast("Play 3 sessions to unlock CEO Mode");
+      return;
+    }
+    const next = !ceoMode;
+    setCeoMode(next);
+    if (next) {
+      setGrid(generateCeoCard());
+      setScore(0);
+      setStreak(0);
+      setMaxStreak(0);
+      maxStreakRef.current = 0;
+      setCompletedLines([]);
+      setDidBingo(false);
+      setDidBlackout(false);
+      bingoCountRef.current = 0;
+      trinityTimesRef.current = {};
+      trinityFiredRef.current = false;
+      pushToast("CEO Mode activated 🎙️");
+    } else {
+      setGrid(initialCard);
+      setScore(0);
+      setStreak(0);
+      setMaxStreak(0);
+      maxStreakRef.current = 0;
+      setCompletedLines([]);
+      setDidBingo(false);
+      setDidBlackout(false);
+      bingoCountRef.current = 0;
+      trinityTimesRef.current = {};
+      trinityFiredRef.current = false;
+      pushToast("Standard mode");
+    }
+  }
+
   async function copyCode() {
     try {
       await navigator.clipboard.writeText(sessionCode);
@@ -461,17 +658,26 @@ export default function Game({
 
   function handleExit() {
     flushPending();
+    incrementSessionCount();
     onExit();
   }
 
   function handleShare() {
     flushPending();
+    incrementSessionCount();
     setPostGame(true);
   }
 
   function endGame() {
     flushPending();
+    incrementSessionCount();
     setPostGame(true);
+  }
+
+  function incrementSessionCount() {
+    const key = "thereitis_session_count";
+    const current = parseInt(localStorage.getItem(key) || "0", 10);
+    localStorage.setItem(key, String(current + 1));
   }
 
   if (postGame) {
@@ -484,6 +690,11 @@ export default function Game({
         onPlayAgain={onPlayAgain}
         players={players}
         currentPlayerId={playerId}
+        maxStreak={maxStreak}
+        predictions={predictions}
+        trinityFired={trinityFiredRef.current}
+        inSyncFired={inSyncFired}
+        ceoMode={ceoMode}
       />
     );
   }
@@ -542,6 +753,21 @@ export default function Game({
         </div>
       </header>
 
+      <div className="flex justify-center mb-2">
+        <button
+          onClick={toggleCeoMode}
+          className={`text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full border transition ${
+            ceoMode
+              ? "bg-gold/20 border-gold/60 text-gold font-semibold"
+              : getCeoUnlocked()
+                ? "border-cream/20 text-cream/60 active:border-gold/40"
+                : "border-cream/10 text-cream/30 opacity-60"
+          }`}
+        >
+          {ceoMode ? "CEO Mode ✓" : "CEO Mode"}
+        </button>
+      </div>
+
       <main className="px-3 sm:px-5 flex-1 flex flex-col items-center">
         <div
           className={`w-full max-w-md rounded-2xl bg-navy-2/40 p-2 border border-cream/5 ${boardPulse}`}
@@ -554,6 +780,9 @@ export default function Game({
                   cell={cell}
                   onTap={() => tapCell(r, c)}
                   onLine={onLineCells.has(`${r}-${c}`)}
+                  isPrediction={predictions && predictions.includes(cell.phrase) && !cell.marked}
+                  predictionHit={predictions && predictions.includes(cell.phrase) && cell.marked}
+                  isGreatQuestion={cell.phrase === GREAT_QUESTION && cell.marked}
                 />
               )),
             )}

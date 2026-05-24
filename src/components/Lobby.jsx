@@ -14,6 +14,7 @@ export default function Lobby({
   const [players, setPlayers] = useState([]);
   const [copied, setCopied] = useState(false);
   const [expired, setExpired] = useState(false);
+  const [playerPredictions, setPlayerPredictions] = useState({});
   const channelRef = useRef(null);
 
   useEffect(() => {
@@ -35,6 +36,25 @@ export default function Lobby({
   }, [sessionId]);
 
   useEffect(() => {
+    async function fetchPredictions() {
+      const { data } = await supabase
+        .from("players")
+        .select("id, display_name, predictions")
+        .eq("session_id", sessionId);
+      if (data) {
+        const preds = {};
+        data.forEach((p) => {
+          if (p.predictions && p.predictions.length > 0) {
+            preds[p.id] = { name: p.display_name, predictions: p.predictions };
+          }
+        });
+        setPlayerPredictions(preds);
+      }
+    }
+    fetchPredictions();
+  }, [sessionId]);
+
+  useEffect(() => {
     const channel = supabase.channel(`lobby:${sessionId}`);
 
     channel.on("presence", { event: "sync" }, () => {
@@ -47,6 +67,28 @@ export default function Lobby({
         }));
       setPlayers(list);
     });
+
+    channel.on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "players",
+        filter: `session_id=eq.${sessionId}`,
+      },
+      (payload) => {
+        const updated = payload.new;
+        if (updated.predictions && updated.predictions.length > 0) {
+          setPlayerPredictions((prev) => ({
+            ...prev,
+            [updated.id]: {
+              name: updated.display_name,
+              predictions: updated.predictions,
+            },
+          }));
+        }
+      },
+    );
 
     channel.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
@@ -96,6 +138,8 @@ export default function Lobby({
       </div>
     );
   }
+
+  const predEntries = Object.entries(playerPredictions);
 
   return (
     <div className="bg-radial-navy min-h-full flex flex-col">
@@ -149,6 +193,30 @@ export default function Lobby({
               )}
             </div>
           </div>
+
+          {predEntries.length > 0 && (
+            <div className="rounded-2xl bg-navy-2/80 border border-purple-500/20 p-5">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-purple-300/70 mb-3">
+                🔮 Predictions
+              </div>
+              <div className="space-y-2 text-left">
+                {predEntries.map(([pid, data]) => (
+                  <div key={pid} className="text-sm text-cream/80">
+                    <span className="font-semibold text-cream">
+                      {data.name}
+                      {pid === playerId && (
+                        <span className="text-cream/40 text-xs ml-1">(you)</span>
+                      )}
+                    </span>
+                    <span className="text-cream/50">: </span>
+                    <span className="text-purple-200">
+                      {data.predictions.join(", ")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <button
             onClick={onStartPlaying}

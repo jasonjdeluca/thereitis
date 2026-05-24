@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { TIER } from "../lib/phrases";
+import { evaluateBadges } from "../lib/badges";
+import BadgeReveal from "./BadgeReveal";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 
@@ -30,10 +32,29 @@ export default function PostGame({
   onPlayAgain,
   players,
   currentPlayerId,
+  maxStreak,
+  predictions,
+  trinityFired,
+  inSyncFired,
+  ceoMode,
 }) {
   const cardRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+
+  const earnedBadges = useMemo(
+    () =>
+      evaluateBadges({
+        grid,
+        didBingo,
+        didBlackout,
+        maxStreak: maxStreak || 0,
+        predictions: predictions || [],
+        trinityFired: trinityFired || false,
+        inSyncFired: inSyncFired || false,
+      }),
+    [grid, didBingo, didBlackout, maxStreak, predictions, trinityFired, inSyncFired],
+  );
 
   useEffect(() => {
     if (!error) return;
@@ -126,7 +147,7 @@ export default function PostGame({
               🏨
             </div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-cream/60">
-              Hilton · Q2 2026
+              Hilton · Q2 2026{ceoMode ? " · CEO Mode" : ""}
             </div>
             <h2 className="mt-3 font-display font-black text-2xl text-gold leading-tight">
               {headline}
@@ -169,6 +190,8 @@ export default function PostGame({
             There It Is<span className="text-gold">.</span>
           </div>
         </div>
+
+        <BadgeReveal badgeIds={earnedBadges} />
 
         {sorted.length > 0 && (
           <div className="mt-6 rounded-2xl bg-navy-2/80 border border-cream/10 p-5">

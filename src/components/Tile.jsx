@@ -16,7 +16,7 @@ function sizeClass(phrase) {
   return "text-[9px] leading-snug";
 }
 
-export default function Tile({ cell, onTap, onLine }) {
+export default function Tile({ cell, onTap, onLine, isPrediction, predictionHit, isGreatQuestion }) {
   const { phrase, tier, isFree, marked } = cell;
   const dot = TIER[tier]?.dot || "";
 
@@ -27,21 +27,29 @@ export default function Tile({ cell, onTap, onLine }) {
     ? "bg-gold text-navy font-semibold shadow-gold"
     : isFree
       ? "bg-cream text-navy font-bold"
-      : "bg-cream text-navy/90 hover:bg-cream/90 active:scale-95";
+      : isPrediction
+        ? "bg-purple-200 text-navy/90 hover:bg-purple-100 active:scale-95 ring-2 ring-purple-400"
+        : "bg-cream text-navy/90 hover:bg-cream/90 active:scale-95";
 
   const lineGlow = onLine ? "ring-2 ring-gold-bright shadow-gold-strong animate-glow" : "";
+  const burstAnim = isGreatQuestion ? "animate-goldBurst" : "";
 
   return (
     <button
       onClick={onTap}
       disabled={isFree}
-      className={`${base} ${stateClasses} ${lineGlow}`}
+      className={`${base} ${stateClasses} ${lineGlow} ${burstAnim}`}
       aria-label={isFree ? "Free space" : `${phrase}, ${tier}`}
       aria-pressed={!!marked}
     >
       {!isFree && (
         <span className="absolute top-0.5 left-1 text-[9px] opacity-70" aria-hidden>
           {dot}
+        </span>
+      )}
+      {predictionHit && (
+        <span className="absolute top-0.5 right-1 text-[9px]" aria-hidden>
+          🔮
         </span>
       )}
       {isFree ? (
