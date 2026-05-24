@@ -36,9 +36,11 @@ function selectQuestions(pool) {
   return shuffle(selected).slice(0, QUESTION_COUNT);
 }
 
-function answersMatch(a, b) {
-  if (!a || !b) return false;
-  return a.toLowerCase() === b.toLowerCase();
+const ANSWER_KEY_MAP = { a: "option_a", b: "option_b", c: "option_c", d: "option_d" };
+
+function correctText(q) {
+  const col = ANSWER_KEY_MAP[q.correct_answer?.toLowerCase()];
+  return col ? q[col] : q.correct_answer;
 }
 
 function resultLine(score) {
@@ -158,7 +160,7 @@ export default function TriviaQuiz({ onBack }) {
 
   if (done) {
     const score = answers.reduce((acc, ans, i) => {
-      return acc + (answersMatch(ans, questions[i]?.correct_answer) ? 1 : 0);
+      return acc + (ans === correctText(questions[i]) ? 1 : 0);
     }, 0);
 
     return (
@@ -184,7 +186,8 @@ export default function TriviaQuiz({ onBack }) {
             <div className="space-y-3 text-left">
               {questions.map((q, i) => {
                 const userAns = answers[i];
-                const correct = answersMatch(userAns, q.correct_answer);
+                const right = correctText(q);
+                const gotIt = userAns === right;
                 return (
                   <div
                     key={i}
@@ -194,7 +197,7 @@ export default function TriviaQuiz({ onBack }) {
                       <span className="text-sm mt-0.5">
                         {userAns === null
                           ? "⏰"
-                          : correct
+                          : gotIt
                             ? "✅"
                             : "❌"}
                       </span>
@@ -202,9 +205,9 @@ export default function TriviaQuiz({ onBack }) {
                         <div className="text-sm text-cream/80">
                           {q.question}
                         </div>
-                        {!correct && (
+                        {!gotIt && (
                           <div className="mt-1 text-xs text-gold">
-                            {q.correct_answer}
+                            {right}
                           </div>
                         )}
                       </div>
@@ -244,13 +247,24 @@ export default function TriviaQuiz({ onBack }) {
 
   return (
     <div className="bg-radial-navy min-h-full flex flex-col">
-      <header className="pt-8 pb-4 px-6 text-center">
-        <h1 className="font-display text-2xl font-black text-cream">
-          There It Is<span className="text-gold">.</span>
-        </h1>
-        <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-cream/50">
-          Trivia
-        </p>
+      <header className="pt-8 pb-4 px-6">
+        <div className="flex items-start justify-between">
+          <button
+            onClick={onBack}
+            className="text-cream/40 text-xs uppercase tracking-[0.3em] active:text-cream transition"
+          >
+            ← Back
+          </button>
+          <div className="text-center flex-1">
+            <h1 className="font-display text-2xl font-black text-cream">
+              There It Is<span className="text-gold">.</span>
+            </h1>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-cream/50">
+              Trivia
+            </p>
+          </div>
+          <div className="w-10" />
+        </div>
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center px-6">
@@ -274,9 +288,9 @@ export default function TriviaQuiz({ onBack }) {
 
           <div className="space-y-3">
             {options.map((option, i) => {
-              const isCorrect = answersMatch(option, q.correct_answer);
+              const isCorrect = option === correctText(q);
               const isSelected = selectedAnswer === option;
-              const playerWasRight = answersMatch(selectedAnswer, q.correct_answer);
+              const playerWasRight = selectedAnswer === correctText(q);
 
               let cardStyle =
                 "bg-navy-2/80 border-cream/10 text-cream active:scale-[0.99]";

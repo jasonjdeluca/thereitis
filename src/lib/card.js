@@ -121,8 +121,16 @@ export function generateCeoCard() {
     };
   });
 
-  const remaining = CEO_MODE_PHRASES.filter((p) => !TRINITY.includes(p));
-  const fillers = shuffle(remaining).slice(0, 21);
+  const ceoFillers = shuffle(
+    CEO_MODE_PHRASES.filter((p) => !TRINITY.includes(p)),
+  );
+
+  const used = new Set([...TRINITY, ...ceoFillers]);
+  const supplement = shuffle(
+    [...HOT, ...WARM, ...COLD].filter((p) => !used.has(p)),
+  );
+
+  const fillers = [...ceoFillers, ...supplement].slice(0, 21);
 
   let idx = 0;
   for (let r = 0; r < 5; r++) {
