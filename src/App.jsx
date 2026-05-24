@@ -3,9 +3,15 @@ import Landing from "./components/Landing";
 import NameEntry from "./components/NameEntry";
 import Lobby from "./components/Lobby";
 import Game from "./components/Game";
+import Admin from "./components/Admin";
+
+function getInitialView() {
+  if (window.location.pathname === "/gate") return "admin";
+  return "landing";
+}
 
 export default function App() {
-  const [view, setView] = useState("landing");
+  const [view, setView] = useState(getInitialView);
   const [session, setSession] = useState(null);
 
   function handleSessionCreated(data) {
@@ -30,6 +36,10 @@ export default function App() {
   function handlePlayAgain() {
     setSession(null);
     setView("nameEntry");
+  }
+
+  if (view === "admin") {
+    return <Admin />;
   }
 
   return (
