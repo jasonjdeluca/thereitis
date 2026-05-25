@@ -302,6 +302,29 @@ function DesktopLanding({ onPickCompany }) {
           you've heard a bunch of times on these calls, finally on a bingo card.
           May improve your listening skills. Don't sue us. 😊
         </p>
+        <div className="mt-4 flex justify-center">
+          <span
+            className="inline-flex items-center gap-2 rounded-[20px] border border-white/10 bg-white/[0.04]"
+            style={{ padding: "6px 14px 6px 8px" }}
+          >
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+              <style>{`@keyframes blink{0%,88%,100%{opacity:1}90%,96%{opacity:0}}.eye{animation:blink 4s ease-in-out infinite}`}</style>
+              <rect width="20" height="20" rx="4" fill="#1a0f0a" />
+              <rect x="4" y="5" width="12" height="8" fill="#C96442" />
+              <rect x="2" y="8" width="2" height="3" fill="#C96442" />
+              <rect x="16" y="8" width="2" height="3" fill="#C96442" />
+              <rect x="6" y="6" width="2" height="3" fill="#1a0f0a" className="eye" />
+              <rect x="12" y="6" width="2" height="3" fill="#1a0f0a" className="eye" />
+              <rect x="5" y="13" width="2" height="2" fill="#C96442" />
+              <rect x="9" y="13" width="2" height="2" fill="#C96442" />
+              <rect x="13" y="13" width="2" height="2" fill="#C96442" />
+            </svg>
+            <span className="text-[11px]">
+              <span className="text-[#667788]">Built by </span>
+              <span className="text-[#C96442] font-bold">Claude Code</span>
+            </span>
+          </span>
+        </div>
       </footer>
     </div>
   );
