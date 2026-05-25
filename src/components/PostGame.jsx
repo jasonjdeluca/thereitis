@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { TIER } from "../lib/phrases";
 import { evaluateBadges } from "../lib/badges";
+import { supabase } from "../lib/supabase";
 import BadgeReveal from "./BadgeReveal";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
@@ -37,10 +38,17 @@ export default function PostGame({
   trinityFired,
   inSyncFired,
   ceoMode,
+  sessionId,
+  companyId,
+  callIdentifier,
 }) {
   const cardRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [mostHeard, setMostHeard] = useState(null);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const isMultiplayer = players && players.length > 1;
 
   const earnedBadges = useMemo(
     () =>
@@ -62,6 +70,39 @@ export default function PostGame({
     return () => clearTimeout(id);
   }, [error]);
 
+  useEffect(() => {
+    async function fetchMostHeard() {
+      if (!companyId || !callIdentifier) return;
+
+      const { data: sessions } = await supabase
+        .from("sessions")
+        .select("id")
+        .eq("company_id", companyId);
+
+      if (!sessions || sessions.length === 0) return;
+
+      const sessionIds = sessions.map((s) => s.id);
+
+      const { data: marks } = await supabase
+        .from("marks")
+        .select("phrase")
+        .in("session_id", sessionIds);
+
+      if (!marks || marks.length === 0) return;
+
+      const counts = {};
+      marks.forEach((m) => {
+        counts[m.phrase] = (counts[m.phrase] || 0) + 1;
+      });
+
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      if (sorted.length > 0) {
+        setMostHeard({ phrase: sorted[0][0], count: sorted[0][1] });
+      }
+    }
+    fetchMostHeard();
+  }, [companyId, callIdentifier]);
+
   const markedPhrases = [];
   for (let r = 0; r < 5; r++) {
     for (let c = 0; c < 5; c++) {
@@ -77,7 +118,7 @@ export default function PostGame({
       : "Game Over";
 
   const sorted =
-    players && players.length > 1
+    isMultiplayer
       ? [...players].sort((a, b) => (b.score || 0) - (a.score || 0))
       : [];
 
@@ -124,6 +165,18 @@ export default function PostGame({
       setError("Could not save card — try a screenshot instead.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function handleShareColleague() {
+    const text =
+      "I just played There It Is — earnings call bingo, live during the call. Join me next quarter: thereitis.live";
+    try {
+      await navigator.clipboard.writeText(text);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      // clipboard unavailable
     }
   }
 
@@ -193,6 +246,20 @@ export default function PostGame({
 
         <BadgeReveal badgeIds={earnedBadges} />
 
+        {mostHeard && (
+          <div className="mt-6 rounded-2xl bg-navy-2/80 border border-gold/20 p-5 text-center">
+            <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
+              Most Heard This Call
+            </div>
+            <div className="font-display text-lg font-bold text-cream">
+              {mostHeard.phrase}
+            </div>
+            <div className="mt-1 text-xs text-cream/40">
+              Marked by {mostHeard.count} player{mostHeard.count !== 1 ? "s" : ""} across all sessions today
+            </div>
+          </div>
+        )}
+
         {sorted.length > 0 && (
           <div className="mt-6 rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
             <div className="text-[10px] uppercase tracking-[0.3em] text-cream/50 mb-3 text-center">
@@ -233,6 +300,21 @@ export default function PostGame({
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {!isMultiplayer && (
+          <div className="mt-6 text-center space-y-4">
+            <p className="text-sm italic text-cream/40">
+              See you next quarter. Bring someone next time — the more people on
+              the call, the better this gets.
+            </p>
+            <button
+              onClick={handleShareColleague}
+              className="w-full rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] transition"
+            >
+              {shareCopied ? "Copied! ✓" : "Share with a Colleague →"}
+            </button>
           </div>
         )}
       </div>

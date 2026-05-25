@@ -11,6 +11,7 @@ import PostGame from "./PostGame";
 import WordOfTheCall from "./WordOfTheCall";
 import LiveFeed from "./LiveFeed";
 import Leaderboard from "./Leaderboard";
+import EndGameLeaderboard from "./EndGameLeaderboard";
 
 const STREAK_TIMEOUT_MS = 5 * 60 * 1000;
 const TRINITY_WINDOW_MS = 2 * 60 * 1000;
@@ -28,6 +29,7 @@ export default function Game({
   playerId,
   displayName,
   initialCard,
+  companyId,
   companyName,
   callIdentifier,
   onExit,
@@ -50,6 +52,7 @@ export default function Game({
   const [players, setPlayers] = useState([]);
   const [playerCount, setPlayerCount] = useState(1);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [endLeaderboard, setEndLeaderboard] = useState(false);
   const [undoPending, setUndoPending] = useState(null);
   const [codeCopied, setCodeCopied] = useState(false);
   const [ceoMode, setCeoMode] = useState(false);
@@ -622,7 +625,12 @@ export default function Game({
           undoTimerRef.current = null;
         }
         setUndoPending(null);
-        setVoting(true);
+        const mp = playersRef.current.length >= 2;
+        if (mp) {
+          setEndLeaderboard(true);
+        } else {
+          setPostGame(true);
+        }
         blackoutTimerRef.current = null;
       }, 2400);
     }
@@ -677,12 +685,35 @@ export default function Game({
 
   function handleShare() {
     flushPending();
-    setVoting(true);
+    const isMultiplayer = players.length >= 2;
+    if (isMultiplayer) {
+      setEndLeaderboard(true);
+    } else {
+      setPostGame(true);
+    }
   }
 
   function endGame() {
     flushPending();
-    setVoting(true);
+    const isMultiplayer = players.length >= 2;
+    if (isMultiplayer) {
+      setEndLeaderboard(true);
+    } else {
+      setPostGame(true);
+    }
+  }
+
+  if (endLeaderboard) {
+    return (
+      <EndGameLeaderboard
+        players={players}
+        currentPlayerId={playerId}
+        onContinue={() => {
+          setEndLeaderboard(false);
+          setVoting(true);
+        }}
+      />
+    );
   }
 
   if (voting) {
@@ -714,6 +745,9 @@ export default function Game({
         trinityFired={trinityFiredRef.current}
         inSyncFired={inSyncFired}
         ceoMode={ceoMode}
+        sessionId={sessionId}
+        companyId={companyId}
+        callIdentifier={callIdentifier}
       />
     );
   }

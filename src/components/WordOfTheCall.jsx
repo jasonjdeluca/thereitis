@@ -18,6 +18,7 @@ export default function WordOfTheCall({
   const [timerDone, setTimerDone] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showSafetyNet, setShowSafetyNet] = useState(false);
+  const [notEnoughVotes, setNotEnoughVotes] = useState(false);
   const startRef = useRef(Date.now());
   const animRef = useRef(null);
   const channelRef = useRef(null);
@@ -134,6 +135,13 @@ export default function WordOfTheCall({
     if (animRef.current) cancelAnimationFrame(animRef.current);
 
     setVotes((current) => {
+      const totalVoteCount = Object.values(current).reduce((s, v) => s + v, 0);
+      if (totalVoteCount < 2) {
+        setNotEnoughVotes(true);
+        setTimeout(() => onComplete(), 2500);
+        return current;
+      }
+
       const phrases = topPhrasesRef.current;
       const entries = Object.entries(current);
       let w;
@@ -203,6 +211,19 @@ export default function WordOfTheCall({
     1,
   );
   const totalVotes = Object.values(votes).reduce((s, v) => s + v, 0);
+
+  if (notEnoughVotes) {
+    return (
+      <div className="bg-radial-navy min-h-full flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-sm text-center space-y-4">
+          <div className="text-3xl">🗳️</div>
+          <p className="text-cream/60 text-sm">
+            Not enough votes this session
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (winner) {
     return (

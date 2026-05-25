@@ -80,6 +80,10 @@ export default {
           "0%": { opacity: "1", transform: "translateY(0)" },
           "100%": { opacity: "0", transform: "translateY(6px)" },
         },
+        livePulse: {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.4", transform: "scale(1.6)" },
+        },
       },
       animation: {
         pop: "pop 200ms ease-out",
@@ -95,6 +99,7 @@ export default {
         "pulse-subtle": "pulseSubtle 2s ease-in-out infinite",
         tooltipIn: "tooltipIn 300ms ease-out forwards",
         tooltipOut: "tooltipOut 300ms ease-in forwards",
+        livePulse: "livePulse 1.5s ease-in-out infinite",
       },
     },
   },

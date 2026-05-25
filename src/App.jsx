@@ -131,11 +131,16 @@ export default function App() {
     return <Admin />;
   }
 
-  return (
-    <div className="min-h-full">
-      {view === "landing" && (
+  if (view === "landing") {
+    return (
+      <div className="min-h-full">
         <Landing onPickCompany={handlePickCompany} />
-      )}
+      </div>
+    );
+  }
+
+  const content = (
+    <>
       {view === "companySelect" && (
         <CompanySelect
           onSelectCompany={handleSelectCompany}
@@ -189,6 +194,7 @@ export default function App() {
           playerId={session.playerId}
           displayName={session.displayName}
           initialCard={session.card}
+          companyId={company?.id}
           companyName={company?.name}
           callIdentifier={company?.call_identifier}
           onExit={handleExit}
@@ -196,6 +202,14 @@ export default function App() {
           predictions={predictions}
         />
       )}
+    </>
+  );
+
+  return (
+    <div className="min-h-full lg:bg-[#050d1a]">
+      <div className="min-h-full lg:max-w-[430px] lg:mx-auto">
+        {content}
+      </div>
     </div>
   );
 }

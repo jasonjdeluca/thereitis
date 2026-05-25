@@ -12,16 +12,35 @@ const TICKERS = {
   choice: "CHH",
 };
 
+const LIVE_BEFORE_MS = 15 * 60 * 1000;
+const LIVE_AFTER_MS = 3 * 60 * 60 * 1000;
+
+function isLive(nextEarningsDate) {
+  if (!nextEarningsDate) return false;
+  const now = Date.now();
+  const target = new Date(nextEarningsDate).getTime();
+  return now >= target - LIVE_BEFORE_MS && now <= target + LIVE_AFTER_MS;
+}
+
 function CountdownDisplay({ nextEarningsDate }) {
   const [display, setDisplay] = useState("");
+  const [live, setLive] = useState(false);
 
   useEffect(() => {
     if (!nextEarningsDate) {
       setDisplay(null);
+      setLive(false);
       return;
     }
 
     function tick() {
+      if (isLive(nextEarningsDate)) {
+        setLive(true);
+        setDisplay(null);
+        return;
+      }
+
+      setLive(false);
       const now = Date.now();
       const target = new Date(nextEarningsDate).getTime();
       const diff = target - now;
@@ -45,6 +64,18 @@ function CountdownDisplay({ nextEarningsDate }) {
 
   if (!nextEarningsDate) {
     return <span className="text-cream/40">&mdash; Coming Soon</span>;
+  }
+
+  if (live) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-red-900/40 border border-red-500/40 px-2.5 py-0.5">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inset-0 rounded-full bg-red-500 animate-livePulse" />
+          <span className="relative rounded-full h-2 w-2 bg-red-500" />
+        </span>
+        <span className="text-red-400 text-[11px] font-semibold tracking-wide uppercase">Live</span>
+      </span>
+    );
   }
 
   if (display === "Call Complete") {
@@ -112,51 +143,54 @@ export default function CompanySelect({ onSelectCompany, onBack }) {
             </div>
           ) : (
             <div className="space-y-0">
-              {companies.map((company, i) => (
-                <div key={company.id}>
-                  {i > 0 && (
-                    <div className="border-t border-gold/20 my-0" />
-                  )}
-                  <div className="py-5">
-                    <div className="flex items-start gap-4">
-                      <div className="text-4xl leading-none select-none" aria-hidden>
-                        {company.emoji}
+              {companies.map((company, i) => {
+                const live = company.is_active && isLive(company.next_earnings_date);
+                return (
+                  <div key={company.id}>
+                    {i > 0 && (
+                      <div className="border-t border-gold/20 my-0" />
+                    )}
+                    <div className="py-5">
+                      <div className="flex items-start gap-4">
+                        <div className="text-4xl leading-none select-none" aria-hidden>
+                          {company.emoji}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-display text-xl font-bold text-cream">
+                            {company.name}{" "}
+                            <span className="text-cream/40 font-sans text-sm font-normal">
+                              ({TICKERS[company.id]})
+                            </span>
+                          </div>
+                          <div className="mt-1 text-sm text-cream/60">
+                            {company.call_identifier || "Next call not yet scheduled"}
+                          </div>
+                          <div className="mt-2 text-xs">
+                            <CountdownDisplay nextEarningsDate={company.next_earnings_date} />
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-display text-xl font-bold text-cream">
-                          {company.name}{" "}
-                          <span className="text-cream/40 font-sans text-sm font-normal">
-                            ({TICKERS[company.id]})
-                          </span>
-                        </div>
-                        <div className="mt-1 text-sm text-cream/60">
-                          {company.call_identifier || "Next call not yet scheduled"}
-                        </div>
-                        <div className="mt-2 text-xs">
-                          <CountdownDisplay nextEarningsDate={company.next_earnings_date} />
-                        </div>
+                      <div className="mt-4">
+                        {company.is_active ? (
+                          <button
+                            onClick={() => onSelectCompany(company)}
+                            className="w-full rounded-2xl bg-gold py-3 text-center font-semibold text-navy tracking-wide active:bg-gold-bright active:scale-[0.99] transition"
+                          >
+                            {live ? "Join the Live Call" : "Start a Game"} &rarr;
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="w-full rounded-2xl bg-cream/10 py-3 text-center font-semibold text-cream/30 tracking-wide cursor-not-allowed"
+                          >
+                            Coming Soon
+                          </button>
+                        )}
                       </div>
-                    </div>
-                    <div className="mt-4">
-                      {company.is_active ? (
-                        <button
-                          onClick={() => onSelectCompany(company)}
-                          className="w-full rounded-2xl bg-gold py-3 text-center font-semibold text-navy tracking-wide active:bg-gold-bright active:scale-[0.99] transition"
-                        >
-                          Start a Game &rarr;
-                        </button>
-                      ) : (
-                        <button
-                          disabled
-                          className="w-full rounded-2xl bg-cream/10 py-3 text-center font-semibold text-cream/30 tracking-wide cursor-not-allowed"
-                        >
-                          Coming Soon
-                        </button>
-                      )}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
