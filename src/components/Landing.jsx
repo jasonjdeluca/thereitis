@@ -87,6 +87,43 @@ function MobileLanding({ onPickCompany }) {
 
           <div className="border-t border-gold/20" />
 
+          <div className="space-y-4">
+            <p className="text-[10px] uppercase tracking-[0.32em] text-gold/60 text-center">
+              Where This Came From
+            </p>
+            <h2 className="font-display text-lg font-bold text-cream text-center leading-snug">
+              If you listen closely enough, you start to hear it.
+            </h2>
+            <div className="space-y-4 text-sm text-[#8899bb] leading-[1.8]">
+              <p>
+                If you've listened to enough earnings calls, you start to notice
+                something. Some of the same phrases reappear. They follow a similar
+                cadence from call to call.
+              </p>
+              <p>
+                This game started with that observation. AI agents scraped years of
+                publicly available transcripts — across multiple calls, multiple
+                companies, multiple market cycles — and did what AI does well: found
+                the patterns. Not guesses about what gets said. Actual language,
+                detected across pages and pages of call transcripts, ranked by how
+                reliably it shows up.
+              </p>
+              <p>
+                The same AI then built the game. The phrases, the trivia questions,
+                the scoring, the code — all of it generated and assembled by the
+                tools, pointed at an opportunity someone noticed.
+              </p>
+              <p>
+                The hope is simple: that somewhere, on a Tuesday morning, someone on
+                a dial-in with colleagues smiles when they hear{" "}
+                <span className="text-gold">"lift up above the noise"</span> for
+                the third time — and quietly taps their card.
+              </p>
+            </div>
+          </div>
+
+          <div className="border-t border-gold/20" />
+
           <div className="text-center space-y-3 pb-4">
             <h2 className="font-display text-xl font-bold text-cream">
               Ready to play?
@@ -105,12 +142,35 @@ function MobileLanding({ onPickCompany }) {
       </main>
 
       <footer className="pb-8 text-center">
-        <p className="text-xs text-cream/40 max-w-sm mx-auto px-4 pb-[env(safe-area-inset-bottom)]">
+        <p className="text-xs text-cream/40 max-w-sm mx-auto px-4">
           Independent hobby project for entertainment purposes. Not affiliated
           with any company included. No gambling, please. Just the same phrases
           you've heard a bunch of times on these calls, finally on a bingo card.
           May improve your listening skills. Don't sue us. 😊
         </p>
+        <div className="mt-4 flex justify-center pb-[env(safe-area-inset-bottom)]">
+          <span
+            className="inline-flex items-center gap-2 rounded-[20px] border border-white/10 bg-white/[0.04]"
+            style={{ padding: "6px 14px 6px 8px" }}
+          >
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+              <style>{`@keyframes blink{0%,88%,100%{opacity:1}90%,96%{opacity:0}}.eye{animation:blink 4s ease-in-out infinite}`}</style>
+              <rect width="20" height="20" rx="4" fill="#1a0f0a" />
+              <rect x="4" y="5" width="12" height="8" fill="#C96442" />
+              <rect x="2" y="8" width="2" height="3" fill="#C96442" />
+              <rect x="16" y="8" width="2" height="3" fill="#C96442" />
+              <rect x="6" y="6" width="2" height="3" fill="#1a0f0a" className="eye" />
+              <rect x="12" y="6" width="2" height="3" fill="#1a0f0a" className="eye" />
+              <rect x="5" y="13" width="2" height="2" fill="#C96442" />
+              <rect x="9" y="13" width="2" height="2" fill="#C96442" />
+              <rect x="13" y="13" width="2" height="2" fill="#C96442" />
+            </svg>
+            <span className="text-[11px]">
+              <span className="text-[#667788]">Built by </span>
+              <span className="text-[#C96442] font-bold">Claude Code</span>
+            </span>
+          </span>
+        </div>
       </footer>
     </div>
   );
@@ -128,7 +188,7 @@ function DesktopLanding({ onPickCompany }) {
 
       {/* Hero */}
       <section
-        className="w-full text-center py-20 border-b border-gold/10 bg-cover bg-center bg-no-repeat"
+        className="w-full text-center py-28 lg:py-32 border-b border-gold/10 bg-cover bg-center bg-no-repeat overflow-hidden lg:min-h-[540px] flex flex-col items-center justify-center"
         style={{
           backgroundImage:
             "url('/call-bingo-hero-bg-desktop-clean-2400x900.png')",
@@ -228,7 +288,7 @@ function DesktopLanding({ onPickCompany }) {
           </p>
           <div className="flex items-center justify-center gap-12 max-w-4xl mx-auto">
             {/* Early Morning Show */}
-            <div className="flex flex-col items-center opacity-30">
+            <div className="flex flex-col items-center opacity-75">
               <svg width="28" height="16" viewBox="0 0 28 16" fill="none" className="mb-1.5">
                 <path d="M14 12 A10 10 0 0 1 4 12" stroke="#667788" strokeWidth="1.5" fill="none" />
                 <line x1="14" y1="2" x2="14" y2="6" stroke="#667788" strokeWidth="1.5" />
@@ -241,7 +301,7 @@ function DesktopLanding({ onPickCompany }) {
             </div>
 
             {/* The Daily Ledger */}
-            <div className="flex flex-col items-center opacity-30">
+            <div className="flex flex-col items-center opacity-75">
               <div className="border-t border-[#667788] w-20 mb-1" />
               <span className="text-[8px] tracking-[0.3em] text-[#667788] uppercase">The</span>
               <span className="text-base font-bold font-serif text-[#667788] leading-tight">DAILY LEDGER</span>
@@ -250,7 +310,7 @@ function DesktopLanding({ onPickCompany }) {
             </div>
 
             {/* Prestige Business Weekly */}
-            <div className="flex flex-col items-center opacity-30">
+            <div className="flex flex-col items-center opacity-75">
               <span className="text-[#667788] text-sm mb-0.5">♛</span>
               <div className="flex items-center gap-2 mb-0.5">
                 <div className="border-t border-[#667788] w-6" />
@@ -261,7 +321,7 @@ function DesktopLanding({ onPickCompany }) {
             </div>
 
             {/* Market Feelings Daily — hidden on mobile */}
-            <div className="hidden xl:flex flex-col items-center opacity-30">
+            <div className="hidden xl:flex flex-col items-center opacity-75">
               <svg width="20" height="16" viewBox="0 0 20 16" fill="none" className="mb-1">
                 <rect x="2" y="8" width="4" height="8" fill="#667788" />
                 <rect x="8" y="4" width="4" height="12" fill="#667788" />
@@ -272,13 +332,13 @@ function DesktopLanding({ onPickCompany }) {
             </div>
 
             {/* Morning Desk Live — hidden on mobile */}
-            <div className="hidden xl:flex flex-col items-center opacity-30">
+            <div className="hidden xl:flex flex-col items-center opacity-75">
               <span className="text-xs font-bold text-[#667788] uppercase tracking-wide">Morning Desk</span>
               <span className="mt-1 text-[8px] bg-[#667788]/20 text-[#667788] px-2 py-0.5 rounded-sm font-bold uppercase tracking-wider">Live</span>
             </div>
 
             {/* The Respected-Looking Times — hidden on mobile */}
-            <div className="hidden xl:flex flex-col items-center opacity-30">
+            <div className="hidden xl:flex flex-col items-center opacity-75">
               <div className="border-t border-b border-[#667788] w-24 py-px mb-1">
                 <div className="border-t border-[#667788]" />
               </div>

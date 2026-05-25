@@ -1,0 +1,29 @@
+# There It Is — Earnings Call Bingo
+> A real-time multiplayer bingo game played live during earnings calls.
+
+## What it is
+There It Is (thereitis.live) is a free, multiplayer bingo game built for people who listen to corporate earnings calls. Players get a randomized 5x5 bingo card populated with phrases commonly heard on earnings calls. During a live call, players tap squares when they hear the phrase. The game supports real-time multiplayer sessions — colleagues can join a shared session using a 6-character code and play simultaneously during the same call.
+
+## How the phrases were selected
+AI agents scraped years of publicly available earnings call transcripts across multiple companies and market cycles. Phrases were ranked by how reliably they appear across calls. The result is a phrase bank of high-confidence, medium-confidence, and wildcard phrases specific to each company covered.
+
+## Companies covered
+Currently: Hilton (HLT). Coming soon: Marriott (MAR), Hyatt (H), IHG Hotels (IHG), Wyndham Hotels (WH), Choice Hotels (CHH).
+
+## Features
+- Real-time multiplayer via Supabase Realtime
+- Randomized cards with Holy Trinity adjacency rule (Brand-Led, Network-Driven, Platform-Enabled always adjacent)
+- Badge engine (12 badges)
+- Special square behaviors and broadcast toasts
+- CEO Mode (curated card of signature phrases)
+- Prediction mode (pre-game phrase predictions)
+- Word of the Call voting (post-game)
+- Call Trivia (questions derived from real transcripts)
+- PWA installable on mobile home screen
+- Admin panel for managing companies and call schedules
+
+## Technology
+Built entirely by AI (Claude Code by Anthropic). Stack: React, Vite, Tailwind CSS, Supabase, Vercel.
+
+## Contact
+thereitis.live

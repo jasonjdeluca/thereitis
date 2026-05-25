@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /gate
+
+Sitemap: https://thereitis.live/sitemap.xml
