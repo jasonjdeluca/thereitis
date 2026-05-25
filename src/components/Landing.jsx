@@ -24,10 +24,13 @@ const STEPS = [
 function MobileLanding({ onPickCompany }) {
   return (
     <div
-      className="min-h-full flex flex-col lg:hidden bg-cover bg-center bg-no-repeat"
+      className="min-h-full flex flex-col lg:hidden overflow-hidden"
       style={{
-        backgroundImage:
-          "url('/call-bingo-hero-bg-mobile-clean-1170x1800.png')",
+        backgroundImage: "url('/call-bingo-hero-bg-mobile-clean-1170x1800.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+        backgroundRepeat: 'no-repeat',
+        minHeight: '480px',
       }}
     >
       <header className="pt-10 pb-6 px-6 text-center">
@@ -55,7 +58,7 @@ function MobileLanding({ onPickCompany }) {
               How It Works
             </p>
             <h2 className="font-display text-xl font-bold text-cream text-center">
-              You and your colleagues. One call. One winner.
+              You and your colleagues. One call. Let's see who was listening.
             </h2>
             <p className="text-sm italic text-cream/50 text-center">
               No setup. No accounts. Just a code.
@@ -188,10 +191,14 @@ function DesktopLanding({ onPickCompany }) {
 
       {/* Hero */}
       <section
-        className="w-full text-center py-28 lg:py-32 border-b border-gold/10 bg-cover bg-center bg-no-repeat overflow-hidden lg:min-h-[540px] flex flex-col items-center justify-center"
+        className="w-full text-center py-28 lg:py-32 border-b border-gold/10 flex flex-col items-center justify-center"
         style={{
-          backgroundImage:
-            "url('/call-bingo-hero-bg-desktop-clean-2400x900.png')",
+          backgroundImage: "url('/call-bingo-hero-bg-desktop-clean-2400x900.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          overflow: 'hidden',
+          minHeight: '520px',
         }}
       >
         <p className="text-[11px] uppercase tracking-[0.4em] text-gold font-semibold mb-6">

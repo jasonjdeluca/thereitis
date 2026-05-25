@@ -320,20 +320,30 @@ export default function PostGame({
       </div>
 
       <div className="fixed bottom-0 inset-x-0 z-30 bg-navy-2/95 backdrop-blur border-t border-cream/10 pb-[env(safe-area-inset-bottom)]">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
-          <button
-            onClick={share}
-            disabled={busy}
-            className="flex-1 rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] disabled:opacity-50"
+        <div className="max-w-md mx-auto px-4 py-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={share}
+              disabled={busy}
+              className="flex-1 rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] disabled:opacity-50"
+            >
+              {busy ? "Generating…" : "Share Card"}
+            </button>
+            <button
+              onClick={onPlayAgain}
+              className="flex-1 rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99]"
+            >
+              Play Again
+            </button>
+          </div>
+          <a
+            href="/"
+            onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}
+            className="block w-full text-center mt-3"
+            style={{ fontSize: '12px', color: '#667788' }}
           >
-            {busy ? "Generating…" : "Share Card"}
-          </button>
-          <button
-            onClick={onPlayAgain}
-            className="flex-1 rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99]"
-          >
-            Play Again
-          </button>
+            ← Back to Home
+          </a>
         </div>
       </div>
     </div>
