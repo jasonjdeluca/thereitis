@@ -306,7 +306,7 @@ export default function PostGame({
         {!isMultiplayer && (
           <div className="mt-6 text-center space-y-4">
             <p className="text-sm italic text-cream/40">
-              See you next quarter. Bring someone next time — the more people on
+              See you next quarter! Bring someone next time — the more people on
               the call, the better this gets.
             </p>
             <button

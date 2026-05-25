@@ -106,7 +106,7 @@ function GateForm({ onAuth }) {
   );
 }
 
-function StatsSection() {
+function CompanyStats({ companyId, callIdentifier }) {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -115,34 +115,80 @@ function StatsSection() {
         Date.now() - 24 * 60 * 60 * 1000,
       ).toISOString();
 
-      const [recentRes, totalSessionsRes, totalPlayersRes, topPhraseRes] =
+      const [recentRes, totalSessionsRes, allSessionsRes] =
         await Promise.all([
           supabase
             .from("sessions")
             .select("id", { count: "exact", head: true })
+            .eq("company_id", companyId)
             .gte("created_at", twentyFourAgo),
           supabase
             .from("sessions")
-            .select("id", { count: "exact", head: true }),
+            .select("id", { count: "exact", head: true })
+            .eq("company_id", companyId),
           supabase
-            .from("players")
-            .select("id", { count: "exact", head: true }),
-          supabase.rpc("top_marked_phrase").maybeSingle(),
+            .from("sessions")
+            .select("id")
+            .eq("company_id", companyId),
         ]);
+
+      const sessionIds = allSessionsRes.data?.map((s) => s.id) || [];
+      let totalPlayers = 0;
+      if (sessionIds.length > 0) {
+        const { count } = await supabase
+          .from("players")
+          .select("id", { count: "exact", head: true })
+          .in("session_id", sessionIds);
+        totalPlayers = count || 0;
+      }
+
+      let topPhrase = "—";
+      let topCount = 0;
+      if (callIdentifier && sessionIds.length > 0) {
+        const { data: callSessions } = await supabase
+          .from("sessions")
+          .select("id")
+          .eq("company_id", companyId)
+          .eq("call_identifier", callIdentifier);
+
+        const callSessionIds = callSessions?.map((s) => s.id) || [];
+        if (callSessionIds.length > 0) {
+          const { data: marks } = await supabase
+            .from("marks")
+            .select("phrase")
+            .in("session_id", callSessionIds);
+
+          if (marks && marks.length > 0) {
+            const counts = {};
+            marks.forEach((m) => {
+              counts[m.phrase] = (counts[m.phrase] || 0) + 1;
+            });
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            if (sorted.length > 0) {
+              topPhrase = sorted[0][0];
+              topCount = sorted[0][1];
+            }
+          }
+        }
+      }
 
       setStats({
         recentSessions: recentRes.count || 0,
         totalSessions: totalSessionsRes.count || 0,
-        totalPlayers: totalPlayersRes.count || 0,
-        topPhrase: topPhraseRes.data?.phrase || "—",
-        topPhraseCount: topPhraseRes.data?.mark_count || 0,
+        totalPlayers,
+        topPhrase,
+        topCount,
       });
     }
     load();
-  }, []);
+
+    function handleFocus() { load(); }
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [companyId, callIdentifier]);
 
   if (!stats) {
-    return <div className="text-cream/40 text-sm">Loading stats…</div>;
+    return <div className="text-cream/40 text-xs mt-3">Loading stats…</div>;
   }
 
   const items = [
@@ -151,21 +197,21 @@ function StatsSection() {
     { label: "Total Players", value: stats.totalPlayers },
     {
       label: "Most Marked",
-      value: `${stats.topPhrase} (${stats.topPhraseCount})`,
+      value: stats.topPhrase !== "—" ? `${stats.topPhrase} (${stats.topCount})` : "—",
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-cream/10">
       {items.map((item) => (
         <div
           key={item.label}
-          className="rounded-xl bg-navy-2/60 border border-cream/10 p-3"
+          className="rounded-lg bg-navy-2/60 border border-cream/5 p-2"
         >
-          <div className="text-[9px] uppercase tracking-[0.3em] text-cream/50">
+          <div className="text-[8px] uppercase tracking-[0.2em] text-cream/40">
             {item.label}
           </div>
-          <div className="mt-1 text-lg font-bold text-cream">{item.value}</div>
+          <div className="mt-0.5 text-sm font-bold text-cream truncate">{item.value}</div>
         </div>
       ))}
     </div>
@@ -389,6 +435,8 @@ function CompanyCard({ company, onUpdate }) {
 
         <Countdown targetDate={previewDate} timezone={timezone} />
       </div>
+
+      <CompanyStats companyId={company.id} callIdentifier={company.call_identifier} />
     </div>
   );
 }
@@ -443,11 +491,6 @@ function AdminPanel() {
             </section>
           ))
         )}
-
-        <section className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
-          <h3 className="text-sm font-semibold text-cream mb-4">Stats</h3>
-          <StatsSection />
-        </section>
 
         <section className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
           <TriviaSection />

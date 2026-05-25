@@ -77,7 +77,7 @@ export default function EndGameLeaderboard({
 
         <div className="text-center">
           <p className="text-sm italic text-cream/40">
-            See you next quarter. Bring someone next time — the more people on
+            See you next quarter! Bring someone next time — the more people on
             the call, the better this gets.
           </p>
         </div>

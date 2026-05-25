@@ -23,7 +23,13 @@ const STEPS = [
 
 function MobileLanding({ onPickCompany }) {
   return (
-    <div className="bg-radial-navy min-h-full flex flex-col lg:hidden">
+    <div
+      className="min-h-full flex flex-col lg:hidden bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage:
+          "url('/call-bingo-hero-bg-mobile-clean-1170x1800.png')",
+      }}
+    >
       <header className="pt-10 pb-6 px-6 text-center">
         <h1 className="font-display text-4xl sm:text-5xl font-black tracking-tight text-cream">
           There It Is<span className="text-gold">.</span>
@@ -121,7 +127,13 @@ function DesktopLanding({ onPickCompany }) {
       </nav>
 
       {/* Hero */}
-      <section className="w-full text-center pt-16 pb-14 border-b border-gold/10">
+      <section
+        className="w-full text-center py-20 border-b border-gold/10 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage:
+            "url('/call-bingo-hero-bg-desktop-clean-2400x900.png')",
+        }}
+      >
         <p className="text-[11px] uppercase tracking-[0.4em] text-gold font-semibold mb-6">
           Earnings Call Bingo
         </p>
@@ -205,6 +217,80 @@ function DesktopLanding({ onPickCompany }) {
               the third time — and quietly taps their card.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Fake Press Strip */}
+      <section className="w-full border-t border-gold/20">
+        <div className="px-12 py-9 text-center">
+          <p className="text-sm italic text-cream/30 mb-8">
+            Not featured in, endorsed by, or even aware of:
+          </p>
+          <div className="flex items-center justify-center gap-12 max-w-4xl mx-auto">
+            {/* Early Morning Show */}
+            <div className="flex flex-col items-center opacity-30">
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none" className="mb-1.5">
+                <path d="M14 12 A10 10 0 0 1 4 12" stroke="#667788" strokeWidth="1.5" fill="none" />
+                <line x1="14" y1="2" x2="14" y2="6" stroke="#667788" strokeWidth="1.5" />
+                <line x1="8" y1="4" x2="10" y2="7" stroke="#667788" strokeWidth="1.5" />
+                <line x1="20" y1="4" x2="18" y2="7" stroke="#667788" strokeWidth="1.5" />
+                <line x1="5" y1="8" x2="8" y2="9" stroke="#667788" strokeWidth="1.5" />
+                <line x1="23" y1="8" x2="20" y2="9" stroke="#667788" strokeWidth="1.5" />
+              </svg>
+              <span className="text-[10px] text-[#667788] font-serif leading-tight text-center">Early<br/>Morning<br/>Show</span>
+            </div>
+
+            {/* The Daily Ledger */}
+            <div className="flex flex-col items-center opacity-30">
+              <div className="border-t border-[#667788] w-20 mb-1" />
+              <span className="text-[8px] tracking-[0.3em] text-[#667788] uppercase">The</span>
+              <span className="text-base font-bold font-serif text-[#667788] leading-tight">DAILY LEDGER</span>
+              <div className="border-t border-[#667788] w-20 mt-1 mb-1" />
+              <span className="text-[#667788] text-[10px] leading-none">◆</span>
+            </div>
+
+            {/* Prestige Business Weekly */}
+            <div className="flex flex-col items-center opacity-30">
+              <span className="text-[#667788] text-sm mb-0.5">♛</span>
+              <div className="flex items-center gap-2 mb-0.5">
+                <div className="border-t border-[#667788] w-6" />
+                <span className="text-[9px] tracking-[0.25em] text-[#667788] font-serif uppercase">Prestige</span>
+                <div className="border-t border-[#667788] w-6" />
+              </div>
+              <span className="text-[8px] tracking-[0.2em] text-[#667788] uppercase">Business Weekly</span>
+            </div>
+
+            {/* Market Feelings Daily — hidden on mobile */}
+            <div className="hidden xl:flex flex-col items-center opacity-30">
+              <svg width="20" height="16" viewBox="0 0 20 16" fill="none" className="mb-1">
+                <rect x="2" y="8" width="4" height="8" fill="#667788" />
+                <rect x="8" y="4" width="4" height="12" fill="#667788" />
+                <rect x="14" y="0" width="4" height="16" fill="#667788" />
+              </svg>
+              <span className="text-[11px] font-bold font-serif text-[#667788] leading-tight text-center">Market<br/>Feelings</span>
+              <span className="text-[8px] text-[#667788] tracking-[0.15em]">— DAILY —</span>
+            </div>
+
+            {/* Morning Desk Live — hidden on mobile */}
+            <div className="hidden xl:flex flex-col items-center opacity-30">
+              <span className="text-xs font-bold text-[#667788] uppercase tracking-wide">Morning Desk</span>
+              <span className="mt-1 text-[8px] bg-[#667788]/20 text-[#667788] px-2 py-0.5 rounded-sm font-bold uppercase tracking-wider">Live</span>
+            </div>
+
+            {/* The Respected-Looking Times — hidden on mobile */}
+            <div className="hidden xl:flex flex-col items-center opacity-30">
+              <div className="border-t border-b border-[#667788] w-24 py-px mb-1">
+                <div className="border-t border-[#667788]" />
+              </div>
+              <span className="text-[8px] tracking-[0.3em] text-[#667788] uppercase">The</span>
+              <span className="text-[11px] font-serif italic text-[#667788] leading-tight">Respected-Looking</span>
+              <span className="text-[9px] tracking-[0.25em] text-[#667788] uppercase">Times</span>
+              <div className="border-t border-b border-[#667788] w-24 py-px mt-1">
+                <div className="border-t border-[#667788]" />
+              </div>
+            </div>
+          </div>
+          <p className="mt-8 text-xs italic text-cream/25">We remain hopeful.</p>
         </div>
       </section>
 
