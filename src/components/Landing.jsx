@@ -12,7 +12,7 @@ const STEPS = [
   {
     num: "3",
     title: "Tap when you hear it",
-    desc: "Live on the call, tap a square the moment you hear the phrase. Your colleagues are doing the same.",
+    desc: "Live on the call, tap a square the moment you hear the phrase. Everyone else is doing the same.",
   },
   {
     num: "4",
@@ -46,7 +46,7 @@ function MobileLanding({ onPickCompany }) {
         <div className="w-full max-w-sm space-y-8">
           <div className="rounded-2xl border border-gold/30 px-5 py-4 text-center">
             <p className="text-sm text-gold leading-relaxed">
-              Play live with your colleagues during the call. Same moment.
+              Play live during the call with anyone who's listening. Same moment.
               First to bingo wins.
             </p>
           </div>
@@ -58,7 +58,7 @@ function MobileLanding({ onPickCompany }) {
               How It Works
             </p>
             <h2 className="font-display text-xl font-bold text-cream text-center">
-              You and your colleagues. One call. Let's see who was listening.
+              You and everyone on the line. One call. Let's see who was listening.
             </h2>
             <p className="text-sm italic text-cream/50 text-center">
               No setup. No accounts. Just a code.
@@ -118,11 +118,55 @@ function MobileLanding({ onPickCompany }) {
               </p>
               <p>
                 The hope is simple: that somewhere, on a Tuesday morning, someone on
-                a dial-in with colleagues smiles when they hear{" "}
+                a dial-in smiles when they hear{" "}
                 <span className="text-gold">"lift up above the noise"</span> for
                 the third time — and quietly taps their card.
               </p>
             </div>
+          </div>
+
+          <div className="border-t border-gold/20" />
+
+          {/* Fake Press Strip — mobile (3 outlets) */}
+          <div className="text-center space-y-4">
+            <p className="text-sm italic text-cream/30">
+              Not featured in, endorsed by, or even aware of:
+            </p>
+            <div className="flex items-center justify-center gap-8">
+              {/* Early Morning Show */}
+              <div className="flex flex-col items-center opacity-75">
+                <svg width="28" height="16" viewBox="0 0 28 16" fill="none" className="mb-1.5">
+                  <path d="M14 12 A10 10 0 0 1 4 12" stroke="#667788" strokeWidth="1.5" fill="none" />
+                  <line x1="14" y1="2" x2="14" y2="6" stroke="#667788" strokeWidth="1.5" />
+                  <line x1="8" y1="4" x2="10" y2="7" stroke="#667788" strokeWidth="1.5" />
+                  <line x1="20" y1="4" x2="18" y2="7" stroke="#667788" strokeWidth="1.5" />
+                  <line x1="5" y1="8" x2="8" y2="9" stroke="#667788" strokeWidth="1.5" />
+                  <line x1="23" y1="8" x2="20" y2="9" stroke="#667788" strokeWidth="1.5" />
+                </svg>
+                <span className="text-[10px] text-[#667788] font-serif leading-tight text-center">Early<br/>Morning<br/>Show</span>
+              </div>
+
+              {/* The Daily Ledger */}
+              <div className="flex flex-col items-center opacity-75">
+                <div className="border-t border-[#667788] w-20 mb-1" />
+                <span className="text-[8px] tracking-[0.3em] text-[#667788] uppercase">The</span>
+                <span className="text-base font-bold font-serif text-[#667788] leading-tight">DAILY LEDGER</span>
+                <div className="border-t border-[#667788] w-20 mt-1 mb-1" />
+                <span className="text-[#667788] text-[10px] leading-none">◆</span>
+              </div>
+
+              {/* Prestige Business Weekly */}
+              <div className="flex flex-col items-center opacity-75">
+                <span className="text-[#667788] text-sm mb-0.5">♛</span>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <div className="border-t border-[#667788] w-6" />
+                  <span className="text-[9px] tracking-[0.25em] text-[#667788] font-serif uppercase">Prestige</span>
+                  <div className="border-t border-[#667788] w-6" />
+                </div>
+                <span className="text-[8px] tracking-[0.2em] text-[#667788] uppercase">Business Weekly</span>
+              </div>
+            </div>
+            <p className="text-xs italic text-cream/25">We remain hopeful.</p>
           </div>
 
           <div className="border-t border-gold/20" />
@@ -208,7 +252,7 @@ function DesktopLanding({ onPickCompany }) {
           Every quarter,<br />right on <span className="text-gold">cue.</span>
         </h2>
         <p className="mt-6 text-base text-cream/50 max-w-lg mx-auto leading-relaxed">
-          Play live with your colleagues during the call. Everyone gets their own
+          Play live during the call. Everyone gets their own
           card. Tap when you hear the phrase. The leaderboard tells the whole story.
         </p>
         <button
@@ -225,7 +269,7 @@ function DesktopLanding({ onPickCompany }) {
           How It Works
         </p>
         <h3 className="font-display text-2xl font-bold text-cream mb-10">
-          You and your colleagues. One call. Let's see who was listening.
+          You and everyone on the line. One call. Let's see who was listening.
         </h3>
         <div className="grid grid-cols-4 gap-5">
           {STEPS.map((step) => (
@@ -279,7 +323,7 @@ function DesktopLanding({ onPickCompany }) {
             </p>
             <p>
               The hope is simple: that somewhere, on a Tuesday morning, someone on
-              a dial-in with colleagues smiles when they hear{" "}
+              a dial-in smiles when they hear{" "}
               <span className="text-gold">"lift up above the noise"</span> for
               the third time — and quietly taps their card.
             </p>

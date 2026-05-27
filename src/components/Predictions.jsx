@@ -40,7 +40,7 @@ export default function Predictions({ card, playerId, onConfirm, onSkip }) {
 
   if (step === 1) {
     return (
-      <div className="bg-radial-navy min-h-full flex flex-col items-center justify-center px-6">
+      <div className="bg-radial-navy min-h-full flex flex-col items-center justify-center px-6 pt-12 pb-16 sm:pt-16 sm:pb-20">
         <div className="w-full max-w-sm text-center space-y-6">
           <div className="text-6xl">🔮</div>
 

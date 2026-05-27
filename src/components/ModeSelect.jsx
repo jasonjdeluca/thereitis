@@ -29,7 +29,7 @@ export default function ModeSelect({ company, onBingo, onTrivia, onBack }) {
               Play Bingo
             </div>
             <p className="mt-2 text-sm text-cream/60 leading-relaxed">
-              Join a live session with colleagues during the call. Tap squares
+              Join a live session during the call. Tap squares
               as you hear the phrases. First to bingo wins.
             </p>
             <div className="mt-4 rounded-2xl bg-gold py-3 text-center font-semibold text-navy tracking-wide group-active:bg-gold-bright transition">

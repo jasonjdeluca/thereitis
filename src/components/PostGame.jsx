@@ -304,17 +304,11 @@ export default function PostGame({
         )}
 
         {!isMultiplayer && (
-          <div className="mt-6 text-center space-y-4">
+          <div className="mt-6 text-center">
             <p className="text-sm italic text-cream/40">
               See you next quarter! Bring someone next time — the more people on
               the call, the better this gets.
             </p>
-            <button
-              onClick={handleShareColleague}
-              className="w-full rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] transition"
-            >
-              {shareCopied ? "Copied! ✓" : "Share with a Colleague →"}
-            </button>
           </div>
         )}
       </div>
@@ -325,17 +319,23 @@ export default function PostGame({
             <button
               onClick={share}
               disabled={busy}
-              className="flex-1 rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] disabled:opacity-50"
+              className="flex-1 rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99] disabled:opacity-50"
             >
               {busy ? "Generating…" : "Share Card"}
             </button>
             <button
               onClick={onPlayAgain}
-              className="flex-1 rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99]"
+              className="flex-1 rounded-2xl border border-gold/60 bg-transparent text-gold py-3 font-semibold active:scale-[0.99]"
             >
               Play Again
             </button>
           </div>
+          <button
+            onClick={handleShareColleague}
+            className="w-full text-center mt-2 text-xs text-cream/50 active:text-cream transition"
+          >
+            {shareCopied ? "Copied! ✓" : "Share with a friend →"}
+          </button>
           <a
             href="/"
             onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}

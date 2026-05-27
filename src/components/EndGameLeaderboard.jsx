@@ -87,7 +87,7 @@ export default function EndGameLeaderboard({
             onClick={handleShare}
             className="w-full rounded-2xl border border-gold/60 text-cream py-3 font-semibold active:scale-[0.99] transition"
           >
-            {copied ? "Copied! ✓" : "Share with a Colleague →"}
+            {copied ? "Copied! ✓" : "Share with a Friend →"}
           </button>
           <button
             onClick={onContinue}
