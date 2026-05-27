@@ -75,10 +75,7 @@ export async function joinSession(code, displayName) {
 
   if (playerError) throw playerError;
 
-  await supabase
-    .from("sessions")
-    .update({ player_count: (session.player_count || 0) + 1 })
-    .eq("id", session.id);
+  await supabase.rpc("increment_player_count", { session_id: session.id });
 
   sessionStorage.setItem("thereitis_session_id", session.id);
   sessionStorage.setItem("thereitis_player_id", player.id);

@@ -1,7 +1,7 @@
+// NOTE: VITE_ADMIN_PASSWORD is no longer used — delete it from Vercel environment variables.
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
-const ADMIN_KEY = "thereitis_admin_auth";
 const COMPANY_ORDER = ["hilton", "marriott", "hyatt", "ihg", "wyndham", "choice"];
 
 function Countdown({ targetDate, timezone }) {
@@ -56,17 +56,24 @@ function Countdown({ targetDate, timezone }) {
 }
 
 function GateForm({ onAuth }) {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const correct = import.meta.env.VITE_ADMIN_PASSWORD;
-    if (password === correct) {
-      sessionStorage.setItem(ADMIN_KEY, "1");
-      onAuth();
+    setLoading(true);
+    setError("");
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    setLoading(false);
+    if (authError) {
+      setError("Invalid credentials");
     } else {
-      setError("Incorrect password");
+      onAuth();
     }
   }
 
@@ -83,6 +90,17 @@ function GateForm({ onAuth }) {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
+            placeholder="Email"
+            autoComplete="email"
+            className="w-full rounded-xl bg-navy-2/80 border border-cream/10 text-cream px-4 py-3 text-lg placeholder:text-cream/30 focus:outline-none focus:border-gold/60 transition"
+          />
+          <input
             type="password"
             value={password}
             onChange={(e) => {
@@ -90,15 +108,16 @@ function GateForm({ onAuth }) {
               setError("");
             }}
             placeholder="Password"
-            autoComplete="off"
+            autoComplete="current-password"
             className="w-full rounded-xl bg-navy-2/80 border border-cream/10 text-cream px-4 py-3 text-lg placeholder:text-cream/30 focus:outline-none focus:border-gold/60 transition"
           />
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99] transition"
+            disabled={loading}
+            className="w-full rounded-2xl bg-gold text-navy py-3 font-semibold active:scale-[0.99] transition disabled:opacity-50"
           >
-            Enter
+            {loading ? "Signing in…" : "Sign In"}
           </button>
         </form>
       </div>
@@ -441,7 +460,7 @@ function CompanyCard({ company, onUpdate }) {
   );
 }
 
-function AdminPanel() {
+function AdminPanel({ onSignOut }) {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -465,6 +484,11 @@ function AdminPanel() {
     );
   }
 
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    onSignOut();
+  }
+
   return (
     <div className="bg-radial-navy min-h-full pb-12">
       <header className="pt-8 pb-6 px-6 text-center">
@@ -474,6 +498,12 @@ function AdminPanel() {
         <p className="mt-1 text-xs uppercase tracking-[0.3em] text-gold/60">
           Admin
         </p>
+        <button
+          onClick={handleSignOut}
+          className="mt-2 text-xs text-cream/40 uppercase tracking-[0.2em] active:text-cream transition"
+        >
+          Sign Out
+        </button>
       </header>
 
       <main className="px-5 max-w-lg mx-auto space-y-6">
@@ -501,13 +531,27 @@ function AdminPanel() {
 }
 
 export default function Admin() {
-  const [authed, setAuthed] = useState(
-    () => sessionStorage.getItem(ADMIN_KEY) === "1",
-  );
+  const [authed, setAuthed] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthed(!!session);
+      setChecking(false);
+    });
+  }, []);
+
+  if (checking) {
+    return (
+      <div className="bg-radial-navy min-h-full flex items-center justify-center">
+        <div className="text-cream/40 text-sm">Loading…</div>
+      </div>
+    );
+  }
 
   if (!authed) {
     return <GateForm onAuth={() => setAuthed(true)} />;
   }
 
-  return <AdminPanel />;
+  return <AdminPanel onSignOut={() => setAuthed(false)} />;
 }

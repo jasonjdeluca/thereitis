@@ -83,7 +83,7 @@ export default function NameEntry({ companyId, onSessionCreated, onSessionJoined
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
-              maxLength={20}
+              maxLength={30}
               autoComplete="off"
               className="w-full rounded-xl bg-navy-2/80 border border-cream/10 text-cream px-4 py-3 text-lg placeholder:text-cream/30 focus:outline-none focus:border-gold/60 transition"
             />

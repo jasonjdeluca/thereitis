@@ -72,6 +72,7 @@ export default function Game({
   const silenceFiredRef = useRef(false);
   const markTimestampsRef = useRef([]);
   const maxStreakRef = useRef(0);
+  const lastBroadcastToastRef = useRef(0);
 
   useEffect(() => {
     playersRef.current = players;
@@ -248,6 +249,9 @@ export default function Game({
     );
 
     channel.on("broadcast", { event: "toast" }, (payload) => {
+      const now = Date.now();
+      if (now - lastBroadcastToastRef.current < 5000) return;
+      lastBroadcastToastRef.current = now;
       pushToast(payload.payload.text);
     });
 
