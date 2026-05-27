@@ -183,7 +183,7 @@ function MobileLanding({ onPickCompany }) {
                 <span className="text-[8px] tracking-[0.2em] text-[#667788] uppercase">Business Weekly</span>
               </div>
             </div>
-            <p className="text-xs italic text-cream/25">We remain hopeful.</p>
+            <p className="text-sm italic text-cream/30">We remain hopeful.</p>
             <div className="border-t border-gold/15" />
           </div>
         </div>
@@ -402,7 +402,7 @@ function DesktopLanding({ onPickCompany }) {
               </div>
             </div>
           </div>
-          <p className="mt-8 text-xs italic text-cream/25">We remain hopeful.</p>
+          <p className="mt-8 text-sm italic text-cream/30">We remain hopeful.</p>
           <div className="border-t border-gold/15 max-w-4xl mx-auto mt-8" />
         </div>
       </section>
