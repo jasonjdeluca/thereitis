@@ -189,6 +189,7 @@ function MobileLanding({ onPickCompany }) {
       </main>
 
       <footer className="pb-8 text-center">
+        <div className="border-t border-gold/15 max-w-sm mx-auto mb-6 mt-2" />
         <p className="text-xs text-cream/40 max-w-sm mx-auto px-4">
           Independent hobby project for entertainment purposes. Not affiliated
           with any company included. No gambling, please. Just the same phrases
@@ -407,6 +408,7 @@ function DesktopLanding({ onPickCompany }) {
 
       {/* Footer */}
       <footer className="w-full px-12 py-5 text-center">
+        <div className="border-t border-gold/15 max-w-4xl mx-auto mb-5" />
         <p className="text-[11px] text-[#334455]">
           Independent hobby project for entertainment purposes. Not affiliated
           with any company included. No gambling, please. Just the same phrases
