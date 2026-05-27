@@ -184,12 +184,12 @@ function MobileLanding({ onPickCompany }) {
               </div>
             </div>
             <p className="text-xs italic text-cream/25">We remain hopeful.</p>
+            <div className="border-t border-gold/15" />
           </div>
         </div>
       </main>
 
-      <footer className="pb-8 text-center">
-        <div className="border-t border-gold/15 max-w-sm mx-auto mb-6 mt-2" />
+      <footer className="pb-8 pt-6 text-center">
         <p className="text-xs text-cream/40 max-w-sm mx-auto px-4">
           Independent hobby project for entertainment purposes. Not affiliated
           with any company included. No gambling, please. Just the same phrases
@@ -403,12 +403,12 @@ function DesktopLanding({ onPickCompany }) {
             </div>
           </div>
           <p className="mt-8 text-xs italic text-cream/25">We remain hopeful.</p>
+          <div className="border-t border-gold/15 max-w-4xl mx-auto mt-8" />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="w-full px-12 py-5 text-center">
-        <div className="border-t border-gold/15 max-w-4xl mx-auto mb-5" />
+      <footer className="w-full px-12 pt-8 pb-5 text-center">
         <p className="text-[11px] text-[#334455]">
           Independent hobby project for entertainment purposes. Not affiliated
           with any company included. No gambling, please. Just the same phrases
