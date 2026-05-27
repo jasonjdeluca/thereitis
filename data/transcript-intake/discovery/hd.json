@@ -1,0 +1,287 @@
+{
+  "company_id": "hd",
+  "company_name": "Home Depot",
+  "ticker": "HD",
+  "target_start_quarter": "2022-Q1",
+  "target_end_quarter": "2026-Q1",
+  "quarters": [
+    {
+      "quarter": "2022-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/The%20Home%20Depot%201Q22%20Transcript_v2.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2022",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF contains the Q1 2022 Home Depot earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2022-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-2q22-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2022",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2022-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/2022%20HD%203Q22%20Transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2022",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2022-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/2022/2022_4Q_Transcript_v2.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2022",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2023-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-1q23-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2023",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF contains the Q1 2023 Home Depot earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2023-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-2q23-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2023",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2023-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-3q23-transcript-v1.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2023",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is titled Q3 Earnings Transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2023-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-4q23-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2023",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2024-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-1q24-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2024",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF contains the Q1 2024 Home Depot earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2024-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-2q24-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2024",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2024-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/2024/HD_3Q24_Transcript_vf2.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2024",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2024-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-4q24-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2024",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is titled HD 4Q24 Transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2025-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/reports-and-presentations/quarterly-earnings/2025/hd-1q25-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2025",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF contains the Q1 2025 Home Depot earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2025-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/reports-and-presentations/quarterly-earnings/2025/hd-2q25-transcript-vf.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2025",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2025-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/reports-and-presentations/quarterly-earnings/the-home-depot-inc-hd-us-q3-2025-earnings-call-v1.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2025",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is titled The Home Depot, Inc. Q3 2025 Earnings Call."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2025-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/reports-and-presentations/quarterly-earnings/hd-4q25-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2025",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF is titled HD 4Q25 Transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2026-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/2026/hd-1q26-transcript.pdf",
+          "source_page_url": "https://ir.homedepot.com/financial-reports/quarterly-earnings/2026",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Home Depot quarterly earnings page links this transcript PDF; opened PDF contains the Q1 2026 Home Depot earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    }
+  ],
+  "missing_quarters": [],
+  "official_sources_checked": [
+    "https://ir.homedepot.com/financial-reports/quarterly-earnings/2022",
+    "https://ir.homedepot.com/financial-reports/quarterly-earnings/2023",
+    "https://ir.homedepot.com/financial-reports/quarterly-earnings/2024",
+    "https://ir.homedepot.com/financial-reports/quarterly-earnings/2025",
+    "https://ir.homedepot.com/financial-reports/quarterly-earnings/2026"
+  ],
+  "excluded_sources_seen": [
+    {
+      "url": "https://www.fool.com/earnings/call-transcripts/",
+      "reason": "Excluded third-party transcript source."
+    },
+    {
+      "url": "https://stockanalysis.com/stocks/hd/transcripts/",
+      "reason": "Third-party transcript source."
+    },
+    {
+      "url": "https://seekingalpha.com/article/4788518-the-home-depot-inc-hd-q1-2025-earnings-conference-call-transcript",
+      "reason": "Excluded third-party transcript source."
+    }
+  ],
+  "notes": "Home Depot was a clean official-source case. The company quarterly earnings pages expose direct Transcript links for each target quarter, and every target-quarter transcript PDF opened successfully in the research tool."
+}

@@ -1,0 +1,280 @@
+{
+  "company_id": "jpm",
+  "company_name": "JPMorgan Chase",
+  "ticker": "JPM",
+  "target_start_quarter": "2022-Q1",
+  "target_end_quarter": "2026-Q1",
+  "quarters": [
+    {
+      "quarter": "2022-Q1",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://s25.q4cdn.com/442043304/files/doc_financials/2022/q1/v2/Q1-2022-Transcript.pdf",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "direct_pdf",
+          "confidence": "medium",
+          "verification_method": "link_label_only",
+          "notes": "Search exposed a direct Q4CDN transcript PDF for Q1 2022, and the official JPMorgan Chase quarterly earnings page lists 1Q22 Earnings Transcript; asset was not opened in this dry run."
+        }
+      ],
+      "notes": "Direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2022-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 2Q22 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2022-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 3Q22 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2022-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 4Q22 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2023-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 1Q23 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2023-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page is the only official source confirmed in this dry run; direct transcript asset URL was not exposed."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2023-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page is the only official source confirmed in this dry run; direct transcript asset URL was not exposed."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2023-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page is the only official source confirmed in this dry run; direct transcript asset URL was not exposed."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page is the only official source confirmed in this dry run; direct transcript asset URL was not exposed."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page is the only official source confirmed in this dry run; direct transcript asset URL was not exposed."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page is the only official source confirmed in this dry run; direct transcript asset URL was not exposed."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page is the only official source confirmed in this dry run; direct transcript asset URL was not exposed."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 1Q25 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 2Q25 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 3Q25 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 4Q25 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2026-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "source_page_url": "https://www.jpmorganchase.com/ir/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official JPMorgan Chase quarterly earnings page lists 1Q26 Earnings Transcript, but this dry run did not expose or open the underlying asset URL."
+        }
+      ],
+      "notes": "Official quarterly earnings page found; direct transcript asset not confirmed."
+    }
+  ],
+  "missing_quarters": [],
+  "official_sources_checked": [
+    "https://www.jpmorganchase.com/ir/quarterly-earnings",
+    "https://www.jpmorganchase.com/ir"
+  ],
+  "excluded_sources_seen": [
+    {
+      "url": "https://stockanalysis.com/stocks/jpm/transcripts/",
+      "reason": "Third-party transcript source."
+    },
+    {
+      "url": "https://seekingalpha.com/article/4890572-jpmorgan-chase-and-co-jpm-q1-2026-earnings-call-transcript",
+      "reason": "Excluded third-party transcript source."
+    }
+  ],
+  "notes": "The official JPMorgan Chase quarterly earnings page clearly lists earnings transcript entries for the target quarters, but the text extraction did not expose most underlying transcript asset URLs. This output intentionally marks those as event_page_only until a browser/verifier can capture the actual transcript links."
+}

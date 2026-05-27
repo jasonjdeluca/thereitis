@@ -1,0 +1,285 @@
+{
+  "company_id": "ko",
+  "company_name": "Coca-Cola",
+  "ticker": "KO",
+  "target_start_quarter": "2022-Q1",
+  "target_end_quarter": "2026-Q1",
+  "quarters": [
+    {
+      "quarter": "2022-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10231/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q1_2022_Earnings_Call%2C_25-April-2022_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q1 2022 Transcript; the linked PDF opened and contains corrected transcript text for The Coca-Cola Co. Q1 2022 earnings call."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2022-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10232/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q2_2022_Earnings_Call%2C_26-July-2022_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q2 2022 Transcript; the linked PDF opened as an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2022-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10233/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q3_2022_Earnings_Call%2C_25-October-2022_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q3 2022 Transcript; the linked PDF opened as an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2022-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10234/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q4_2022_Earnings_Call%2C_14-February-2023_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the FY 2022 Transcript; the linked PDF opened and contains corrected transcript text for The Coca-Cola Co. Q4 2022 earnings call."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2023-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10235/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q1_2023_Earnings_Call%2C_24-April-2023_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q1 2023 Transcript; the linked PDF opened as an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2023-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10236/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q2_2023_Earnings_Call%2C_26-July-2023_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q2 2023 Transcript; the linked PDF opened as an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2023-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10237/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q3_2023_Earnings_Call%2C_24-October-2023_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q3 2023 Transcript; the linked PDF opened as an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2023-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10238/webcast_transcript/CORRECTED_TRANSCRIPT_The_Coca-Cola_Co.%28KO-US%29%2C_Q4_2023_Earnings_Call%2C_13-February-2024_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the FY 2023 Transcript; the linked PDF opened and contains corrected transcript text for The Coca-Cola Co. Q4 2023 earnings call."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2024-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10239/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q1_2024_Earnings_Call%2C_30-April-2024_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q1 2024 Transcript; the linked PDF opened as an earnings call transcript."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2024-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10240/webcast_transcript/CORRECTED_TRANSCRIPT_The_Coca-Cola_Co.%28KO-US%29%2C_Q2_2024_Earnings_Call%2C_23-July-2024_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q2 2024 Transcript; the linked PDF opened and contains corrected transcript text for The Coca-Cola Co. Q2 2024 earnings call."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2024-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10241/webcast_transcript/CORRECTED_TRANSCRIPT_The_Coca-Cola_Co.%28KO-US%29%2C_Q3_2024_Earnings_Call%2C_23-October-2024_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q3 2024 Earnings Call Transcript; the linked URL opened as an application/pdf asset."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2024-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10242/webcast_transcript/CORRECTED_TRANSCRIPT_The_Coca-Cola_Co.%28KO-US%29%2C_Q4_2024_Earnings_Call%2C_11-February-2025_8_30_AM_ET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Official Coca-Cola investor financial information page labels this as the FY 2024 Transcript; the linked PDF opened and contains corrected transcript text for The Coca-Cola Co. Q4 2024 earnings call."
+        }
+      ],
+      "notes": "Official direct transcript PDF found from the Coca-Cola investor financial information page."
+    },
+    {
+      "quarter": "2025-Q1",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10625/webcast_transcript/CORRECTED%2BTRANSCRIPT%2B%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2C%2BQ1%2B2025%2BEarnings%2BCall%2C%2B29-April-2025%2B8%2B30%2BAM%2BET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q1 2025 Transcript and links to a PDF-like webcast_transcript asset; direct PDF inspection was blocked by the host's JavaScript verification response."
+        }
+      ],
+      "notes": "Official direct transcript PDF candidate found from the Coca-Cola investor financial information page; content should be verified by a browser or verifier that can access the asset."
+    },
+    {
+      "quarter": "2025-Q2",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/11064/webcast_transcript/CORRECTED%2BTRANSCRIPT_%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2C%2BQ2%2B2025%2BEarnings%2BCall%2C%2B22-July-2025%2B8_30%2BAM%2BET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q2 2025 Transcript and links to a PDF-like webcast_transcript asset; direct PDF inspection was blocked by the host's JavaScript verification response."
+        }
+      ],
+      "notes": "Official direct transcript PDF candidate found from the Coca-Cola investor financial information page; content should be verified by a browser or verifier that can access the asset."
+    },
+    {
+      "quarter": "2025-Q3",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/11074/webcast_transcript/CORRECTED%2BTRANSCRIPT%2B%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2C%2BQ3%2B2025%2BEarnings%2BCall%2C%2B21-October-2025%2B8%2B30%2BAM%2BET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q3 2025 Transcript and links to a PDF-like webcast_transcript asset; direct PDF inspection was blocked by the host's JavaScript verification response."
+        }
+      ],
+      "notes": "Official direct transcript PDF candidate found from the Coca-Cola investor financial information page; content should be verified by a browser or verifier that can access the asset."
+    },
+    {
+      "quarter": "2025-Q4",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_0a07e436ec47aec04366979fda305b00/cocacolacompany/db/880/11088/webcast_transcript/CORRECTED%2BTRANSCRIPT%2B%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2BQ4%2B2025%2BEarnings%2BCall%2B10-February-2026%2B8%2B30%2BAM%2BET.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Coca-Cola investor financial information page labels the FY 2025 item as a Transcript, and search exposed an official investors.coca-colacompany.com webcast_transcript PDF for Q4 2025; direct click inspection from the financial information page was not available in this tool."
+        }
+      ],
+      "notes": "Official direct transcript PDF candidate found for the FY 2025 earnings call, treated as 2025-Q4."
+    },
+    {
+      "quarter": "2026-Q1",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/11107/webcast_transcript/CORRECTED%2BTRANSCRIPT_KO%2BQ126%2BEarnings%2BCall.pdf",
+          "source_page_url": "https://investors.coca-colacompany.com/financial-information",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Coca-Cola investor financial information page labels this as the Q1 2026 Transcript and links to a PDF-like webcast_transcript asset; direct PDF inspection was blocked by the host's JavaScript verification response."
+        }
+      ],
+      "notes": "Official direct transcript PDF candidate found from the Coca-Cola investor financial information page; content should be verified by a browser or verifier that can access the asset."
+    }
+  ],
+  "missing_quarters": [],
+  "official_sources_checked": [
+    "https://investors.coca-colacompany.com/financial-information",
+    "https://investors.coca-colacompany.com/ir-home",
+    "https://investors.coca-colacompany.com/news-events/press-releases/detail/1149/the-coca-cola-company-announces-timing-of-fourth-quarter-and-full-year-2025-earnings-release"
+  ],
+  "excluded_sources_seen": [
+    {
+      "url": "https://www.marketscreener.com/quote/stock/THE-COCA-COLA-COMPANY-4819/news/Coca-Cola-Transcript-Q1-2022-40155504/",
+      "reason": "Third-party transcript source."
+    },
+    {
+      "url": "https://stockanalysis.com/stocks/ko/transcripts/",
+      "reason": "Third-party transcript source."
+    },
+    {
+      "url": "https://seekingalpha.com/article/4868196-the-coca-cola-company-ko-q4-2025-earnings-call-transcript",
+      "reason": "Excluded third-party transcript source."
+    }
+  ],
+  "notes": "Dry run found official Coca-Cola IR transcript links for every target quarter. The primary source is the official financial information page, which lists Transcript links by quarter. Most 2022-2024 PDF assets opened directly in the research tool; several 2025-2026 direct PDF assets returned a JavaScript verification page during direct inspection, so they are marked link_label_only and should be verified in the next pass."
+}

@@ -1,0 +1,67 @@
+[
+  {
+    "company_id": "ko",
+    "company_name": "Coca-Cola",
+    "ticker": "KO",
+    "status": "candidate_links_found",
+    "target_start_quarter": "2022-Q1",
+    "target_end_quarter": "2026-Q1",
+    "attempt_count": 1,
+    "last_attempt_at": "2026-05-26T20:02:35.1221176-05:00",
+    "discovery_result_path": "data/transcript-intake/discovery/ko.json",
+    "verification_result_path": "data/transcript-intake/verified/ko.json",
+    "notes": "Dry run found official IR-linked direct transcript PDF candidates for every target quarter; some 2025-2026 assets need verifier follow-up because direct PDF inspection was blocked by JavaScript verification."
+  },
+  {
+    "company_id": "hd",
+    "company_name": "Home Depot",
+    "ticker": "HD",
+    "status": "candidate_links_found",
+    "target_start_quarter": "2022-Q1",
+    "target_end_quarter": "2026-Q1",
+    "attempt_count": 1,
+    "last_attempt_at": "2026-05-26T20:13:00.3469318-05:00",
+    "discovery_result_path": "data/transcript-intake/discovery/hd.json",
+    "verification_result_path": "data/transcript-intake/verified/hd.json",
+    "notes": "Dry run found and opened official Home Depot direct transcript PDFs for every target quarter."
+  },
+  {
+    "company_id": "c",
+    "company_name": "Citigroup",
+    "ticker": "C",
+    "status": "partial_found",
+    "target_start_quarter": "2022-Q1",
+    "target_end_quarter": "2026-Q1",
+    "attempt_count": 1,
+    "last_attempt_at": "2026-05-26T20:15:11.0617213-05:00",
+    "discovery_result_path": "data/transcript-intake/discovery/c.json",
+    "verification_result_path": "data/transcript-intake/verified/c.json",
+    "notes": "Dry run found a mix of opened official transcript PDFs, official direct transcript candidates, and official event pages only; verifier should prioritize 2023 and late-2024 direct asset confirmation."
+  },
+  {
+    "company_id": "jpm",
+    "company_name": "JPMorgan Chase",
+    "ticker": "JPM",
+    "status": "partial_found",
+    "target_start_quarter": "2022-Q1",
+    "target_end_quarter": "2026-Q1",
+    "attempt_count": 1,
+    "last_attempt_at": "2026-05-26T20:16:41.9772129-05:00",
+    "discovery_result_path": "data/transcript-intake/discovery/jpm.json",
+    "verification_result_path": "data/transcript-intake/verified/jpm.json",
+    "notes": "Dry run confirmed official quarterly earnings page transcript labels across target quarters, but most underlying direct transcript asset URLs were not exposed in text extraction."
+  },
+  {
+    "company_id": "v",
+    "company_name": "Visa",
+    "ticker": "V",
+    "status": "partial_found",
+    "target_start_quarter": "2022-Q1",
+    "target_end_quarter": "2026-Q1",
+    "attempt_count": 1,
+    "last_attempt_at": "2026-05-26T20:17:59.8588789-05:00",
+    "discovery_result_path": "data/transcript-intake/discovery/v.json",
+    "verification_result_path": "data/transcript-intake/verified/v.json",
+    "notes": "Dry run found one opened official transcript, several official direct transcript candidates, and many event-page-only quarters; verifier/browser pass should extract underlying event transcript links."
+  }
+]

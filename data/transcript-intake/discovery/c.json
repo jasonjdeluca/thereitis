@@ -1,0 +1,286 @@
+{
+  "company_id": "c",
+  "company_name": "Citigroup",
+  "ticker": "C",
+  "target_start_quarter": "2022-Q1",
+  "target_end_quarter": "2026-Q1",
+  "quarters": [
+    {
+      "quarter": "2022-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://uat.citigroup.com/rcs/citigpa/akpublic/storage/public/tr220414a.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2022/citi-first-quarter-2022-earnings-review",
+          "asset_type": "direct_pdf",
+          "confidence": "medium",
+          "verification_method": "opened_pdf",
+          "notes": "Opened a Citigroup-hosted PDF that contains Citi First Quarter 2022 Earnings Review transcript text. Host is a Citi UAT subdomain, so verifier should confirm the production URL or archival status."
+        }
+      ],
+      "notes": "Transcript content was opened, but the URL uses a Citi UAT host."
+    },
+    {
+      "quarter": "2022-Q2",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://uat.citigroup.com/rcs/citigpa/akpublic/storage/public/tr220715a.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2022/citi-second-quarter-2022-earnings-review",
+          "asset_type": "direct_pdf",
+          "confidence": "medium",
+          "verification_method": "opened_pdf",
+          "notes": "Opened a Citigroup-hosted PDF that contains Citi Second Quarter 2022 Earnings Review transcript text. Host is a Citi UAT subdomain, so verifier should confirm the production URL or archival status."
+        }
+      ],
+      "notes": "Transcript content was opened, but the URL uses a Citi UAT host."
+    },
+    {
+      "quarter": "2022-Q3",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/akpublic/storage/public/tr221014a.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2022/citi-third-quarter-2022-earnings-review",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Opened official Citigroup PDF containing Citi Third Quarter 2022 Earnings Review transcript text."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2022-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/tr230113b.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2022/citi-fourth-quarter-2022-earnings-review-1",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Opened official Citigroup PDF containing Citi Fourth Quarter 2022 Earnings Review transcript text."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2023-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/global/news/press-release/2023/citi-first-quarter-2023-earnings-call",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Citi earnings call page indicates a replay and transcript would be available, but this dry run did not identify or open a direct official transcript asset."
+        }
+      ],
+      "notes": "Official event page found; direct transcript file not confirmed in this pass."
+    },
+    {
+      "quarter": "2023-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/global/news/press-release/2023/citi-second-quarter-2023-earnings-call",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Citi earnings call page indicates a replay and transcript would be available, but this dry run did not identify or open a direct official transcript asset."
+        }
+      ],
+      "notes": "Official event page found; direct transcript file not confirmed in this pass."
+    },
+    {
+      "quarter": "2023-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/global/news/press-release/2023/citi-third-quarter-2023-earnings-call",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Citi earnings call page indicates a replay and transcript would be available, but this dry run did not identify or open a direct official transcript asset."
+        }
+      ],
+      "notes": "Official event page found; direct transcript file not confirmed in this pass."
+    },
+    {
+      "quarter": "2023-Q4",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/4Q23-Earnings-Transcript.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2023/citi-fourth-quarter-2023-earnings-call",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Opened official Citigroup PDF containing Citi Fourth Quarter 2023 Earnings Call transcript text."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2024-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2024q1tr.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2024/citi-first-quarter-2024-earnings-call",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Opened official Citigroup PDF containing Citi First Quarter 2024 Earnings Call transcript text."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2024-Q2",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/transcript07122024.pdf",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Search exposed an official Citigroup-hosted transcript PDF for Citi Second Quarter 2024 Earnings Call, but this dry run did not open/read the asset directly."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2024-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/global/news/press-release/2024/citi-third-quarter-2024-earnings-call",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Citi earnings call page found, but this dry run did not identify or open a direct official transcript asset."
+        }
+      ],
+      "notes": "Official event page found; direct transcript file not confirmed in this pass."
+    },
+    {
+      "quarter": "2024-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/global/news/press-release/2024/citi-fourth-quarter-2024-earnings-call",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Citi earnings call page found, but this dry run did not identify or open a direct official transcript asset."
+        }
+      ],
+      "notes": "Official event page found; direct transcript file not confirmed in this pass."
+    },
+    {
+      "quarter": "2025-Q1",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/transcript.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2025/citi-first-quarter-2025-earnings-call",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Citigroup-hosted transcript PDF candidate found; not directly opened/read in this dry run."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2025-Q2",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22025/transcript.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/press-release/2025/citi-second-quarter-2025-earnings-call",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Citigroup-hosted transcript PDF candidate found; not directly opened/read in this dry run."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2025-Q3",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32025/2025psqtr3-transcript.pdf",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Citigroup-hosted transcript PDF candidate found; not directly opened/read in this dry run."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2025-Q4",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025psqtr4-transcript.pdf",
+          "source_page_url": "https://www.citigroup.com/global/news/article/2026/fourth-quarter-2025-earnings-call",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Citigroup-hosted transcript PDF candidate found; not directly opened/read in this dry run."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2026-Q1",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2026psqtr1-transcript.pdf",
+          "source_page_url": "https://www.citigroup.com/global/investors/quarterly-earnings",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Official Citigroup-hosted transcript PDF candidate found; not directly opened/read in this dry run."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    }
+  ],
+  "missing_quarters": [],
+  "official_sources_checked": [
+    "https://www.citigroup.com/global/investors/quarterly-earnings",
+    "https://www.citigroup.com/global/investors/events-and-presentations",
+    "https://www.citigroup.com/global/news/press-release/2022/citi-first-quarter-2022-earnings-review",
+    "https://www.citigroup.com/global/news/press-release/2025/citi-first-quarter-2025-earnings-call"
+  ],
+  "excluded_sources_seen": [
+    {
+      "url": "https://www.fool.com/earnings/call-transcripts/2026/04/14/citigroup-c-q1-2026-earnings-call-transcript/",
+      "reason": "Excluded third-party transcript source."
+    },
+    {
+      "url": "https://news.alphastreet.com/citigroup-inc-c-q1-2022-earnings-call-transcript/",
+      "reason": "Third-party transcript source."
+    },
+    {
+      "url": "https://www.marketbeat.com/earnings/reports/2022-4-14-citigroup-inc-stock/",
+      "reason": "Third-party transcript source."
+    }
+  ],
+  "notes": "Citigroup is less clean than KO or HD. Some official transcript PDFs opened, some official transcript PDF candidates were found but not opened in this pass, and several quarters only have official Citi event pages confirmed. This output intentionally avoids treating official event pages as direct transcript assets."
+}

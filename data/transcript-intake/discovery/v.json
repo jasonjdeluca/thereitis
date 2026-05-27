@@ -1,0 +1,286 @@
+{
+  "company_id": "v",
+  "company_name": "Visa",
+  "ticker": "V",
+  "target_start_quarter": "2022-Q1",
+  "target_end_quarter": "2026-Q1",
+  "quarters": [
+    {
+      "quarter": "2022-Q1",
+      "status": "opened_transcript",
+      "candidates": [
+        {
+          "url": "https://s1.q4cdn.com/050606653/files/doc_financials/2022/q1/CORRECTED-TRANSCRIPT_-Visa%2C-Inc.%28V-US%29%2C-Q1-2022-Earnings-Call%2C-27-January-2022-5_00-PM-ET.pdf",
+          "source_page_url": "https://investor.visa.com/events-calendar/Event-Details/2022/Q1-2022-Visa-Inc-Earnings-Conference-Call/default.aspx",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "opened_pdf",
+          "notes": "Opened transcript PDF linked from Visa's official Q1 2022 event page; PDF contains corrected transcript text for Visa Q1 2022 earnings call."
+        }
+      ],
+      "notes": "Official direct transcript PDF found and opened."
+    },
+    {
+      "quarter": "2022-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor site/event calendar is the confirmed source path, but this dry run did not identify a direct official transcript URL for this quarter."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2022-Q3",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://s1.q4cdn.com/050606653/files/doc_financials/2022/q3/CORRECTED-TRANSCRIPT_-Visa%2C-Inc.%28V-US%29%2C-Q3-2022-Earnings-Call.pdf",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Search surfaced a direct official Q4CDN-hosted Visa Q3 2022 transcript PDF; this dry run did not open/read the asset."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2022-Q4",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://s1.q4cdn.com/050606653/files/doc_financials/2022/q4/CORRECTED-TRANSCRIPT_-Visa-Inc.%28V-US%29-Q4-2022-Earnings-Call-25-October-2022-5_00-PM-ET.pdf",
+          "source_page_url": "https://investor.visa.com/news/news-details/2022/Visa-Inc.-Fiscal-Fourth-Quarter-and-Full-Year-2022-Financial-Results/default.aspx",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Search surfaced a direct official Q4CDN-hosted Visa Q4 2022 transcript PDF; this dry run did not open/read the asset."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    },
+    {
+      "quarter": "2023-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2023-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2023-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2023-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2024-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q1",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q2",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q3",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2025-Q4",
+      "status": "event_page_only",
+      "candidates": [
+        {
+          "url": "https://investor.visa.com/events-calendar/default.aspx",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "event_page_only",
+          "confidence": "medium",
+          "verification_method": "official_event_page_only",
+          "notes": "Official Visa investor event/quarterly earnings path found, but no direct official transcript URL was confirmed in this pass."
+        }
+      ],
+      "notes": "Official event source found; direct transcript asset not confirmed."
+    },
+    {
+      "quarter": "2026-Q1",
+      "status": "direct_transcript_candidate",
+      "candidates": [
+        {
+          "url": "https://s1.q4cdn.com/050606653/files/doc_financials/2026/q1/CORRECTED-TRANSCRIPT_-Visa-Inc-V-US-Q1-2026-Earnings-Call-29-January-2026-5_00-PM-ET.pdf",
+          "source_page_url": "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+          "asset_type": "direct_pdf",
+          "confidence": "high",
+          "verification_method": "link_label_only",
+          "notes": "Search surfaced a direct official Q4CDN-hosted Visa Q1 2026 transcript PDF; this dry run did not open/read the asset."
+        }
+      ],
+      "notes": "Official direct transcript candidate found but not opened."
+    }
+  ],
+  "missing_quarters": [],
+  "official_sources_checked": [
+    "https://investor.visa.com/financial-information/quarterly-earnings/default.aspx",
+    "https://investor.visa.com/events-calendar/default.aspx",
+    "https://investor.visa.com/events-calendar/Event-Details/2022/Q1-2022-Visa-Inc-Earnings-Conference-Call/default.aspx",
+    "https://investor.visa.com/news/news-details/2022/Visa-Inc.-Fiscal-Fourth-Quarter-and-Full-Year-2022-Financial-Results/default.aspx"
+  ],
+  "excluded_sources_seen": [
+    {
+      "url": "https://www.fool.com/earnings/call-transcripts/2026/01/30/visa-v-q1-2026-earnings-call-transcript/",
+      "reason": "Excluded third-party transcript source."
+    },
+    {
+      "url": "https://stockanalysis.com/stocks/v/transcripts/",
+      "reason": "Third-party transcript source."
+    },
+    {
+      "url": "https://seekingalpha.com/article/4864179-visa-inc-v-q1-2026-earnings-call-transcript",
+      "reason": "Excluded third-party transcript source."
+    }
+  ],
+  "notes": "Visa requires a browser/verifier pass. The Q1 2022 official event page exposed and opened a direct transcript PDF, and search surfaced several official Q4CDN transcript PDF candidates, but this dry run did not cleanly extract every target-quarter direct transcript link from the official investor site."
+}
