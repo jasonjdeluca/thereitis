@@ -47,7 +47,7 @@ function MobileLanding({ onPickCompany }) {
           <div className="rounded-2xl border border-gold/30 px-5 py-4 text-center">
             <p className="text-sm text-gold leading-relaxed">
               Play live during the call with anyone who's listening. Same moment.
-              First to bingo wins.
+              Same card. Let's see who heard it first.
             </p>
           </div>
 
@@ -58,7 +58,7 @@ function MobileLanding({ onPickCompany }) {
               How It Works
             </p>
             <h2 className="font-display text-xl font-bold text-cream text-center">
-              You and everyone on the line. One call. Let's see who was listening.
+              You and others on the line. One call. Let's see who was listening.
             </h2>
             <p className="text-sm italic text-cream/50 text-center">
               No setup. No accounts. Just a code.
@@ -127,6 +127,23 @@ function MobileLanding({ onPickCompany }) {
 
           <div className="border-t border-gold/20" />
 
+          <div className="text-center space-y-3 pb-4">
+            <h2 className="font-display text-xl font-bold text-cream">
+              Ready to play?
+            </h2>
+            <p className="text-sm italic text-cream/50">
+              Choose a company to get started.
+            </p>
+            <button
+              onClick={onPickCompany}
+              className="w-full rounded-2xl bg-gold py-3 font-semibold text-navy tracking-wide active:bg-gold-bright active:scale-[0.99] transition"
+            >
+              Pick a Company &rarr;
+            </button>
+          </div>
+
+          <div className="border-t border-gold/20" />
+
           {/* Fake Press Strip — mobile (3 outlets) */}
           <div className="text-center space-y-4">
             <p className="text-sm italic text-cream/30">
@@ -167,23 +184,6 @@ function MobileLanding({ onPickCompany }) {
               </div>
             </div>
             <p className="text-xs italic text-cream/25">We remain hopeful.</p>
-          </div>
-
-          <div className="border-t border-gold/20" />
-
-          <div className="text-center space-y-3 pb-4">
-            <h2 className="font-display text-xl font-bold text-cream">
-              Ready to play?
-            </h2>
-            <p className="text-sm italic text-cream/50">
-              Choose a company to get started.
-            </p>
-            <button
-              onClick={onPickCompany}
-              className="w-full rounded-2xl bg-gold py-3 font-semibold text-navy tracking-wide active:bg-gold-bright active:scale-[0.99] transition"
-            >
-              Pick a Company &rarr;
-            </button>
           </div>
         </div>
       </main>
@@ -269,7 +269,7 @@ function DesktopLanding({ onPickCompany }) {
           How It Works
         </p>
         <h3 className="font-display text-2xl font-bold text-cream mb-10">
-          You and everyone on the line. One call. Let's see who was listening.
+          You and others on the line. One call. Let's see who was listening.
         </h3>
         <div className="grid grid-cols-4 gap-5">
           {STEPS.map((step) => (

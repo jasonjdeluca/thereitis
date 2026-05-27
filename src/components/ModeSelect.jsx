@@ -57,17 +57,13 @@ export default function ModeSelect({ company, onBingo, onTrivia, onBack }) {
         </div>
       </main>
 
-      <footer className="pb-8 text-center">
+      <footer className="pb-8 text-center pb-[env(safe-area-inset-bottom)]">
         <button
           onClick={onBack}
-          className="text-cream/40 text-xs uppercase tracking-[0.3em] py-2 active:text-cream transition mb-4"
+          className="text-cream/40 text-xs uppercase tracking-[0.3em] py-2 active:text-cream transition"
         >
           &larr; Back
         </button>
-        <p className="text-xs text-cream/40 max-w-sm mx-auto px-4 pb-[env(safe-area-inset-bottom)]">
-          Independent hobby project for entertainment purposes. Not affiliated
-          with any company included. No gambling, please. 😊
-        </p>
       </footer>
     </div>
   );

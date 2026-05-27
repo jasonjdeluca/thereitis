@@ -46,8 +46,6 @@ export default function PostGame({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [mostHeard, setMostHeard] = useState(null);
-  const [shareCopied, setShareCopied] = useState(false);
-
   const isMultiplayer = players && players.length > 1;
 
   const earnedBadges = useMemo(
@@ -165,18 +163,6 @@ export default function PostGame({
       setError("Could not save card — try a screenshot instead.");
     } finally {
       setBusy(false);
-    }
-  }
-
-  async function handleShareColleague() {
-    const text =
-      "I just played There It Is — earnings call bingo, live during the call. Join me next quarter: thereitis.live";
-    try {
-      await navigator.clipboard.writeText(text);
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
-    } catch {
-      // clipboard unavailable
     }
   }
 
@@ -330,12 +316,6 @@ export default function PostGame({
               Play Again
             </button>
           </div>
-          <button
-            onClick={handleShareColleague}
-            className="w-full text-center mt-2 text-xs text-cream/50 active:text-cream transition"
-          >
-            {shareCopied ? "Copied! ✓" : "Share with a friend →"}
-          </button>
           <a
             href="/"
             onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}
