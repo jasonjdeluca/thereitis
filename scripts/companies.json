@@ -37,7 +37,7 @@
     "id": "c",
     "name": "Citigroup",
     "ticker": "C",
-    "emoji": "🏦",
+    "emoji": "🏛️",
     "transcripts": [
       { "quarter": "Q1 2026", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2026psqtr1-transcript.pdf" },
       { "quarter": "Q4 2025", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025psqtr4-transcript.pdf" },

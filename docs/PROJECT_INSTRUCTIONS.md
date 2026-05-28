@@ -168,20 +168,26 @@ To activate DB-driven phrases:
 
 ---
 
+## Active Companies
+
+| Emoji | Name | Ticker | phrase_count | Notes |
+|---|---|---|---|---|
+| 🏨 | Hilton | HLT | 51 | Original company; phrases hardcoded in `phrases.js` |
+| 🥤 | Coca-Cola | KO | 0 | Activated 2026-05-28; phrases pending ingest pipeline |
+
 ## Staged Companies (Ready to Ingest)
 
-The following companies are defined in `scripts/companies.json` with 9 transcript PDF URLs each and are ready to run through the ingest pipeline. They are **not yet active** in the app — no data has been loaded, and they do not appear in Admin or CompanySelect.
+The following companies are defined in `scripts/companies.json` with 9 transcript PDF URLs each and are ready to run through the ingest pipeline. They are **not yet active** in the app — no data has been loaded.
 
 To activate any of these: run the ingest pipeline, review the SQL, execute it, and toggle the company active at `/gate`.
 
 | Emoji | Name | Ticker | Transcripts |
 |---|---|---|---|
-| 🥤 | Coca-Cola | KO | Q1 2024 – Q1 2026 (9 quarters) |
 | 🔨 | Home Depot | HD | Q1 2024 – Q1 2026 (9 quarters) |
-| 🏦 | Citigroup | C | Q1 2024 – Q1 2026 (9 quarters) |
+| 🏛️ | Citigroup | C | Q1 2024 – Q1 2026 (9 quarters) |
 | 🏦 | JPMorgan Chase | JPM | Q1 2024 – Q1 2026 (9 quarters) |
 
-Note: Citigroup and JPMorgan Chase share the 🏦 emoji in `companies.json`. Update one before activating both to avoid collision in the UI.
+Note: Emoji collision between Citigroup and JPMorgan Chase **resolved** — Citigroup reassigned 🏛️, JPMorgan Chase retains 🏦.
 
 ---
 

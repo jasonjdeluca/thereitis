@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
-const COMPANY_ORDER = ["hilton", "marriott", "hyatt", "ihg", "wyndham", "choice"];
+const COMPANY_ORDER = ["hilton", "ko", "marriott", "hyatt", "ihg", "wyndham", "choice"];
 
 const TICKERS = {
   hilton: "HLT",
+  ko: "KO",
   marriott: "MAR",
   hyatt: "H",
   ihg: "IHG",

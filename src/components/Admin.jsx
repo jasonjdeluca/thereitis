@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
-const COMPANY_ORDER = ["hilton", "marriott", "hyatt", "ihg", "wyndham", "choice"];
+const COMPANY_ORDER = ["hilton", "ko", "marriott", "hyatt", "ihg", "wyndham", "choice"];
 
 function Countdown({ targetDate, timezone }) {
   const [display, setDisplay] = useState("");
