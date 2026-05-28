@@ -14,14 +14,13 @@ ALTER TABLE players
   ADD COLUMN IF NOT EXISTS predictions jsonb DEFAULT '[]';
 
 -- ────────────────────────────────────────────────────────────────
--- KNOWN BUG: sessions has no created_at column (only started_at).
--- Code in src/lib/session.js and src/components/Lobby.jsx references
--- session.created_at for the 6-hour expiry check, which will always
--- be undefined. The expiry check silently fails (NaN > threshold = false).
--- Fix: update those code paths to use started_at instead of created_at.
+-- RESOLVED: sessions.started_at (not created_at)
+-- Fixed: session.js:59, Lobby.jsx:24+29 (expiry check), Admin.jsx:143
+-- (sessions 24h filter) all updated to use started_at.
 -- ────────────────────────────────────────────────────────────────
 
--- KNOWN BUG: marks has no created_at column (only marked_at).
--- Code in Game.jsx uses mark.created_at || new Date().toISOString()
--- which always falls back to the current time — harmless but imprecise.
+-- RESOLVED: marks.marked_at (not created_at)
+-- Fixed: Game.jsx:151+152 — mark.created_at fallback replaced with
+-- mark.marked_at; now uses the actual DB timestamp instead of always
+-- falling back to current time.
 -- ────────────────────────────────────────────────────────────────

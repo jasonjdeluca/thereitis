@@ -21,12 +21,12 @@ export default function Lobby({
     async function checkExpiry() {
       const { data } = await supabase
         .from("sessions")
-        .select("created_at, status")
+        .select("started_at, status")
         .eq("id", sessionId)
         .single();
 
       if (data) {
-        const age = Date.now() - new Date(data.created_at).getTime();
+        const age = Date.now() - new Date(data.started_at).getTime();
         if (age > SIX_HOURS_MS || data.status === "ended") {
           setExpired(true);
         }

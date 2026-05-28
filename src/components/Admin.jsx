@@ -140,7 +140,7 @@ function CompanyStats({ companyId, callIdentifier }) {
             .from("sessions")
             .select("id", { count: "exact", head: true })
             .eq("company_id", companyId)
-            .gte("created_at", twentyFourAgo),
+            .gte("started_at", twentyFourAgo),
           supabase
             .from("sessions")
             .select("id", { count: "exact", head: true })

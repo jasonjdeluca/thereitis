@@ -56,7 +56,7 @@ export async function joinSession(code, displayName) {
     return { error: "Session not found — check the code and try again" };
   }
 
-  const age = Date.now() - new Date(session.created_at).getTime();
+  const age = Date.now() - new Date(session.started_at).getTime();
   if (age > SIX_HOURS_MS || session.status === "ended") {
     return { error: "This session has expired — start a new one" };
   }

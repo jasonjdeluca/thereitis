@@ -148,8 +148,8 @@ export default function Game({
 
         resetSilenceTimer();
 
-        checkEveryoneHeardThat(mark.phrase, mark.created_at || new Date().toISOString());
-        checkInSync(mark.phrase, mark.player_id, mark.created_at || new Date().toISOString());
+        checkEveryoneHeardThat(mark.phrase, mark.marked_at || new Date().toISOString());
+        checkInSync(mark.phrase, mark.player_id, mark.marked_at || new Date().toISOString());
 
         if (mark.player_id === playerId) return;
 
