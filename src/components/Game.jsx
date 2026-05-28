@@ -688,16 +688,6 @@ export default function Game({
     onExit();
   }
 
-  function handleShare() {
-    flushPending();
-    const isMultiplayer = players.length >= 2;
-    if (isMultiplayer) {
-      setEndLeaderboard(true);
-    } else {
-      setPostGame(true);
-    }
-  }
-
   function endGame() {
     flushPending();
     const isMultiplayer = players.length >= 2;
@@ -912,7 +902,6 @@ export default function Game({
       <Toolbar
         score={score}
         streak={streak}
-        onShare={handleShare}
         onEnd={endGame}
         onLeaderboard={() => setShowLeaderboard(true)}
       />

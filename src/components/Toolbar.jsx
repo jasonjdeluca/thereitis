@@ -27,7 +27,7 @@ function ToolbarTooltip({ label, children }) {
   );
 }
 
-export default function Toolbar({ score, streak, onShare, onEnd, onLeaderboard }) {
+export default function Toolbar({ score, streak, onEnd, onLeaderboard }) {
   return (
     <div className="fixed bottom-0 inset-x-0 z-30 bg-navy-2/90 backdrop-blur border-t border-cream/10 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
@@ -53,15 +53,6 @@ export default function Toolbar({ score, streak, onShare, onEnd, onLeaderboard }
               aria-label="Leaderboard"
             >
               <span aria-hidden>🏆</span>
-            </button>
-          </ToolbarTooltip>
-          <ToolbarTooltip label="Share results">
-            <button
-              onClick={onShare}
-              className="text-cream/80 hover:text-gold active:scale-95 px-2 py-1 text-lg"
-              aria-label="Share"
-            >
-              <span aria-hidden>📤</span>
             </button>
           </ToolbarTooltip>
           <button
