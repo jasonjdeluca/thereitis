@@ -1,9 +1,7 @@
-// Phrase bank (Hilton-only until DB-driven phrases are wired up via ingest pipeline).
-// Tiers: hot (high confidence), warm (medium), cold (low — max 1-2 per card).
-//
-// TODO: replace with Supabase phrases query once phrases table is populated via
-// ingest pipeline. See docs/PROJECT_INSTRUCTIONS.md "Pending Work" for steps.
-// When wired, card.js must receive phrases as async input scoped to company_id.
+// Hilton phrase bank — hardcoded fallback for when DB phrases are unavailable.
+// DB-driven phrases (fetched per company_id) are the primary source; see session.js.
+// TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK, TIER constants remain here
+// because Game.jsx uses them for scoring logic independent of the phrase bank.
 
 export const HOT = [
   "Serial Compounder",

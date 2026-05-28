@@ -73,12 +73,12 @@ export default function App() {
   }
 
   function handleSessionCreated(data) {
-    setSession(data);
+    setSession(data); // data includes { sessionId, sessionCode, playerId, displayName, card, phrases }
     setView("lobby");
   }
 
   function handleSessionJoined(data) {
-    setSession(data);
+    setSession(data); // data includes { sessionId, sessionCode, playerId, displayName, card, phrases }
     setView("lobby");
   }
 
@@ -194,6 +194,7 @@ export default function App() {
           playerId={session.playerId}
           displayName={session.displayName}
           initialCard={session.card}
+          phrases={session.phrases}
           companyId={company?.id}
           companyName={company?.name}
           callIdentifier={company?.call_identifier}

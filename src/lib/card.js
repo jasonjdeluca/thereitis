@@ -1,6 +1,4 @@
-// TODO: when DB-driven phrases are ready, this module needs to accept phrase arrays
-// as parameters instead of importing from phrases.js. See phrases.js TODO and
-// docs/PROJECT_INSTRUCTIONS.md "Pending Work" for the full activation checklist.
+// Phrases are DB-driven (fetched per company_id) with a hardcoded fallback to phrases.js.
 import { HOT, WARM, COLD, TRINITY, FILIBUSTER, FREE_LABEL, tierOf, CEO_MODE_PHRASES } from "./phrases.js";
 
 function shuffle(arr) {
@@ -14,6 +12,26 @@ function shuffle(arr) {
 
 function pick(arr, n) {
   return shuffle(arr).slice(0, n);
+}
+
+// Derive hot/warm/cold phrase text arrays from a DB phrases response.
+// Falls back to hardcoded arrays if phrases is null/empty.
+function derivePools(phrases) {
+  if (!phrases || phrases.length === 0) {
+    return { hot: HOT, warm: WARM, cold: COLD, ceo: CEO_MODE_PHRASES };
+  }
+  return {
+    hot: phrases.filter((p) => p.tier === "hot").map((p) => p.phrase),
+    warm: phrases.filter((p) => p.tier === "warm").map((p) => p.phrase),
+    cold: phrases.filter((p) => p.tier === "cold").map((p) => p.phrase),
+    ceo: phrases.filter((p) => p.ceo_mode).map((p) => p.phrase),
+  };
+}
+
+// Build a tier lookup from DB phrases for use in cell construction.
+function makeTierLookup(phrases) {
+  if (!phrases || phrases.length === 0) return null;
+  return new Map(phrases.map((p) => [p.phrase, p.tier]));
 }
 
 // 5x5 grid, FREE at [2][2].
@@ -44,7 +62,15 @@ function trinityPlacements() {
   return placements;
 }
 
-export function generateCard() {
+/**
+ * @param {Array<{phrase: string, tier: string, ceo_mode: boolean}>} [phrases]
+ *   DB phrase rows for the active company. Falls back to hardcoded arrays if omitted.
+ */
+export function generateCard(phrases) {
+  const { hot, warm, cold } = derivePools(phrases);
+  const tierLookup = makeTierLookup(phrases);
+  const getTier = (phrase) => (tierLookup && tierLookup.get(phrase)) || tierOf(phrase);
+
   const grid = Array.from({ length: 5 }, () => Array(5).fill(null));
 
   // FREE center
@@ -71,15 +97,15 @@ export function generateCard() {
   });
 
   // Remaining 21 cells: hot pool excluding Trinity, plus warm, plus 1-2 cold
-  const hotPool = HOT.filter((p) => !TRINITY.includes(p));
+  const hotPool = hot.filter((p) => !TRINITY.includes(p));
   const coldCount = Math.random() < 0.5 ? 1 : 2;
   const hotCount = 13;
   const warmCount = 21 - coldCount - hotCount; // 7 or 6
 
   const fillers = shuffle([
     ...pick(hotPool, hotCount),
-    ...pick(WARM, warmCount),
-    ...pick(COLD, coldCount),
+    ...pick(warm, warmCount),
+    ...pick(cold, coldCount),
   ]);
 
   let idx = 0;
@@ -89,7 +115,7 @@ export function generateCard() {
       const phrase = fillers[idx++];
       grid[r][c] = {
         phrase,
-        tier: tierOf(phrase),
+        tier: getTier(phrase),
         isFree: false,
         isTrinity: false,
         isFilibuster: phrase === FILIBUSTER,
@@ -100,7 +126,15 @@ export function generateCard() {
   return grid;
 }
 
-export function generateCeoCard() {
+/**
+ * @param {Array<{phrase: string, tier: string, ceo_mode: boolean}>} [phrases]
+ *   DB phrase rows for the active company. Falls back to hardcoded arrays if omitted.
+ */
+export function generateCeoCard(phrases) {
+  const { hot, warm, cold, ceo } = derivePools(phrases);
+  const tierLookup = makeTierLookup(phrases);
+  const getTier = (phrase) => (tierLookup && tierLookup.get(phrase)) || tierOf(phrase);
+
   const grid = Array.from({ length: 5 }, () => Array(5).fill(null));
 
   grid[2][2] = {
@@ -124,13 +158,11 @@ export function generateCeoCard() {
     };
   });
 
-  const ceoFillers = shuffle(
-    CEO_MODE_PHRASES.filter((p) => !TRINITY.includes(p)),
-  );
+  const ceoFillers = shuffle(ceo.filter((p) => !TRINITY.includes(p)));
 
   const used = new Set([...TRINITY, ...ceoFillers]);
   const supplement = shuffle(
-    [...HOT, ...WARM, ...COLD].filter((p) => !used.has(p)),
+    [...hot, ...warm, ...cold].filter((p) => !used.has(p)),
   );
 
   const fillers = [...ceoFillers, ...supplement].slice(0, 21);
@@ -142,7 +174,7 @@ export function generateCeoCard() {
       const phrase = fillers[idx++];
       grid[r][c] = {
         phrase,
-        tier: tierOf(phrase),
+        tier: getTier(phrase),
         isFree: false,
         isTrinity: false,
         isFilibuster: phrase === FILIBUSTER,

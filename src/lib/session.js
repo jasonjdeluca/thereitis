@@ -4,6 +4,21 @@ import { generateCard } from "./card";
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
+async function fetchPhrases(companyId) {
+  if (!companyId) return null;
+  try {
+    const { data, error } = await supabase
+      .from("phrases")
+      .select("phrase, tier, ceo_mode, special_square")
+      .eq("company_id", companyId)
+      .eq("is_active", true);
+    if (error || !data || data.length === 0) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 function generateCode() {
   let code = "";
   for (let i = 0; i < 6; i++) {
@@ -14,7 +29,9 @@ function generateCode() {
 
 export async function createSession(displayName, companyId) {
   const code = generateCode();
-  const card = generateCard();
+  const phrases = await fetchPhrases(companyId);
+  if (!phrases) console.warn("[phrases] fetch failed or empty — using hardcoded fallback");
+  const card = generateCard(phrases);
 
   const row = { session_code: code, status: "active", player_count: 1 };
   if (companyId) row.company_id = companyId;
@@ -42,7 +59,7 @@ export async function createSession(displayName, companyId) {
   sessionStorage.setItem("thereitis_session_id", session.id);
   sessionStorage.setItem("thereitis_player_id", player.id);
 
-  return { session, player, card };
+  return { session, player, card, phrases };
 }
 
 export async function joinSession(code, displayName) {
@@ -61,7 +78,9 @@ export async function joinSession(code, displayName) {
     return { error: "This session has expired — start a new one" };
   }
 
-  const card = generateCard();
+  const phrases = await fetchPhrases(session.company_id);
+  if (!phrases) console.warn("[phrases] fetch failed or empty — using hardcoded fallback");
+  const card = generateCard(phrases);
 
   const { data: player, error: playerError } = await supabase
     .from("players")
@@ -80,5 +99,5 @@ export async function joinSession(code, displayName) {
   sessionStorage.setItem("thereitis_session_id", session.id);
   sessionStorage.setItem("thereitis_player_id", player.id);
 
-  return { session, player, card };
+  return { session, player, card, phrases };
 }

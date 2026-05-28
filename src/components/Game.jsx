@@ -29,6 +29,7 @@ export default function Game({
   playerId,
   displayName,
   initialCard,
+  phrases,
   companyId,
   companyName,
   callIdentifier,
@@ -644,7 +645,7 @@ export default function Game({
     const next = !ceoMode;
     setCeoMode(next);
     if (next) {
-      setGrid(generateCeoCard());
+      setGrid(generateCeoCard(phrases));
       setScore(0);
       setStreak(0);
       setMaxStreak(0);

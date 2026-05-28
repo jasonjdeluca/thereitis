@@ -125,46 +125,26 @@ These are open and documented — do not treat them as discoveries:
 - **`sessions.created_at` missing**: Code in `src/lib/session.js` and `src/components/Lobby.jsx` reads `session.created_at` for the 6-hour expiry check. This column does not exist — the equivalent column is `started_at`. The check silently fails (returns NaN, which never exceeds the threshold), so sessions never expire client-side. Fix: update both files to use `started_at`.
 - **`marks.created_at` missing**: `Game.jsx` reads `mark.created_at || new Date().toISOString()`. The `marks` table has `marked_at` not `created_at`, so this always falls back to `new Date()` — harmless but imprecise.
 - **`player_badges` unused**: The table exists and has RLS policies, but the app never writes badge data to it. Badges are evaluated client-side only (PostGame/BadgeReveal). If server-side badge persistence is desired, wire `evaluateBadges()` output to an insert at game end.
-- **`phrases` table not created**: DB-driven phrases are deferred. See "Pending Work" below.
 - **`README.md` is outdated**: Describes a single-player no-backend prototype. `claude.md` is authoritative.
 
 ---
 
+## Phrases
+
+Phrases are DB-driven. The `phrases` table (migration 011) is populated per company via `scripts/ingest.js`.
+
+**How it works:**
+- `session.js` calls `fetchPhrases(companyId)` before generating each player's card.
+- Fetches `phrases` where `company_id = <active company>` and `is_active = true`.
+- On success, the phrase array is passed to `generateCard(phrases)` and `generateCeoCard(phrases)`.
+- On failure or empty result, both functions fall back silently to the hardcoded arrays in `phrases.js`.
+- Phrases are fetched once per session join and passed as a prop to `Game.jsx` for CEO mode card generation.
+
+**Fallback:** The hardcoded `HOT`/`WARM`/`COLD`/`CEO_MODE_PHRASES` arrays in `phrases.js` serve as the fallback. `TRINITY`, `FILIBUSTER`, `GREAT_QUESTION`, `DONT_OVERCOOK`, `TIER`, and `tierOf()` remain in `phrases.js` because `Game.jsx` uses them for scoring logic regardless of phrase source.
+
+**To add phrases for a new company:** run the ingest pipeline (see Ingest Pipeline section), review the SQL output, execute via Supabase MCP, and write it to a new migration file.
+
 ## Pending Work
-
-### DB-Driven Phrases
-
-Phrases are currently hardcoded in `src/lib/phrases.js` (Hilton only). The ingest pipeline (`scripts/ingest.js`) is designed to populate a `phrases` table per company, but that table does not yet exist in the live DB.
-
-To activate DB-driven phrases:
-
-1. **Create the phrases table** — run and migrate:
-   ```sql
-   CREATE TABLE phrases (
-     id           uuid    PRIMARY KEY DEFAULT gen_random_uuid(),
-     company_id   text    REFERENCES companies(id),
-     phrase       text    NOT NULL,
-     tier         text    NOT NULL,        -- 'hot', 'warm', 'cold'
-     points       integer NOT NULL,
-     ceo_mode     boolean DEFAULT true,
-     special_square text,                 -- 'great_question', 'dont_overcook', 'filibuster', or NULL
-     is_active    boolean DEFAULT true,
-     created_at   timestamptz DEFAULT now(),
-     CHECK (char_length(phrase) <= 25)
-   );
-   CREATE INDEX ON phrases(company_id);
-   ALTER TABLE phrases ENABLE ROW LEVEL SECURITY;
-   CREATE POLICY "phrases_select_all" ON phrases FOR SELECT USING (true);
-   CREATE POLICY "phrases_insert_admin" ON phrases FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-   CREATE POLICY "phrases_update_admin" ON phrases FOR UPDATE USING (auth.role() = 'authenticated');
-   CREATE POLICY "phrases_delete_admin" ON phrases FOR DELETE USING (auth.role() = 'authenticated');
-   ```
-2. **Run ingest** for at least Hilton: `ANTHROPIC_API_KEY=<key> node scripts/ingest.js`
-3. **Review and execute** the generated `scripts/pending/hilton.sql` — also write it to a migration file.
-4. **Update `card.js`** — `generateCard()` and `generateCeoCard()` need to accept phrase arrays as arguments instead of importing from `phrases.js`. The callers (session.js, NameEntry) must fetch phrases from Supabase before calling card generation.
-5. **Update `phrases.js`** — the constants for TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK, TIER, and `tierOf()` should remain as they are used by Game.jsx for scoring logic. Only the HOT/WARM/COLD/CEO_MODE_PHRASES arrays need to become DB-fetched.
-6. **Add loading state** — card generation must wait for the phrase fetch to complete. Add a fallback to the hardcoded arrays if the fetch fails or returns empty, so the game never breaks.
-7. **Scope to company_id** — fetch only phrases where `company_id = <active company>` and `is_active = true`.
 
 ---
 
