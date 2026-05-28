@@ -42,7 +42,9 @@ Both `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` must be set in Vercel envi
 
 Supabase project is under the **"There It Is" org** — always confirm before executing any SQL via MCP.
 
-### Tables (from migrations + live DB)
+Migrations 001–012 cover the full schema. The migration directory is complete as of 2026-05-28. Every new SQL change must add a new versioned migration file.
+
+### Tables
 
 #### `sessions`
 | Column | Type | Notes |
@@ -52,9 +54,8 @@ Supabase project is under the **"There It Is" org** — always confirm before ex
 | call_identifier | text | e.g. "Q2 2026 Earnings Call" |
 | session_code | text UNIQUE | 6-char alphanumeric |
 | started_at | timestamptz | default now() |
-| created_at | timestamptz | used in code for age checks |
 | ended_at | timestamptz | |
-| status | text | default 'lobby' |
+| status | text | default 'lobby'; set to 'active' on create via session.js |
 | player_count | integer | default 0 |
 | winner_phrase | text | written by WordOfTheCall after voting |
 
@@ -63,7 +64,7 @@ Supabase project is under the **"There It Is" org** — always confirm before ex
 |---|---|---|
 | id | uuid PK | |
 | session_id | uuid | FK → sessions(id) ON DELETE CASCADE |
-| display_name | text | max 30 chars (DB constraint) |
+| display_name | text | max 30 chars (DB CHECK constraint) |
 | card_layout | jsonb | 5×5 grid of cell objects |
 | marked_squares | jsonb | default '[]' |
 | predictions | jsonb | up to 3 pre-call phrase picks |
@@ -80,14 +81,13 @@ Supabase project is under the **"There It Is" org** — always confirm before ex
 | player_id | uuid | FK → players(id) ON DELETE CASCADE |
 | phrase | text | |
 | marked_at | timestamptz | default now() |
-| created_at | timestamptz | used by realtime payload |
 | points_awarded | integer | default 0 |
 | streak_count | integer | default 0 |
 
 #### `companies`
 | Column | Type | Notes |
 |---|---|---|
-| id | text PK | e.g. 'hilton', 'marriott' |
+| id | text PK | e.g. 'hilton', 'ko' |
 | name | text | display name |
 | emoji | text | e.g. '🏨' — no trademark logos ever |
 | is_active | boolean | controls whether "Start a Game" is enabled |
@@ -95,14 +95,18 @@ Supabase project is under the **"There It Is" org** — always confirm before ex
 | call_identifier | text | e.g. "Q2 2026 Earnings Call" |
 | next_earnings_date | timestamptz | drives countdown timer |
 | next_earnings_timezone | text | e.g. 'America/New_York' |
+| total_sessions | integer | default 0 |
+| created_at | timestamptz | default now() |
 
-Active companies: hilton, marriott, hyatt, ihg, wyndham, choice (in Admin.jsx COMPANY_ORDER).
+Active companies in DB: **hilton** (🏨), **ko** (🥤 Coca-Cola).
+
+COMPANY_ORDER in `Admin.jsx` and `CompanySelect.jsx`: `["hilton", "ko", "marriott", "hyatt", "ihg", "wyndham", "choice"]`. Companies not yet in the DB (marriott, hyatt, ihg, wyndham, choice) are silently filtered out — they appear in COMPANY_ORDER but have no rows and are not shown.
 
 #### `trivia_questions`
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid PK | |
-| company_id | text | |
+| company_id | text | FK → companies(id) |
 | question | text | |
 | option_a/b/c/d | text | |
 | correct_answer | text | 'a', 'b', 'c', or 'd' |
@@ -116,37 +120,49 @@ Active companies: hilton, marriott, hyatt, ihg, wyndham, choice (in Admin.jsx CO
 | Column | Type | Notes |
 |---|---|---|
 | id | uuid PK | |
-| session_id | uuid | |
-| player_id | uuid | |
+| session_id | uuid | FK → sessions(id) ON DELETE CASCADE |
+| player_id | uuid | FK → players(id) ON DELETE CASCADE |
 | phrase | text | |
+| voted_at | timestamptz | default now() |
+| — | UNIQUE | (session_id, player_id) — one vote per player per session |
 
 #### `player_badges`
 | Column | Type | Notes |
 |---|---|---|
-| (schema not yet fully versioned) | | Used in RLS; no CREATE TABLE migration exists yet |
+| id | uuid PK | |
+| player_id | uuid | FK → players(id) ON DELETE CASCADE |
+| session_id | uuid | FK → sessions(id) ON DELETE CASCADE |
+| badge_id | text | matches keys in `src/lib/badges.js` BADGE_DEFS |
+| earned_at | timestamptz | default now() |
 
-#### `phrases` (future / ingest-only)
-Referenced in `scripts/ingest.js` SQL output. Not yet wired into the app — phrases are currently hardcoded in `src/lib/phrases.js`. When DB-driven phrases are implemented, this table will have: company_id, phrase, tier, points, ceo_mode, special_square, is_active.
+Currently 0 rows — badges are evaluated client-side only (PostGame/BadgeReveal) and not yet written back here.
+
+#### `phrases`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| company_id | text | FK → companies(id) |
+| phrase | text | max 25 chars (DB CHECK constraint) |
+| tier | text | 'hot', 'warm', or 'cold' |
+| points | integer | |
+| ceo_mode | boolean | default true |
+| special_square | text | 'filibuster', 'great_question', 'dont_overcook', or null |
+| is_active | boolean | default true |
+| created_at | timestamptz | |
+
+Live and populated: Hilton (51 phrases seeded via migration 012). Coca-Cola row exists but phrases not yet ingested (phrase_count = 0).
 
 ### RLS Status
 
 All tables have RLS enabled (migration 002). Policies:
 - **SELECT**: public (all tables)
 - **INSERT**: public for sessions, players, marks, call_votes, player_badges
-- **INSERT/UPDATE/DELETE**: `auth.role() = 'authenticated'` for companies, trivia_questions
+- **INSERT/UPDATE/DELETE**: `auth.role() = 'authenticated'` for companies, trivia_questions, phrases
 - **DELETE**: `auth.role() = 'authenticated'` for sessions, players, marks, call_votes, player_badges
 
 ### Functions / RPCs
 
 - `increment_player_count(session_id uuid)`: Atomically increments `sessions.player_count`. Called on join to avoid race conditions.
-
-### Migration Gap (known debt)
-
-`supabase/migrations/` is **not a complete picture of the live schema**. The following are in the live DB but lack CREATE TABLE migrations:
-- `companies`, `trivia_questions`, `call_votes`, `player_badges`
-- `sessions.winner_phrase`, `sessions.created_at`, `players.predictions`, `marks.created_at`
-
-When adding new columns or tables via Supabase MCP, always write the SQL to a new migration file in `supabase/migrations/` as well (e.g., `005_add_X.sql`).
 
 ---
 
@@ -191,14 +207,14 @@ When adding new columns or tables via Supabase MCP, always write the SQL to a ne
 - **`Celebration`**: Bingo/blackout animation overlay.
 - **`Toast`**: Floating notifications (local and broadcast).
 - **`TriviaQuiz`**: 6-question quiz from `trivia_questions` table. Randomized per-session, difficulty-mixed (2 easy, 3 medium, 1 hard). 10-second timer per question.
-- **`Admin`**: Auth-gated (Supabase Auth). Manages company earnings dates, call identifiers, active status; trivia question on/off toggles; session stats per company.
+- **`Admin`**: Auth-gated (Supabase Auth). Manages company earnings dates, call identifiers, active status; trivia question on/off toggles; session stats per company. **Known limitation**: `TriviaSection` is hardcoded to `company_id = "hilton"` — trivia management only works for Hilton until this is generalized.
 
 ### Lib Descriptions
 
 - **`supabase.js`**: Supabase client singleton.
-- **`session.js`**: `createSession(displayName, companyId)` and `joinSession(code, displayName)`. Writes to `sessions` and `players`. Stores IDs in `sessionStorage`.
-- **`card.js`**: `generateCard()` and `generateCeoCard()`. Trinity (Brand-Led, Network-Driven, Platform-Enabled) always placed as 3 consecutive cells in a row or column (not through FREE). FREE hardcoded to [2][2]. 1–2 cold phrases per card.
-- **`phrases.js`**: HOT (28), WARM (18), COLD (5) phrase arrays. Tier point values. CEO_MODE_PHRASES subset. Special exports: TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK.
+- **`session.js`**: `createSession(displayName, companyId)` and `joinSession(code, displayName)`. Fetches DB phrases via `fetchPhrases(companyId)` before card generation. Writes to `sessions` and `players`. Stores IDs in `sessionStorage`.
+- **`card.js`**: `generateCard(phrases)` and `generateCeoCard(phrases)`. Both accept DB phrase rows (with fallback to hardcoded arrays). Trinity (Brand-Led, Network-Driven, Platform-Enabled) always placed as 3 consecutive cells in a row or column (not through FREE). FREE hardcoded to [2][2]. 1–2 cold phrases per card.
+- **`phrases.js`**: HOT (28), WARM (18), COLD (5) phrase arrays — Hilton fallback bank. Tier point values. CEO_MODE_PHRASES subset. Special exports: TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK, TIER, CEO_TIER, and `tierOf()`.
 - **`bingo.js`**: Line detection (5 rows + 5 cols + 2 diagonals), `evaluate()` returns completed lines + nearMiss, `isBlackout()`.
 - **`badges.js`**: 12 badge definitions, `evaluateBadges()` evaluates all conditions against end-of-game state.
 
@@ -235,7 +251,9 @@ When adding new columns or tables via Supabase MCP, always write the SQL to a ne
 - Budget cap: $8.00 per run
 - Requires `ANTHROPIC_API_KEY` in shell environment (NOT a Vite env var — never included in the browser bundle)
 - Output SQL files must be reviewed before executing against the live DB
-- `scripts/companies.json` contains ingest candidates: Coca-Cola (KO), Home Depot (HD), Citigroup (C), JPMorgan Chase (JPM) — these are not yet live in the app
+- `scripts/companies.json` contains ingest candidates: Coca-Cola (KO), Home Depot (HD), Citigroup (C), JPMorgan Chase (JPM)
+  - Coca-Cola (`ko`) is **active** in the DB but phrases not yet ingested (phrase_count = 0)
+  - Home Depot (`hd`), Citigroup (`c`), JPMorgan Chase (`jpm`) are **not yet in the DB** — run ingest + toggle active at `/gate` to activate
 
 ---
 
@@ -250,7 +268,7 @@ Admin can:
 - Set next earnings date, time, timezone
 - Set call identifier string
 - View per-company session stats (24h sessions, total games, total players, most-marked phrase)
-- Toggle trivia questions active/inactive
+- Toggle trivia questions active/inactive (**Hilton only** — TriviaSection hardcoded to `company_id = "hilton"`)
 
 ---
 
@@ -267,21 +285,21 @@ Admin can:
 These findings are resolved — do not re-audit or re-open:
 
 1. **Admin gate**: Supabase Auth `signInWithPassword`. `VITE_ADMIN_PASSWORD` and all sessionStorage bypass logic are gone.
-2. **RLS**: Enabled on all 7 tables with appropriate policies (migration 002).
+2. **RLS**: Enabled on all 8 tables with appropriate policies (migration 002).
 3. **Atomic player count**: `increment_player_count` RPC prevents race conditions on simultaneous joins (migration 003).
 4. **Display name constraint**: DB-level `CHECK (char_length(display_name) <= 30)` (migration 004).
-5. **Security headers**: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy in `vercel.json`.
-6. **Broadcast toast throttle**: Receiving client ignores broadcast toasts within 5 seconds of the last one.
-7. **Anthropic SDK**: In `devDependencies` only — never bundled into the client.
+5. **Phrase length constraint**: DB-level `CHECK (char_length(phrase) <= 25)` on `phrases` table (migration 011).
+6. **Security headers**: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy in `vercel.json`.
+7. **Broadcast toast throttle**: Receiving client ignores broadcast toasts within 5 seconds of the last one.
+8. **Anthropic SDK**: In `devDependencies` only — never bundled into the client.
 
 ---
 
 ## Known Bugs / Technical Debt
 
-- **`sessions.created_at` missing**: `session.js` and `Lobby.jsx` reference `session.created_at` for the 6-hour expiry check, but the column is `started_at`. Expiry silently fails (NaN comparison). Fix: use `started_at`.
-- **`marks.created_at` missing**: `Game.jsx` uses `mark.created_at || new Date().toISOString()`. Column is `marked_at`; fallback always fires — harmless but imprecise.
-- **`player_badges` unused**: Table exists with full RLS, but the app never writes badge data. Badges are evaluated client-side only (PostGame/BadgeReveal).
-- **`phrases` table not created**: DB-driven phrases deferred. See `docs/PROJECT_INSTRUCTIONS.md` "Pending Work" for activation checklist.
+- **`player_badges` unused**: Table exists with full RLS, but the app never writes badge data. Badges are evaluated client-side only (PostGame/BadgeReveal). If server-side badge persistence is desired, wire `evaluateBadges()` output to an insert at game end.
+- **TriviaSection hardcoded to Hilton**: `Admin.jsx` `TriviaSection` component fetches `trivia_questions` filtered to `company_id = "hilton"` only. Trivia management for other companies requires generalizing this component.
+- **Coca-Cola phrases not ingested**: `ko` company row exists and is active, but `phrase_count = 0` and no rows in `phrases` for `company_id = 'ko'`. Games started for Coca-Cola silently fall back to Hilton hardcoded phrases. Fix: run ingest pipeline for KO.
 - **`README.md` is outdated**: Describes a single-player no-backend prototype. This file is authoritative.
 
 ---
@@ -290,13 +308,13 @@ These findings are resolved — do not re-audit or re-open:
 
 1. **No individual person names** — not in code, UI, comments, variable names, copy, or toast messages. Role references ("the CEO") are OK.
 2. **No company logos or trademark assets** — emoji icons only (🏨 for hotels). This is a non-affiliated hobby project.
-3. **25 character max on all phrase tiles** — enforced by `ingest.js` validation; must be respected in any manual phrase additions.
+3. **25 character max on all phrase tiles** — enforced by `ingest.js` validation and DB constraint on `phrases.phrase`; must be respected in any manual phrase additions.
 4. **Mobile first** — the 5×5 card is sacred. Nothing overlaps the card. Max width `430px` on desktop (`lg:max-w-[430px] lg:mx-auto`).
 5. **Dark navy (#0A1628) + gold (#D4AF37) throughout** — use Tailwind tokens `navy`, `gold`, `cream`. Never introduce new color schemes.
 6. **Tailwind CSS only** — no additional styling libraries. No inline styles except where Tailwind cannot express the value.
 7. **CEO Mode only in phrase content** — all extracted phrases must be executive-level catchphrases, corporate buzzwords, or verbal tics. No operational minutiae.
 8. **Supabase MCP**: Always confirm the active project is under the **"There It Is" org** before executing any SQL. Never connect to another org.
-9. **Migration files**: Every SQL change executed via MCP must also be written to `supabase/migrations/` as a new versioned file (e.g., `005_add_X.sql`).
+9. **Migration files**: Every SQL change executed via MCP must also be written to `supabase/migrations/` as a new versioned file (e.g., `013_add_X.sql`). Next migration number is 013.
 10. **Vercel auto-deploys on push to `main`** — any push is a production deploy.
 11. **VITE_ADMIN_PASSWORD is retired** — must never be re-introduced in any form.
 12. **README.md is outdated** (describes a no-backend single-player prototype) — do not use it as a reference; this file is authoritative.
