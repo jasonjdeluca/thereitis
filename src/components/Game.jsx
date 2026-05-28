@@ -751,6 +751,7 @@ export default function Game({
         ceoMode={ceoMode}
         sessionId={sessionId}
         companyId={companyId}
+        companyName={companyName}
         callIdentifier={callIdentifier}
       />
     );

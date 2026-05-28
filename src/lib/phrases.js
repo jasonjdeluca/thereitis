@@ -1,5 +1,9 @@
-// Phrase bank for Hilton Q2 2026 earnings call.
+// Phrase bank (Hilton-only until DB-driven phrases are wired up via ingest pipeline).
 // Tiers: hot (high confidence), warm (medium), cold (low — max 1-2 per card).
+//
+// TODO: replace with Supabase phrases query once phrases table is populated via
+// ingest pipeline. See docs/PROJECT_INSTRUCTIONS.md "Pending Work" for steps.
+// When wired, card.js must receive phrases as async input scoped to company_id.
 
 export const HOT = [
   "Serial Compounder",

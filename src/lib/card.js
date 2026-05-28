@@ -1,3 +1,6 @@
+// TODO: when DB-driven phrases are ready, this module needs to accept phrase arrays
+// as parameters instead of importing from phrases.js. See phrases.js TODO and
+// docs/PROJECT_INSTRUCTIONS.md "Pending Work" for the full activation checklist.
 import { HOT, WARM, COLD, TRINITY, FILIBUSTER, FREE_LABEL, tierOf, CEO_MODE_PHRASES } from "./phrases.js";
 
 function shuffle(arr) {

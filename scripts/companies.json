@@ -1,0 +1,70 @@
+[
+  {
+    "id": "ko",
+    "name": "Coca-Cola",
+    "ticker": "KO",
+    "emoji": "🥤",
+    "transcripts": [
+      { "quarter": "Q1 2026", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/11107/webcast_transcript/CORRECTED%2BTRANSCRIPT_KO%2BQ126%2BEarnings%2BCall.pdf" },
+      { "quarter": "Q4 2025", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/11088/webcast_transcript/CORRECTED%2BTRANSCRIPT%2B%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2BQ4%2B2025%2BEarnings%2BCall%2B10-February-2026%2B8%2B30%2BAM%2BET.pdf" },
+      { "quarter": "Q3 2025", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/11074/webcast_transcript/CORRECTED%2BTRANSCRIPT%2B%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2C%2BQ3%2B2025%2BEarnings%2BCall%2C%2B21-October-2025%2B8%2B30%2BAM%2BET.pdf" },
+      { "quarter": "Q2 2025", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/11064/webcast_transcript/CORRECTED%2BTRANSCRIPT_%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2C%2BQ2%2B2025%2BEarnings%2BCall%2C%2B22-July-2025%2B8_30%2BAM%2BET.pdf" },
+      { "quarter": "Q1 2025", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10625/webcast_transcript/CORRECTED%2BTRANSCRIPT%2B%2BThe%2BCoca-Cola%2BCo.%28KO-US%29%2C%2BQ1%2B2025%2BEarnings%2BCall%2C%2B29-April-2025%2B8%2B30%2BAM%2BET.pdf" },
+      { "quarter": "Q4 2024", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10242/webcast_transcript/CORRECTED_TRANSCRIPT_The_Coca-Cola_Co.%28KO-US%29%2C_Q4_2024_Earnings_Call%2C_11-February-2025_8_30_AM_ET.pdf" },
+      { "quarter": "Q3 2024", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10241/webcast_transcript/CORRECTED_TRANSCRIPT_The_Coca-Cola_Co.%28KO-US%29%2C_Q3_2024_Earnings_Call%2C_23-October-2024_8_30_AM_ET.pdf" },
+      { "quarter": "Q2 2024", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10240/webcast_transcript/CORRECTED_TRANSCRIPT_The_Coca-Cola_Co.%28KO-US%29%2C_Q2_2024_Earnings_Call%2C_23-July-2024_8_30_AM_ET.pdf" },
+      { "quarter": "Q1 2024", "url": "https://investors.coca-colacompany.com/_assets/_7558b9e229c4944bef38147230779b0f/cocacolacompany/db/880/10239/webcast_transcript/CORRECTED_TRANSCRIPT__The_Coca-Cola_Co.%28KO-US%29%2C_Q1_2024_Earnings_Call%2C_30-April-2024_8_30_AM_ET.pdf" }
+    ]
+  },
+  {
+    "id": "hd",
+    "name": "Home Depot",
+    "ticker": "HD",
+    "emoji": "🔨",
+    "transcripts": [
+      { "quarter": "Q1 2026", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/2026/hd-1q26-transcript.pdf" },
+      { "quarter": "Q4 2025", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/reports-and-presentations/quarterly-earnings/hd-4q25-transcript.pdf" },
+      { "quarter": "Q3 2025", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/2025/the-home-depot-inc-hd-us-q3-2025-earnings-call-v1.pdf" },
+      { "quarter": "Q2 2025", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/reports-and-presentations/quarterly-earnings/2025/hd-2q25-transcript-vf.pdf" },
+      { "quarter": "Q1 2025", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/reports-and-presentations/quarterly-earnings/2025/hd-1q25-transcript.pdf" },
+      { "quarter": "Q4 2024", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-4q24-transcript.pdf" },
+      { "quarter": "Q3 2024", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/2024/HD_3Q24_Transcript_vf2.pdf" },
+      { "quarter": "Q2 2024", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-2q24-transcript.pdf" },
+      { "quarter": "Q1 2024", "url": "https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/documents/hd-1q24-transcript.pdf" }
+    ]
+  },
+  {
+    "id": "c",
+    "name": "Citigroup",
+    "ticker": "C",
+    "emoji": "🏦",
+    "transcripts": [
+      { "quarter": "Q1 2026", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2026psqtr1-transcript.pdf" },
+      { "quarter": "Q4 2025", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2025psqtr4-transcript.pdf" },
+      { "quarter": "Q3 2025", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q32025/2025psqtr3-transcript.pdf" },
+      { "quarter": "Q2 2025", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q22025/transcript.pdf" },
+      { "quarter": "Q1 2025", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q12025/transcript.pdf" },
+      { "quarter": "Q4 2024", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/Earnings/Q42024/4Q24-Earnings-Transcript.pdf" },
+      { "quarter": "Q3 2024", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/3Q24-Earnings-Transcript.pdf" },
+      { "quarter": "Q2 2024", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/transcript07122024.pdf" },
+      { "quarter": "Q1 2024", "url": "https://www.citigroup.com/rcs/citigpa/storage/public/2024q1tr.pdf" }
+    ]
+  },
+  {
+    "id": "jpm",
+    "name": "JPMorgan Chase",
+    "ticker": "JPM",
+    "emoji": "🏦",
+    "transcripts": [
+      { "quarter": "Q1 2026", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2026/1st-quarter/1q26-earnings-transcript.pdf" },
+      { "quarter": "Q4 2025", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2025/4th-quarter/4q25-earnings-transcript.pdf" },
+      { "quarter": "Q3 2025", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2025/3rd-quarter/3q25-earnings-transcript.pdf" },
+      { "quarter": "Q2 2025", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2025/2nd-quarter/2q25-earnings-transcript.pdf" },
+      { "quarter": "Q1 2025", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2025/1st-quarter/1q25-earnings-transcript.pdf" },
+      { "quarter": "Q4 2024", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2024/4th-quarter/4q24-earnings-transcript.pdf" },
+      { "quarter": "Q3 2024", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2024/3rd-quarter/3q24-earnings-transcript.pdf" },
+      { "quarter": "Q2 2024", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2024/2nd-quarter/2q24-earnings-transcript.pdf" },
+      { "quarter": "Q1 2024", "url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2024/1st-quarter/1q24-earnings-transcript.pdf" }
+    ]
+  }
+]

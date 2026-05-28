@@ -40,6 +40,7 @@ export default function PostGame({
   ceoMode,
   sessionId,
   companyId,
+  companyName,
   callIdentifier,
 }) {
   const cardRef = useRef(null);
@@ -186,7 +187,7 @@ export default function PostGame({
               🏨
             </div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-cream/60">
-              Hilton · Q2 2026{ceoMode ? " · CEO Mode" : ""}
+              {companyName || "There It Is"}{callIdentifier ? ` · ${callIdentifier}` : ""}{ceoMode ? " · CEO Mode" : ""}
             </div>
             <h2 className="mt-3 font-display font-black text-2xl text-gold leading-tight">
               {headline}
