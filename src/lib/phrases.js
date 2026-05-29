@@ -1,7 +1,7 @@
-// Hilton phrase bank — hardcoded fallback for when DB phrases are unavailable.
-// DB-driven phrases (fetched per company_id) are the primary source; see session.js.
-// TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK, TIER constants remain here
-// because Game.jsx uses them for scoring logic independent of the phrase bank.
+// Constants used by Game.jsx for scoring, card generation, and special-square detection.
+// HOT/WARM/COLD arrays are Hilton phrases used only by tierOf() as a tier-lookup fallback
+// for phrases not found in the DB-driven tierLookup (e.g. Trinity cells in card.js).
+// They are NOT a fallback phrase source — session.js throws if DB phrases are unavailable.
 
 export const HOT = [
   "Serial Compounder",

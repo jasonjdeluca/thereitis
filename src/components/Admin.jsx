@@ -237,7 +237,7 @@ function CompanyStats({ companyId, callIdentifier }) {
   );
 }
 
-function TriviaSection() {
+function TriviaSection({ companyId }) {
   const [questions, setQuestions] = useState([]);
   const [count, setCount] = useState(0);
 
@@ -246,14 +246,14 @@ function TriviaSection() {
       const { data, count: total } = await supabase
         .from("trivia_questions")
         .select("id, question, difficulty, is_active", { count: "exact" })
-        .eq("company_id", "hilton")
+        .eq("company_id", companyId)
         .order("created_at", { ascending: true });
 
       setQuestions(data || []);
       setCount(total || 0);
     }
     load();
-  }, []);
+  }, [companyId]);
 
   async function toggleQuestion(id, currentActive) {
     await supabase
@@ -456,6 +456,10 @@ function CompanyCard({ company, onUpdate }) {
       </div>
 
       <CompanyStats companyId={company.id} callIdentifier={company.call_identifier} />
+
+      <div className="mt-4 pt-4 border-t border-cream/10">
+        <TriviaSection companyId={company.id} />
+      </div>
     </div>
   );
 }
@@ -521,10 +525,6 @@ function AdminPanel({ onSignOut }) {
             </section>
           ))
         )}
-
-        <section className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
-          <TriviaSection />
-        </section>
       </main>
     </div>
   );

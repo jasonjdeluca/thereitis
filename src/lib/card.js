@@ -1,5 +1,4 @@
-// Phrases are DB-driven (fetched per company_id) with a hardcoded fallback to phrases.js.
-import { HOT, WARM, COLD, TRINITY, FILIBUSTER, FREE_LABEL, tierOf, CEO_MODE_PHRASES } from "./phrases.js";
+import { TRINITY, FILIBUSTER, FREE_LABEL, tierOf } from "./phrases.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -14,12 +13,7 @@ function pick(arr, n) {
   return shuffle(arr).slice(0, n);
 }
 
-// Derive hot/warm/cold phrase text arrays from a DB phrases response.
-// Falls back to hardcoded arrays if phrases is null/empty.
 function derivePools(phrases) {
-  if (!phrases || phrases.length === 0) {
-    return { hot: HOT, warm: WARM, cold: COLD, ceo: CEO_MODE_PHRASES };
-  }
   return {
     hot: phrases.filter((p) => p.tier === "hot").map((p) => p.phrase),
     warm: phrases.filter((p) => p.tier === "warm").map((p) => p.phrase),

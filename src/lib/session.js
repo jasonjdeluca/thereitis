@@ -30,7 +30,7 @@ function generateCode() {
 export async function createSession(displayName, companyId) {
   const code = generateCode();
   const phrases = await fetchPhrases(companyId);
-  if (!phrases) console.warn("[phrases] fetch failed or empty — using hardcoded fallback");
+  if (!phrases) throw new Error("This company has no phrases yet — the game cannot be started");
   const card = generateCard(phrases);
 
   const row = { session_code: code, status: "active", player_count: 1 };
@@ -79,7 +79,7 @@ export async function joinSession(code, displayName) {
   }
 
   const phrases = await fetchPhrases(session.company_id);
-  if (!phrases) console.warn("[phrases] fetch failed or empty — using hardcoded fallback");
+  if (!phrases) return { error: "This company has no phrases yet — the game cannot be joined" };
   const card = generateCard(phrases);
 
   const { data: player, error: playerError } = await supabase
