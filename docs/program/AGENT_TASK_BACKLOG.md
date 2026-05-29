@@ -81,16 +81,16 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group D — Admin Console
 *Claude Code · Phase 2 · Depends on: Group A complete, Group B scripts exist*
 
-- [ ] Build company readiness table on admin dashboard
+- [x] Build company readiness table on admin dashboard
   - Columns: company name, emoji, ticker, phrase count, trivia count, status badge, activation toggle
   - Data source: live Supabase query or `reports/company-readiness.json`
-- [ ] Add status badges: Ready (green), Needs Phrases (yellow), Needs Trivia (yellow), Blocked (red)
-- [ ] Add activation gate: if company fails minimum readiness, disable the active toggle and show reason
-- [ ] Add ingestion status column: Not Started / Researching / Fetching / Extracting / Generating / QA / Ready for Migration / Active
-- [ ] Add next call date field per company, editable inline by admin
-- [ ] Add admin warning banner for companies that are active but stale or below threshold
-- [ ] Add sample card preview: clicking a company shows a randomly assembled 5×5 bingo card using that company's phrases
-- [ ] Add recent sessions list: last 10 sessions with company name, player count, whether bingo was reached
+- [x] Add status badges: Ready (green), Needs Phrases (yellow), Needs Trivia (yellow), Blocked (red)
+- [x] Add activation gate: if company fails minimum readiness, disable the active toggle and show reason
+- [x] Add ingestion status column: Not Started / Researching / Fetching / Extracting / Generating / QA / Ready for Migration / Active
+- [x] Add next call date field per company, editable inline by admin
+- [x] Add admin warning banner for companies that are active but stale or below threshold
+- [x] Add sample card preview: clicking a company shows a randomly assembled 5×5 bingo card using that company's phrases
+- [x] Add recent sessions list: last 10 sessions with company name, player count, whether bingo was reached
 
 ---
 
