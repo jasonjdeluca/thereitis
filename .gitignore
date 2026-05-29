@@ -18,6 +18,11 @@ dist-ssr
 # Runtime report artifacts
 reports/
 
+# Ingestion pipeline runtime artifacts (SQLite queue + raw transcripts)
+# Keep the directory tracked via .gitkeep, ignore everything else.
+data/*
+!data/.gitkeep
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

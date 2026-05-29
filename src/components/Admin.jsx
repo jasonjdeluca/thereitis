@@ -346,6 +346,322 @@ function CompanyReadinessTable() {
   );
 }
 
+// ─── Phrase staging review ───────────────────────────────────────────────────
+
+// phrases.tier and phrases.points are NOT NULL with no DB default, so an approve
+// must supply them. New phrases land as 'warm'; an admin can re-tier later.
+const APPROVE_DEFAULT_TIER = "warm";
+const APPROVE_DEFAULT_POINTS = 75;
+
+function BingoTilePreview({ phrase }) {
+  return (
+    <div className="inline-flex items-center justify-center text-center rounded-lg bg-navy border border-gold text-gold font-semibold uppercase tracking-wide text-[11px] leading-tight px-2 py-2 min-w-[7rem] max-w-[9rem] min-h-[3.5rem]">
+      {phrase}
+    </div>
+  );
+}
+
+function PhraseReviewPanel() {
+  const [pending, setPending] = useState([]);
+  const [companiesMap, setCompaniesMap] = useState({});
+  const [counts, setCounts] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [tableMissing, setTableMissing] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [busyIds, setBusyIds] = useState({});
+  const [actionError, setActionError] = useState("");
+
+  async function loadData() {
+    const [stagingRes, companiesRes] = await Promise.all([
+      supabase
+        .from("phrase_staging")
+        .select("id, company_id, phrase, source_quarter, nlp_score, nlp_flags, status")
+        .order("nlp_score", { ascending: false })
+        .limit(20000),
+      supabase.from("companies").select("id, name, emoji"),
+    ]);
+
+    if (stagingRes.error) {
+      // Most likely the table has not been created yet (Task 1 migration).
+      setTableMissing(true);
+      setLoading(false);
+      return;
+    }
+
+    const cmap = {};
+    (companiesRes.data || []).forEach((c) => {
+      cmap[c.id] = c;
+    });
+
+    const statusCounts = {};
+    (stagingRes.data || []).forEach((r) => {
+      if (!statusCounts[r.company_id]) {
+        statusCounts[r.company_id] = { pending: 0, approved: 0, rejected: 0 };
+      }
+      if (statusCounts[r.company_id][r.status] != null) {
+        statusCounts[r.company_id][r.status] += 1;
+      }
+    });
+
+    setCompaniesMap(cmap);
+    setCounts(statusCounts);
+    setPending((stagingRes.data || []).filter((r) => r.status === "pending"));
+    setTableMissing(false);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  function bumpCounts(companyId, from, to) {
+    setCounts((prev) => {
+      const c = prev[companyId] || { pending: 0, approved: 0, rejected: 0 };
+      return {
+        ...prev,
+        [companyId]: {
+          ...c,
+          [from]: Math.max(0, (c[from] || 0) - 1),
+          [to]: (c[to] || 0) + 1,
+        },
+      };
+    });
+  }
+
+  async function approveRow(row) {
+    setBusyIds((b) => ({ ...b, [row.id]: true }));
+    setActionError("");
+    const ins = await supabase.from("phrases").insert({
+      company_id: row.company_id,
+      phrase: row.phrase,
+      tier: APPROVE_DEFAULT_TIER,
+      points: APPROVE_DEFAULT_POINTS,
+    });
+    if (ins.error) {
+      setActionError(`Approve failed: ${ins.error.message}`);
+      setBusyIds((b) => ({ ...b, [row.id]: false }));
+      return false;
+    }
+    const upd = await supabase
+      .from("phrase_staging")
+      .update({ status: "approved" })
+      .eq("id", row.id);
+    setBusyIds((b) => ({ ...b, [row.id]: false }));
+    if (upd.error) {
+      setActionError(`Phrase saved but staging update failed: ${upd.error.message}`);
+      return false;
+    }
+    setPending((prev) => prev.filter((r) => r.id !== row.id));
+    bumpCounts(row.company_id, "pending", "approved");
+    return true;
+  }
+
+  async function rejectRow(row) {
+    setBusyIds((b) => ({ ...b, [row.id]: true }));
+    setActionError("");
+    const upd = await supabase
+      .from("phrase_staging")
+      .update({ status: "rejected" })
+      .eq("id", row.id);
+    setBusyIds((b) => ({ ...b, [row.id]: false }));
+    if (upd.error) {
+      setActionError(`Reject failed: ${upd.error.message}`);
+      return;
+    }
+    setPending((prev) => prev.filter((r) => r.id !== row.id));
+    bumpCounts(row.company_id, "pending", "rejected");
+  }
+
+  async function bulkApprove(companyId) {
+    // Approve every pending phrase for this company that has no NLP flags.
+    const clean = pending.filter(
+      (r) =>
+        r.company_id === companyId &&
+        (!r.nlp_flags || r.nlp_flags.length === 0),
+    );
+    for (const row of clean) {
+      await approveRow(row);
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
+        <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em] mb-3">
+          Phrase Staging Review
+        </h2>
+        <div className="text-cream/40 text-sm">Loading staged phrases…</div>
+      </section>
+    );
+  }
+
+  if (tableMissing) {
+    return (
+      <section className="rounded-2xl bg-navy-2/80 border border-cream/10 border-l-4 border-l-gold p-5">
+        <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em] mb-3">
+          Phrase Staging Review
+        </h2>
+        <p className="text-cream/50 text-sm leading-relaxed">
+          Phrase staging table not yet created. Run migration SQL from Task 1
+          first.
+        </p>
+      </section>
+    );
+  }
+
+  // Companies that currently have pending phrases, in a stable order.
+  const companyIds = [...new Set(pending.map((r) => r.company_id))].sort(
+    (a, b) =>
+      (companiesMap[a]?.name || a).localeCompare(companiesMap[b]?.name || b),
+  );
+  const visibleIds = filter === "all" ? companyIds : companyIds.filter((id) => id === filter);
+
+  return (
+    <section className="rounded-2xl bg-navy-2/80 border border-cream/10 overflow-hidden">
+      <div className="px-5 py-4 border-b border-cream/10 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em]">
+            Phrase Staging Review
+          </h2>
+          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gold/15 text-gold border border-gold/30">
+            {pending.length} pending
+          </span>
+        </div>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="rounded-lg bg-navy-2/80 border border-cream/10 text-cream px-3 py-1.5 text-xs focus:outline-none focus:border-gold/60"
+        >
+          <option value="all">All Companies</option>
+          {companyIds.map((id) => (
+            <option key={id} value={id}>
+              {(companiesMap[id]?.emoji || "") + " " + (companiesMap[id]?.name || id)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {actionError && (
+        <div className="px-5 py-2 text-red-400 text-xs border-b border-cream/10">
+          {actionError}
+        </div>
+      )}
+
+      {pending.length === 0 ? (
+        <div className="text-cream/40 text-sm text-center py-6">
+          No pending phrases to review.
+        </div>
+      ) : (
+        <div className="divide-y divide-cream/10">
+          {visibleIds.map((id) => {
+            const company = companiesMap[id];
+            const c = counts[id] || { pending: 0, approved: 0, rejected: 0 };
+            const groupRows = pending.filter((r) => r.company_id === id);
+            return (
+              <div key={id} className="p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="select-none">{company?.emoji || "🏢"}</span>
+                    <span className="text-cream font-medium text-sm">
+                      {company?.name || id}
+                    </span>
+                    <span className="text-[10px] text-cream/40">
+                      {c.pending} pending · {c.approved} approved · {c.rejected} rejected
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => bulkApprove(id)}
+                    className="rounded-lg bg-gold/10 border border-gold/30 text-gold px-3 py-1.5 text-xs font-semibold hover:bg-gold/20 transition"
+                    title="Approve all pending phrases for this company that have no flags"
+                  >
+                    Bulk approve (no flags)
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm" style={{ minWidth: "640px" }}>
+                    <thead>
+                      <tr className="border-b border-cream/10">
+                        <th className="px-3 py-2 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                          Phrase
+                        </th>
+                        <th className="px-3 py-2 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                          Quarter
+                        </th>
+                        <th className="px-3 py-2 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                          Score
+                        </th>
+                        <th className="px-3 py-2 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                          Flags
+                        </th>
+                        <th className="px-3 py-2 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groupRows.map((row) => (
+                        <tr
+                          key={row.id}
+                          className="border-b border-cream/5 last:border-0"
+                        >
+                          <td className="px-3 py-3">
+                            <BingoTilePreview phrase={row.phrase} />
+                          </td>
+                          <td className="px-3 py-3 text-cream/60 text-xs whitespace-nowrap">
+                            {row.source_quarter || "—"}
+                          </td>
+                          <td className="px-3 py-3 text-gold text-xs font-mono">
+                            {row.nlp_score}
+                          </td>
+                          <td className="px-3 py-3">
+                            {row.nlp_flags && row.nlp_flags.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {row.nlp_flags.map((f) => (
+                                  <span
+                                    key={f}
+                                    className="inline-block px-1.5 py-0.5 rounded text-[9px] bg-red-900/30 text-red-300 border border-red-500/30 whitespace-nowrap"
+                                  >
+                                    {f}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-cream/25 text-xs">—</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-3">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => approveRow(row)}
+                                disabled={busyIds[row.id]}
+                                className="rounded-lg bg-green-900/30 border border-green-500/30 text-green-400 px-3 py-1.5 text-xs font-semibold hover:bg-green-900/50 transition disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => rejectRow(row)}
+                                disabled={busyIds[row.id]}
+                                className="rounded-lg bg-red-900/30 border border-red-500/30 text-red-400 px-3 py-1.5 text-xs font-semibold hover:bg-red-900/50 transition disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function IngestionStatusPanel() {
   return (
     <section className="rounded-2xl bg-navy-2/80 border border-cream/10 border-l-4 border-l-gold p-5">
@@ -896,6 +1212,7 @@ function AdminPanel({ onSignOut }) {
 
       <main className="px-5 max-w-3xl mx-auto space-y-6">
         <CompanyReadinessTable />
+        <PhraseReviewPanel />
         <IngestionStatusPanel />
 
         <div className="pt-2">

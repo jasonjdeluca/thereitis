@@ -121,6 +121,21 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group F — Ingestion Pipeline
 *Claude Code (build) · Docker/VPS (run) · Phase 2 · Depends on: Group E source manifests exist for at least 3 companies*
 
+### Phase 1 — Node.js pipeline (`scripts/ingestion/`)
+*Built ahead of the Phase 2 Docker architecture below. Deterministic, no AI in the loop; all approved phrases go through the admin Phrase Staging Review panel.*
+
+- [x] phrase_staging migration SQL output (Task 1 — output only, human runs in Supabase; adapted to live schema: no `ticker` column on `companies`)
+- [x] Queue builder script (`queue-builder.js`)
+- [x] Fetcher script (HTML + PDF) (`fetcher.js`)
+- [x] Extractor script (`extractor.js`)
+- [x] Validator script (`validator.js`)
+- [x] Staging writer script (`staging-writer.js`)
+- [x] Pipeline runner (`run-pipeline.js`)
+- [x] End-to-end MSFT validation (15/17 quarters fetched, 7086 valid candidates)
+- [x] Admin phrase review UI (`PhraseReviewPanel` in `Admin.jsx`)
+
+### Phase 2 — Docker container architecture
+
 - [ ] Define and document `company-pack` directory structure in `docs/program/INGESTION_RUNBOOK.md`
 - [ ] Build `ops-worker/fetcher/` (Node.js Docker container)
   - Reads SQLite job queue for pending companies
