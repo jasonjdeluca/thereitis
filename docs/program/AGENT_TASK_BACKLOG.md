@@ -20,24 +20,24 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group B — Deterministic Truth Layer
 *Claude Code (build) · Docker/VPS cron (run) · Phase 1 · Depends on: Group A complete*
 
-- [ ] Create `scripts/company-readiness.js`
+- [x] Create `scripts/company-readiness.js`
   - Input: Supabase companies, phrases, trivia tables
   - Output: `reports/company-readiness.json`
   - Checks: phrase count per company, trivia count, phrase length violations, active-with-zero-phrases, fallback risk, missing ticker or emoji, missing next call date
-- [ ] Create `scripts/content-validation.js`
+- [x] Create `scripts/content-validation.js`
   - Input: Supabase phrases and trivia tables
   - Output: `reports/content-validation.json`
   - Checks: 25-char max, blank phrases, cross-company duplicates, invalid company IDs, possible person names (flag for human review, do not auto-reject), trivia missing choices or correct answer field
-- [ ] Create `scripts/migration-check.js`
+- [x] Create `scripts/migration-check.js`
   - Input: `supabase/migrations/` directory
   - Output: `reports/migration-check.json`
   - Checks: sequential numbering with no gaps, no duplicate numbers, migration filename format compliance
-- [ ] Create `scripts/pm-packet.js`
+- [x] Create `scripts/pm-packet.js`
   - Input: all three reports above
   - Output: `reports/pm-packet.json`
   - Aggregates exception counts and top issues from each report into a single AI-readable packet
-- [ ] Add `reports/` to `.gitignore`
-- [ ] Create `reports/.gitkeep` so the directory exists in the repo
+- [x] Add `reports/` to `.gitignore`
+- [x] Create `reports/.gitkeep` so the directory exists in the repo
 - [ ] Add VPS cron entry: 6:00am ET — runs all four scripts in sequence
 - [ ] Add VPS cron entry: 9:00pm ET — runs all four scripts in sequence
 
