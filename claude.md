@@ -1,5 +1,22 @@
 # There It Is — Claude Code Reference
 
+## Session Start Protocol
+
+Every Claude Code session must begin with:
+
+```bash
+task_budget 80000
+cd ~/thereitis && git pull && npm install
+```
+
+Then read in this order before touching any code:
+1. This file (`claude.md`)
+2. `docs/program/PROGRAM_CHARTER.md` — workstream map, tool assignments, build phases
+3. `docs/program/AGENT_TASK_BACKLOG.md` — current task status across all groups
+4. Relevant source files for the specific ticket being worked
+
+---
+
 ## Project Purpose
 
 Real-time multiplayer earnings call bingo. Players get randomized 5×5 cards loaded with phrases extracted from actual call transcripts. During a live call, everyone taps squares as they hear phrases. Scoring, streaks, bingo detection, and end-of-game leaderboards run entirely in the browser; state is persisted and synchronized via Supabase Realtime.
@@ -218,6 +235,10 @@ All tables have RLS enabled (migration 002). Policies:
 - **`bingo.js`**: Line detection (5 rows + 5 cols + 2 diagonals), `evaluate()` returns completed lines + nearMiss, `isBlackout()`.
 - **`badges.js`**: 12 badge definitions, `evaluateBadges()` evaluates all conditions against end-of-game state.
 
+### Program Docs (added May 2026)
+- `docs/program/PROGRAM_CHARTER.md` — full architecture, tool roles, agentic PM loop, company readiness rules, build phases
+- `docs/program/AGENT_TASK_BACKLOG.md` — all tasks by workstream group with status markers. Update in-place as work completes.
+
 ### Realtime Channels
 
 | Channel | Events | Used by |
@@ -277,6 +298,9 @@ Admin can:
 - **Vercel** auto-deploys on push to `main`
 - SPA rewrite: all routes → `/index.html` (via `vercel.json`)
 - Security headers applied globally: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+Claude Code Routines use the `claude/` branch prefix (e.g. `claude/fix-fallback`).
+Always include `gh pr create` as the final step rather than asking Jason to open the PR manually.
 
 ---
 
