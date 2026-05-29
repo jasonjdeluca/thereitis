@@ -9,11 +9,11 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group A — Live Game Stability
 *Claude Code · Phase 1 · ⚠️ Blocks all other groups*
 
-- [ ] Remove silent fallback behavior — the code path that serves another company's phrases when the selected company has none
-- [ ] Fix or deactivate any company with active status and zero phrases
-- [ ] Generalize `TriviaSection` component so it is not hardcoded to a single company
-- [ ] Add active company readiness gate — prevent game session creation for companies below minimum readiness threshold
-- [ ] Update README.md to reflect current project state and tech stack
+- [x] Remove silent fallback behavior — the code path that serves another company's phrases when the selected company has none
+- [x] Fix or deactivate any company with active status and zero phrases
+- [x] Generalize `TriviaSection` component so it is not hardcoded to a single company
+- [x] Add active company readiness gate — prevent game session creation for companies below minimum readiness threshold
+- [x] Update README.md to reflect current project state and tech stack
 
 ---
 
