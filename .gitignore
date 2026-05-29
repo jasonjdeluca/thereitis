@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Environment credentials — never commit
+.env
+
 # Runtime report artifacts
 reports/
 

@@ -172,12 +172,19 @@ export default function CompanySelect({ onSelectCompany, onBack }) {
                         </div>
                       </div>
                       <div className="mt-4">
-                        {company.is_active ? (
+                        {company.is_active && company.phrase_count >= 50 ? (
                           <button
                             onClick={() => onSelectCompany(company)}
                             className="w-full rounded-2xl bg-gold py-3 text-center font-semibold text-navy tracking-wide active:bg-gold-bright active:scale-[0.99] transition"
                           >
                             {live ? "Join the Live Call" : "Start a Game"} &rarr;
+                          </button>
+                        ) : company.is_active ? (
+                          <button
+                            disabled
+                            className="w-full rounded-2xl bg-cream/10 py-3 text-center font-semibold text-cream/30 tracking-wide cursor-not-allowed"
+                          >
+                            Phrases Not Ready
                           </button>
                         ) : (
                           <button
