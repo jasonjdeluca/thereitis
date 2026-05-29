@@ -38,8 +38,8 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - Aggregates exception counts and top issues from each report into a single AI-readable packet
 - [x] Add `reports/` to `.gitignore`
 - [x] Create `reports/.gitkeep` so the directory exists in the repo
-- [ ] Add VPS cron entry: 6:00am ET — runs all four scripts in sequence
-- [ ] Add VPS cron entry: 9:00pm ET — runs all four scripts in sequence
+- [x] Add VPS cron entry: 6:00am ET — runs all four scripts in sequence
+- [x] Add VPS cron entry: 9:00pm ET — runs all four scripts in sequence
 
 ---
 

@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 // migration-check.js — audits supabase/migrations/ for naming convention violations,
-// duplicate timestamps, and unusually large gaps between consecutive migrations.
+// duplicate sequence numbers, and unusually large gaps between consecutive migrations.
 // Output: reports/migration-check.json
+//
+// This project uses sequential NNN_description.sql numbering (e.g. 001_init.sql),
+// not timestamp-based filenames. Gap detection is based on sequence number delta,
+// not calendar time.
 
 import { readdirSync, writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
@@ -11,21 +15,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_DIR = join(__dirname, "../supabase/migrations");
 const REPORTS_DIR = join(__dirname, "../reports");
 
-// 30 days expressed as a 14-digit timestamp delta.
-// Format: YYYYMMDDHHmmss — 30 days = 30 * 24 * 60 * 60 = 2592000 seconds.
-// We parse the timestamp as a Date to compute real elapsed seconds.
-const GAP_WARN_SECONDS = 30 * 24 * 60 * 60;
-
-function parseTimestamp(ts) {
-  // ts: "20260528123456" → Date
-  const y = ts.slice(0, 4);
-  const mo = ts.slice(4, 6);
-  const d = ts.slice(6, 8);
-  const h = ts.slice(8, 10);
-  const mi = ts.slice(10, 12);
-  const s = ts.slice(12, 14);
-  return new Date(`${y}-${mo}-${d}T${h}:${mi}:${s}Z`);
-}
+// Warn if consecutive sequence numbers jump by more than this amount.
+const GAP_WARN_THRESHOLD = 10;
 
 function run() {
   let files;
@@ -37,40 +28,40 @@ function run() {
   }
 
   const issues = [];
-  const VALID_PATTERN = /^(\d{14})_[a-z0-9_]+\.sql$/;
-  const timestampSeen = {};
+  // Format: NNN_lowercase_description.sql (1 or more digits, underscore, lowercase/digits/underscores)
+  const VALID_PATTERN = /^(\d+)_[a-z0-9_]+\.sql$/;
+  const seqSeen = {};
   const validFiles = [];
 
   for (const filename of files) {
     const match = filename.match(VALID_PATTERN);
     if (!match) {
-      issues.push({ type: "invalid_filename", filename, detail: "Does not match YYYYMMDDHHMMSS_description.sql" });
+      issues.push({ type: "invalid_filename", filename, detail: "Does not match NNN_description.sql (lowercase, digits, underscores only)" });
       continue;
     }
 
-    const ts = match[1];
+    const seq = parseInt(match[1], 10);
 
-    // Duplicate timestamp check
-    if (timestampSeen[ts]) {
-      issues.push({ type: "duplicate_timestamp", filename, detail: `Timestamp ${ts} also used by ${timestampSeen[ts]}` });
+    // Duplicate sequence number check
+    if (seqSeen[seq] !== undefined) {
+      issues.push({ type: "duplicate_sequence", filename, detail: `Sequence ${seq} also used by ${seqSeen[seq]}` });
     } else {
-      timestampSeen[ts] = filename;
-      validFiles.push({ filename, ts, date: parseTimestamp(ts) });
+      seqSeen[seq] = filename;
+      validFiles.push({ filename, seq });
     }
   }
 
-  // Sort by timestamp and check for large gaps
-  validFiles.sort((a, b) => a.ts.localeCompare(b.ts));
+  // Sort by sequence and check for large gaps
+  validFiles.sort((a, b) => a.seq - b.seq);
   for (let i = 1; i < validFiles.length; i++) {
     const prev = validFiles[i - 1];
     const curr = validFiles[i];
-    const gapSeconds = (curr.date - prev.date) / 1000;
-    if (gapSeconds > GAP_WARN_SECONDS) {
-      const gapDays = Math.round(gapSeconds / 86400);
+    const gap = curr.seq - prev.seq;
+    if (gap > GAP_WARN_THRESHOLD) {
       issues.push({
         type: "large_gap",
         filename: curr.filename,
-        detail: `${gapDays}-day gap before this migration (previous: ${prev.filename})`,
+        detail: `Sequence gap of ${gap} before this migration (previous: ${prev.filename})`,
       });
     }
   }
