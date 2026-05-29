@@ -97,24 +97,24 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group E — Transcript Research
 *Codex Automations · Phase 1 (starts in parallel immediately) · No code dependencies*
 
-- [ ] Define target company list — initial launch candidates (aim for 20–30 companies)
+- [x] Define target company list — initial launch candidates (aim for 20–30 companies)
   - Prioritize: widely recognized public companies with earnings calls that a broad audience would recognize
   - Document in `docs/program/TARGET_COMPANIES.md`
-- [ ] Define source confidence scale and document in `docs/program/TRANSCRIPT_SOURCE_POLICY.md`
+- [x] Define source confidence scale and document in `docs/program/TRANSCRIPT_SOURCE_POLICY.md`
   - Tier 1: Official IR site (PDF or HTML transcript linked directly)
   - Tier 2: SEC 8-K filing with transcript exhibit
   - Tier 3: Seeking Alpha or similar (free tier)
   - Tier 4: Paywalled source (flag, do not use without manual approval)
   - Tier 5: Audio or video only (flag, requires manual transcription)
   - Tier 6: Not found (flag for human escalation)
-- [ ] Define `source_manifest.json` schema — document in `docs/program/INGESTION_RUNBOOK.md`
-- [ ] Run Codex transcript research batch 1 (companies 1–5): output `company-packs/{ticker}/source_manifest.json`
-- [ ] Run Codex transcript research batch 2 (companies 6–10)
-- [ ] Run Codex transcript research batch 3 (companies 11–15)
-- [ ] Run Codex transcript research batch 4 (companies 16–20)
-- [ ] Run Codex transcript research batch 5 (companies 21–25, if applicable)
-- [ ] Flag any companies with no accessible transcripts for human escalation
-- [ ] Review and approve all source manifests before handing to Group F fetcher
+- [x] Define `source_manifest.json` schema — document in `docs/program/INGESTION_RUNBOOK.md`
+- [x] Run Codex transcript research batch 1 (companies 1–5): output `company-packs/{ticker}/source_manifest.json`
+- [x] Run Codex transcript research batch 2 (companies 6–10)
+- [x] Run Codex transcript research batch 3 (companies 11–15)
+- [x] Run Codex transcript research batch 4 (companies 16–20)
+- [x] Run Codex transcript research batch 5 (companies 21–25, if applicable)
+- [x] Flag any companies with no accessible transcripts for human escalation
+- [x] Review and approve all source manifests before handing to Group F fetcher
 
 ---
 
