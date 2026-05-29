@@ -1,8 +1,366 @@
 // NOTE: VITE_ADMIN_PASSWORD is no longer used — delete it from Vercel environment variables.
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../lib/supabase";
 
 const COMPANY_ORDER = ["hilton", "ko", "marriott", "hyatt", "ihg", "wyndham", "choice"];
+
+const TICKERS = {
+  hilton: "HLT",
+  ko: "KO",
+  marriott: "MAR",
+  hyatt: "H",
+  ihg: "IHG",
+  wyndham: "WH",
+  choice: "CHH",
+};
+
+// ─── Readiness table sub-components ──────────────────────────────────────────
+
+function StatusBadge({ isActive, phraseCount, triviaCount }) {
+  if (!isActive) {
+    return (
+      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-cream/10 text-cream/40">
+        Coming Soon
+      </span>
+    );
+  }
+  if (phraseCount >= 50 && triviaCount >= 12) {
+    return (
+      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-500/20 text-green-400 border border-green-500/30">
+        Ready
+      </span>
+    );
+  }
+  return (
+    <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-gold/10 text-gold border border-gold/30">
+      Needs Content
+    </span>
+  );
+}
+
+function InlineDateEditor({ companyId, currentDate, onSaved }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState("");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const escapedRef = useRef(false);
+
+  function startEdit() {
+    setValue(
+      currentDate ? new Date(currentDate).toISOString().split("T")[0] : "",
+    );
+    setEditing(true);
+    setError("");
+    escapedRef.current = false;
+  }
+
+  async function save() {
+    if (saving) return;
+    setSaving(true);
+    setError("");
+    const nextDate = value
+      ? new Date(value + "T16:30:00").toISOString()
+      : null;
+    const { error: supaError } = await supabase
+      .from("companies")
+      .update({ next_earnings_date: nextDate })
+      .eq("id", companyId);
+    setSaving(false);
+    if (supaError) {
+      setError("Save failed");
+    } else {
+      setEditing(false);
+      onSaved(nextDate);
+    }
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      save();
+    }
+    if (e.key === "Escape") {
+      escapedRef.current = true;
+      setEditing(false);
+    }
+  }
+
+  function handleBlur() {
+    if (escapedRef.current) return;
+    save();
+  }
+
+  if (editing) {
+    return (
+      <div className="flex flex-col gap-1">
+        <input
+          type="date"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setError("");
+          }}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          autoFocus
+          disabled={saving}
+          className="rounded bg-navy-2/80 border border-gold/40 text-cream px-2 py-1 text-xs focus:outline-none focus:border-gold w-32 disabled:opacity-50"
+        />
+        {error && (
+          <span className="text-red-400 text-[10px]">{error}</span>
+        )}
+      </div>
+    );
+  }
+
+  const display = currentDate
+    ? new Date(currentDate).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "—";
+
+  return (
+    <button
+      onClick={startEdit}
+      className="text-left text-sm text-cream/70 hover:text-gold transition underline decoration-dotted underline-offset-2 whitespace-nowrap"
+    >
+      {display}
+    </button>
+  );
+}
+
+function ActivationToggle({ companyId, isActive, phraseCount, triviaCount, onToggled }) {
+  const [loading, setLoading] = useState(false);
+  const canActivate = phraseCount >= 50 && triviaCount >= 12;
+
+  async function toggle() {
+    setLoading(true);
+    const next = !isActive;
+    await supabase
+      .from("companies")
+      .update({ is_active: next })
+      .eq("id", companyId);
+    setLoading(false);
+    onToggled(next);
+  }
+
+  if (!isActive && !canActivate) {
+    const needPhrases = Math.max(0, 50 - phraseCount);
+    const needTrivia = Math.max(0, 12 - triviaCount);
+    const parts = [];
+    if (needPhrases > 0) parts.push(`${needPhrases} phrases`);
+    if (needTrivia > 0) parts.push(`${needTrivia} trivia`);
+    return (
+      <div className="flex flex-col items-start gap-1">
+        <button
+          disabled
+          className="rounded-lg bg-cream/5 text-cream/25 px-3 py-1.5 text-xs font-semibold cursor-not-allowed border border-cream/10"
+          title={`Requires ≥50 phrases and ≥12 trivia questions`}
+        >
+          Cannot Activate
+        </button>
+        <span className="text-[9px] text-cream/30 leading-tight">
+          Need {parts.join(", ")}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      disabled={loading}
+      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition border ${
+        isActive
+          ? "bg-red-900/30 border-red-500/30 text-red-400 hover:bg-red-900/50"
+          : "bg-gold/10 border-gold/30 text-gold hover:bg-gold/20"
+      } disabled:opacity-50`}
+    >
+      {loading ? "…" : isActive ? "Deactivate" : "Activate"}
+    </button>
+  );
+}
+
+function CompanyReadinessTable() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  async function loadData() {
+    const [companiesRes, phrasesRes, triviaRes] = await Promise.all([
+      supabase
+        .from("companies")
+        .select("id, name, emoji, is_active, next_earnings_date"),
+      supabase.from("phrases").select("company_id"),
+      supabase.from("trivia_questions").select("company_id"),
+    ]);
+
+    const companies = companiesRes.data || [];
+    const phrases = phrasesRes.data || [];
+    const trivia = triviaRes.data || [];
+
+    const phraseCounts = {};
+    phrases.forEach((p) => {
+      phraseCounts[p.company_id] = (phraseCounts[p.company_id] || 0) + 1;
+    });
+
+    const triviaCounts = {};
+    trivia.forEach((t) => {
+      triviaCounts[t.company_id] = (triviaCounts[t.company_id] || 0) + 1;
+    });
+
+    const sorted = COMPANY_ORDER.map((id) => companies.find((c) => c.id === id))
+      .filter(Boolean)
+      .map((c) => ({
+        ...c,
+        phraseCount: phraseCounts[c.id] || 0,
+        triviaCount: triviaCounts[c.id] || 0,
+      }));
+
+    setRows(sorted);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  function handleToggled(id, newActive) {
+    setRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, is_active: newActive } : r)),
+    );
+  }
+
+  function handleDateSaved(id, newDate) {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, next_earnings_date: newDate } : r,
+      ),
+    );
+  }
+
+  return (
+    <section className="rounded-2xl bg-navy-2/80 border border-cream/10 overflow-hidden">
+      <div className="px-5 py-4 border-b border-cream/10">
+        <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em]">
+          Company Readiness
+        </h2>
+      </div>
+
+      {loading ? (
+        <div className="text-cream/40 text-sm text-center py-6">
+          Loading readiness data…
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm" style={{ minWidth: "580px" }}>
+            <thead>
+              <tr className="border-b border-cream/10">
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                  Company
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                  Ticker
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                  Phrases
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                  Trivia
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                  Next Earnings
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-cream/40 font-semibold">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="border-b border-cream/5 last:border-0 hover:bg-cream/[0.02] transition-colors"
+                >
+                  <td className="px-4 py-3">
+                    <span className="mr-2 select-none">{row.emoji}</span>
+                    <span className="text-cream font-medium">{row.name}</span>
+                  </td>
+                  <td className="px-4 py-3 text-cream/60 font-mono text-xs">
+                    {TICKERS[row.id] || row.id.toUpperCase()}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={
+                        row.phraseCount >= 50 ? "text-green-400" : "text-gold"
+                      }
+                    >
+                      {row.phraseCount}
+                    </span>
+                    <span className="text-cream/30 text-xs ml-1">/ 50</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={
+                        row.triviaCount >= 12 ? "text-green-400" : "text-gold"
+                      }
+                    >
+                      {row.triviaCount}
+                    </span>
+                    <span className="text-cream/30 text-xs ml-1">/ 12</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <InlineDateEditor
+                      companyId={row.id}
+                      currentDate={row.next_earnings_date}
+                      onSaved={(d) => handleDateSaved(row.id, d)}
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <StatusBadge
+                      isActive={row.is_active}
+                      phraseCount={row.phraseCount}
+                      triviaCount={row.triviaCount}
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <ActivationToggle
+                      companyId={row.id}
+                      isActive={row.is_active}
+                      phraseCount={row.phraseCount}
+                      triviaCount={row.triviaCount}
+                      onToggled={(v) => handleToggled(row.id, v)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function IngestionStatusPanel() {
+  return (
+    <section className="rounded-2xl bg-navy-2/80 border border-cream/10 border-l-4 border-l-gold p-5">
+      <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em] mb-3">
+        Ingestion Pipeline
+      </h2>
+      <p className="text-cream/50 text-sm leading-relaxed">
+        Pipeline not yet configured. This panel will show ingestion queue
+        status once Group F is complete.
+      </p>
+    </section>
+  );
+}
+
+// ─── Countdown (admin card preview) ──────────────────────────────────────────
 
 function Countdown({ targetDate, timezone }) {
   const [display, setDisplay] = useState("");
@@ -54,6 +412,8 @@ function Countdown({ targetDate, timezone }) {
     </div>
   );
 }
+
+// ─── Auth gate ────────────────────────────────────────────────────────────────
 
 function GateForm({ onAuth }) {
   const [email, setEmail] = useState("");
@@ -124,6 +484,8 @@ function GateForm({ onAuth }) {
     </div>
   );
 }
+
+// ─── Company card (detailed edit view) ───────────────────────────────────────
 
 function CompanyStats({ companyId, callIdentifier }) {
   const [stats, setStats] = useState(null);
@@ -201,7 +563,9 @@ function CompanyStats({ companyId, callIdentifier }) {
     }
     load();
 
-    function handleFocus() { load(); }
+    function handleFocus() {
+      load();
+    }
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
   }, [companyId, callIdentifier]);
@@ -216,7 +580,10 @@ function CompanyStats({ companyId, callIdentifier }) {
     { label: "Total Players", value: stats.totalPlayers },
     {
       label: "Most Marked",
-      value: stats.topPhrase !== "—" ? `${stats.topPhrase} (${stats.topCount})` : "—",
+      value:
+        stats.topPhrase !== "—"
+          ? `${stats.topPhrase} (${stats.topCount})`
+          : "—",
     },
   ];
 
@@ -230,7 +597,9 @@ function CompanyStats({ companyId, callIdentifier }) {
           <div className="text-[8px] uppercase tracking-[0.2em] text-cream/40">
             {item.label}
           </div>
-          <div className="mt-0.5 text-sm font-bold text-cream truncate">{item.value}</div>
+          <div className="mt-0.5 text-sm font-bold text-cream truncate">
+            {item.value}
+          </div>
         </div>
       ))}
     </div>
@@ -262,7 +631,9 @@ function TriviaSection({ companyId }) {
       .eq("id", id);
 
     setQuestions((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, is_active: !currentActive } : q)),
+      prev.map((q) =>
+        q.id === id ? { ...q, is_active: !currentActive } : q,
+      ),
     );
   }
 
@@ -281,7 +652,9 @@ function TriviaSection({ companyId }) {
             <button
               onClick={() => toggleQuestion(q.id, q.is_active)}
               className={`mt-0.5 w-8 h-5 rounded-full transition-colors flex items-center ${
-                q.is_active ? "bg-green-500 justify-end" : "bg-cream/20 justify-start"
+                q.is_active
+                  ? "bg-green-500 justify-end"
+                  : "bg-cream/20 justify-start"
               }`}
             >
               <span className="w-4 h-4 rounded-full bg-white mx-0.5" />
@@ -341,7 +714,9 @@ function CompanyCard({ company, onUpdate }) {
     setSaving(true);
     let nextDate = null;
     if (earningsDate) {
-      nextDate = new Date(`${earningsDate}T${earningsTime || "16:30"}:00`).toISOString();
+      nextDate = new Date(
+        `${earningsDate}T${earningsTime || "16:30"}:00`,
+      ).toISOString();
     }
 
     await supabase
@@ -365,7 +740,9 @@ function CompanyCard({ company, onUpdate }) {
   }
 
   const previewDate = earningsDate
-    ? new Date(`${earningsDate}T${earningsTime || "16:30"}:00`).toISOString()
+    ? new Date(
+        `${earningsDate}T${earningsTime || "16:30"}:00`,
+      ).toISOString()
     : null;
 
   return (
@@ -383,7 +760,9 @@ function CompanyCard({ company, onUpdate }) {
         <button
           onClick={toggleActive}
           className={`w-12 h-6 rounded-full transition-colors flex items-center ${
-            company.is_active ? "bg-green-500 justify-end" : "bg-cream/20 justify-start"
+            company.is_active
+              ? "bg-green-500 justify-end"
+              : "bg-cream/20 justify-start"
           }`}
         >
           <span className="w-5 h-5 rounded-full bg-white mx-0.5" />
@@ -455,7 +834,10 @@ function CompanyCard({ company, onUpdate }) {
         <Countdown targetDate={previewDate} timezone={timezone} />
       </div>
 
-      <CompanyStats companyId={company.id} callIdentifier={company.call_identifier} />
+      <CompanyStats
+        companyId={company.id}
+        callIdentifier={company.call_identifier}
+      />
 
       <div className="mt-4 pt-4 border-t border-cream/10">
         <TriviaSection companyId={company.id} />
@@ -463,6 +845,8 @@ function CompanyCard({ company, onUpdate }) {
     </div>
   );
 }
+
+// ─── Admin panel (authenticated view) ────────────────────────────────────────
 
 function AdminPanel({ onSignOut }) {
   const [companies, setCompanies] = useState([]);
@@ -472,9 +856,9 @@ function AdminPanel({ onSignOut }) {
     async function load() {
       const { data } = await supabase.from("companies").select("*");
       if (data) {
-        const sorted = COMPANY_ORDER
-          .map((id) => data.find((c) => c.id === id))
-          .filter(Boolean);
+        const sorted = COMPANY_ORDER.map((id) => data.find((c) => c.id === id)).filter(
+          Boolean,
+        );
         setCompanies(sorted);
       }
       setLoading(false);
@@ -510,25 +894,37 @@ function AdminPanel({ onSignOut }) {
         </button>
       </header>
 
-      <main className="px-5 max-w-lg mx-auto space-y-6">
-        {loading ? (
-          <div className="text-cream/40 text-sm text-center py-10">
-            Loading companies...
+      <main className="px-5 max-w-3xl mx-auto space-y-6">
+        <CompanyReadinessTable />
+        <IngestionStatusPanel />
+
+        <div className="pt-2">
+          <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em] mb-4">
+            Company Details
+          </h2>
+          <div className="space-y-6">
+            {loading ? (
+              <div className="text-cream/40 text-sm text-center py-10">
+                Loading companies...
+              </div>
+            ) : (
+              companies.map((company) => (
+                <section
+                  key={company.id}
+                  className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5"
+                >
+                  <CompanyCard company={company} onUpdate={handleUpdate} />
+                </section>
+              ))
+            )}
           </div>
-        ) : (
-          companies.map((company) => (
-            <section
-              key={company.id}
-              className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5"
-            >
-              <CompanyCard company={company} onUpdate={handleUpdate} />
-            </section>
-          ))
-        )}
+        </div>
       </main>
     </div>
   );
 }
+
+// ─── Root export ──────────────────────────────────────────────────────────────
 
 export default function Admin() {
   const [authed, setAuthed] = useState(false);

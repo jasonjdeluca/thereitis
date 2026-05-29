@@ -81,40 +81,40 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group D — Admin Console
 *Claude Code · Phase 2 · Depends on: Group A complete, Group B scripts exist*
 
-- [ ] Build company readiness table on admin dashboard
+- [x] Build company readiness table on admin dashboard
   - Columns: company name, emoji, ticker, phrase count, trivia count, status badge, activation toggle
   - Data source: live Supabase query or `reports/company-readiness.json`
-- [ ] Add status badges: Ready (green), Needs Phrases (yellow), Needs Trivia (yellow), Blocked (red)
-- [ ] Add activation gate: if company fails minimum readiness, disable the active toggle and show reason
-- [ ] Add ingestion status column: Not Started / Researching / Fetching / Extracting / Generating / QA / Ready for Migration / Active
-- [ ] Add next call date field per company, editable inline by admin
-- [ ] Add admin warning banner for companies that are active but stale or below threshold
-- [ ] Add sample card preview: clicking a company shows a randomly assembled 5×5 bingo card using that company's phrases
-- [ ] Add recent sessions list: last 10 sessions with company name, player count, whether bingo was reached
+- [x] Add status badges: Ready (green), Needs Phrases (yellow), Needs Trivia (yellow), Blocked (red)
+- [x] Add activation gate: if company fails minimum readiness, disable the active toggle and show reason
+- [x] Add ingestion status column: Not Started / Researching / Fetching / Extracting / Generating / QA / Ready for Migration / Active
+- [x] Add next call date field per company, editable inline by admin
+- [x] Add admin warning banner for companies that are active but stale or below threshold
+- [x] Add sample card preview: clicking a company shows a randomly assembled 5×5 bingo card using that company's phrases
+- [x] Add recent sessions list: last 10 sessions with company name, player count, whether bingo was reached
 
 ---
 
 ## Group E — Transcript Research
 *Codex Automations · Phase 1 (starts in parallel immediately) · No code dependencies*
 
-- [ ] Define target company list — initial launch candidates (aim for 20–30 companies)
+- [x] Define target company list — initial launch candidates (aim for 20–30 companies)
   - Prioritize: widely recognized public companies with earnings calls that a broad audience would recognize
   - Document in `docs/program/TARGET_COMPANIES.md`
-- [ ] Define source confidence scale and document in `docs/program/TRANSCRIPT_SOURCE_POLICY.md`
+- [x] Define source confidence scale and document in `docs/program/TRANSCRIPT_SOURCE_POLICY.md`
   - Tier 1: Official IR site (PDF or HTML transcript linked directly)
   - Tier 2: SEC 8-K filing with transcript exhibit
   - Tier 3: Seeking Alpha or similar (free tier)
   - Tier 4: Paywalled source (flag, do not use without manual approval)
   - Tier 5: Audio or video only (flag, requires manual transcription)
   - Tier 6: Not found (flag for human escalation)
-- [ ] Define `source_manifest.json` schema — document in `docs/program/INGESTION_RUNBOOK.md`
-- [ ] Run Codex transcript research batch 1 (companies 1–5): output `company-packs/{ticker}/source_manifest.json`
-- [ ] Run Codex transcript research batch 2 (companies 6–10)
-- [ ] Run Codex transcript research batch 3 (companies 11–15)
-- [ ] Run Codex transcript research batch 4 (companies 16–20)
-- [ ] Run Codex transcript research batch 5 (companies 21–25, if applicable)
-- [ ] Flag any companies with no accessible transcripts for human escalation
-- [ ] Review and approve all source manifests before handing to Group F fetcher
+- [x] Define `source_manifest.json` schema — document in `docs/program/INGESTION_RUNBOOK.md`
+- [x] Run Codex transcript research batch 1 (companies 1–5): output `company-packs/{ticker}/source_manifest.json`
+- [x] Run Codex transcript research batch 2 (companies 6–10)
+- [x] Run Codex transcript research batch 3 (companies 11–15)
+- [x] Run Codex transcript research batch 4 (companies 16–20)
+- [x] Run Codex transcript research batch 5 (companies 21–25, if applicable)
+- [x] Flag any companies with no accessible transcripts for human escalation
+- [x] Review and approve all source manifests before handing to Group F fetcher
 
 ---
 
