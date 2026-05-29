@@ -50,27 +50,27 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - Trigger: schedule, 6:15am ET weekdays
   - Repos: thereitis
   - Prompt: read `reports/pm-packet.json` and last 10 git commits, identify blockers and top 2–3 recommended tickets, post GitHub issue titled "Daily PM Brief — [YYYY-MM-DD]"
-  - Save prompt to `docs/program/prompts/routine-pm-brief.md`
+  - [x] Prompt file written: `docs/program/prompts/routine-pm-brief.md` (platform configuration still pending — manual setup in Claude Code Routines)
 - [ ] Configure Claude Code Routine: GitHub-triggered implementation
   - Trigger: GitHub issue labeled `claude-implement`
   - Repos: thereitis
   - Prompt: read the labeled issue fully, read relevant source files, implement the ticket, open PR to `claude/` branch with summary of changes
-  - Save prompt to `docs/program/prompts/routine-implement.md`
+  - [x] Prompt file written: `docs/program/prompts/routine-implement.md` (platform configuration still pending — manual setup in Claude Code Routines)
 - [ ] Configure Codex Automation: Weekly content quality summary
   - Trigger: schedule, Friday 8:00am ET
   - Reads: `reports/content-validation.json`, `reports/company-readiness.json`
   - Output: GitHub issue "Weekly Content Quality Report — [date]" listing companies below threshold and suspicious phrases
-  - Save prompt to `docs/program/prompts/codex-content-quality.md`
+  - [x] Prompt file written: `docs/program/prompts/codex-content-quality.md` (platform configuration still pending — manual setup in Codex Automations)
 - [ ] Configure Codex Automation: Nightly ingestion queue triage
   - Trigger: schedule, 9:30pm ET during active onboarding phases
   - Reads: `reports/ingestion-status.json`
   - Output: GitHub issue comment on current ingestion tracking issue listing blocked packs, ready packs, and failed extractions
-  - Save prompt to `docs/program/prompts/codex-ingestion-triage.md`
+  - [x] Prompt file written: `docs/program/prompts/codex-ingestion-triage.md` (platform configuration still pending — manual setup in Codex Automations)
 - [ ] Configure Codex Automation: Overflow PM brief
   - Trigger: schedule, 8:00am ET daily
   - Logic: check if a "Daily PM Brief" issue was posted today — if not, post a brief version as backup
-  - Save prompt to `docs/program/prompts/codex-pm-brief-overflow.md`
-- [ ] Add GitHub labels to repo via GitHub CLI or settings:
+  - [x] Prompt file written: `docs/program/prompts/codex-pm-brief-overflow.md` (platform configuration still pending — manual setup in Codex Automations)
+- [x] Add GitHub labels to repo via GitHub CLI or settings:
   - `claude-implement` (blue) — triggers Claude Code Routine implementation
   - `human-decision-needed` (red) — requires human review before proceeding
   - `content-review` (yellow) — phrase or trivia content needs editorial judgment
