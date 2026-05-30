@@ -8,10 +8,10 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Group G (content-validation.js expanded, CONTENT_QA_RUBRIC.md, Codex editorial prompt)
-**In progress:** Group C (platform configuration pending), Group E (Codex Priority 4 repair pass for AMGN/JPM/MRK + link validation)
-**Pending human merge:** PR #19 (remaining blue-chip manifests — updated with Codex Priority 3 repairs), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX), PR #22 (Group G content QA)
-**Ready to start:** Group H (blocked on action item #11 — latest_ingested_quarter decision)
+**Just completed:** Groups G, H, I, J — all four built in last session; PRs #21–#24 opened
+**In progress:** Group C (platform configuration pending), Group E (Codex Priority 6 official URL repair assigned — human fills in), Group F Phase 2 (PR #20 open)
+**Pending human merge:** PR #19 (remaining blue-chip manifests — Priority 3+4 repairs applied), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX), PR #22 (Group G content QA), PR #23 (Group H evergreen + migration 015), PR #24 (Group J QA)
+**Codex Priority 5 complete:** All 68 HD/WMT/NKE/DIS official PDF URLs pass; 13 PR #18 companies have no official URLs (all StockAnalysis) — next Codex assignment is Priority 6 official URL repair for those 13 (human fills in task)
 
 ---
 
@@ -23,13 +23,13 @@
 | B | Deterministic Truth Layer | ✅ Complete | All 4 scripts built and deployed; VPS cron running at 6:00am and 9:00pm ET |
 | C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; naming conflict resolved (Claude Code convention canonical); platform configuration pending — manual setup in Claude Code Routines and Codex Automations platforms. |
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
-| E | Transcript Research | 🔄 In Progress | All 30 target companies researched. 5 with fully official IR sources (HD, WMT, NKE, DIS, KO). 8 pending official-source repair pass (MSFT, JPM, V, TRV, AMGN, JNJ, MRK, VZ — assigned to Codex Priority 3). 17 using third-party as best available. JNJ: human_review_required. Reconciliation task closed — no prior tables existed. |
-| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete (MSFT, 4,790 phrases). Phase 2 Docker ops-worker built and tested NKE end-to-end: 17/17 PDFs fetched, 7,629 candidates, 40 phrases + migration.sql generated. PR #20 ready. Key finding: only Q4CDN vendor-hosted PDFs accessible for Phase 2 fetcher — ir.homedepot.com and StockAnalysis both block bots. |
-| G | Content QA | ✅ Complete | content-validation.js expanded (Part B: generated pack checks), CONTENT_QA_RUBRIC.md written, codex-content-editorial-review.md prompt written. Codex trigger is manual per company until Routines are configured. |
-| H | Evergreen Maintenance | ⬜ Not Started | Depends on Group F operational; freshness watcher and stale detector not built |
-| I | Public UX and SEO | 🔄 In Progress | Active companies section, interactive sample card, FAQ accordion added to landing page. SEO (title, OG, Twitter, JSON-LD, canonical, sitemap, robots) was already complete. PR #21 open. |
-| J | QA and Launch Hardening | ⬜ Not Started | Depends on Groups A–I substantially complete; no Playwright tests or release readiness script |
-| K | Analytics and Launch | ⬜ Not Started | Phase 3 / post-launch; no event tracking, snapshot script, or launch kit |
+| E | Transcript Research | 🔄 In Progress | All 30 companies researched and promoted to `company-packs/`. Priority 4 complete: AMGN/JPM/MRK deeper repair; 73 official URLs validated. Priority 5 complete: 68/68 HD/WMT/NKE/DIS official PDFs confirmed; 13 PR #18 companies have no official URLs (StockAnalysis only — AAPL, NVDA, AMZN, CSCO, IBM, CRM, KO, CAT, BA, HON, MMM, SHW, MCD). HD direct PDF URLs confirmed accessible (resolves bot-blocking concern). JNJ: human_review_required. MSFT: HTML-only, StockAnalysis fallback. Priority 6 next: find official PDFs for the 13 StockAnalysis-only PR #18 companies. |
+| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete (MSFT, 4,790 phrases). Phase 2 Docker ops-worker built and tested NKE end-to-end: 17/17 PDFs fetched, 7,629 candidates, 40 phrases + migration.sql generated. PR #20 ready for merge. Q4CDN-only fetcher constraint confirmed. |
+| G | Content QA | ✅ Complete | `scripts/content-validation.js` expanded with post-generation checks. `CONTENT_QA_RUBRIC.md` written. Codex editorial review prompt at `docs/program/prompts/codex-content-editorial-review.md`. PR #22 open. |
+| H | Evergreen Maintenance | ✅ Complete | `scripts/transcript-freshness.js` built (6-flag freshness report, exits non-zero on critical flags). Stale detector integrated. Migration 015 (`latest_ingested_quarter` column) output — human execution required post-merge. `EVERGREEN_MAINTENANCE_RUNBOOK.md` written. Codex stale company exception prompt written. Post-call HTTP watch deferred to Phase 3. PR #23 open. |
+| I | Public UX and SEO | ✅ Complete | Companies section, interactive sample card, FAQ added to Landing.jsx (PR #21). SEO (title, OG, Twitter, JSON-LD, canonical, sitemap.xml, robots.txt) was already complete before this session. |
+| J | QA and Launch Hardening | ✅ Complete | Playwright smoke + game-flow tests in `tests/`. `scripts/release-readiness.js` built (Green/Yellow/Red posture, cron-detectable). `RELEASE_CHECKLIST.md` written. Codex release-readiness synthesis prompt written. Requires `npx playwright install-deps` on VPS after PR #24 merge. PR #24 open. |
+| K | Analytics and Launch | ⬜ Not Started | Phase 3 / post-launch. Launch kit draft staged in `codex/staging/docs/program/LAUNCH_KIT.md` by Codex — awaiting human review before promotion. |
 
 ---
 
@@ -52,6 +52,9 @@
 | codex/staging ↔ codex/inbox pipeline | Shared staging branch protocol live on main. Codex deposits work to `codex/staging/`; Claude Code writes task assignments and responses to `codex/inbox/`. `PROTOCOL.md` is the source of truth. |
 | Phase 2 fetcher: Q4CDN only | `ir.homedepot.com` and StockAnalysis both block automated fetching (403/400). Phase 2 Docker fetcher can only reliably download from Q4CDN vendor-hosted PDFs. Confirmed working: NKE (`s1.q4cdn.com`), confirmed in spot checks: V, TRV, MRK. This is why Codex Priority 3 (official source repair) directly unblocks the pipeline. |
 | ANTHROPIC_API_KEY in thereitis/.env | Key is now in `~/thereitis/.env` for docker compose validator service. Never commit `.env`. |
+| MSFT official HTML confirmed inaccessible | Codex Priority 4 validation: 15 MSFT official IR HTML pages return 403 to Node GET. These are transcript web pages, not PDFs. MSFT stays on StockAnalysis fallback for Phase 2; Phase 1 ingest (4,790 phrases staged) is unaffected since the extractor works against pre-downloaded text. |
+| VZ fully official — prime Phase 2 candidate | Codex Priority 4 validated all 17 VZ official PDFs (verizon.com/about/file/* token URLs): 17/17 pass with correct Content-Type and PDF signature. TRV (s26.q4cdn.com) also 10/10 pass. VZ and TRV are the next lowest-risk companies to run through the Phase 2 pipeline. |
+| KO official PDF returns 403 | Codex Priority 2 spot check: KO Q1 2026 official transcript PDF on investors.coca-colacompany.com returns 403 application/xml even with browser-like headers. Ingestion access issue — KO may require a different fetch approach or manual download. |
 
 ---
 
@@ -69,30 +72,37 @@
 | 8 | **Review human_review_required sources before ingestion** | RHP (intermittent PDFs Q1/Q4 2022, Q1 2023), CLDT (historical quarters low-confidence), AHT (Q1 2026 missing), JNJ (several quarters pattern-matched not directly verified). See `docs/research/transcript-source-manifest.md` Open Human Review Items table. |
 | 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ, CLDT, AHT are researched but not yet in the `companies` table. Required before ingestion pipeline can process them. |
 | 10 | **DB migration executed** | ✅ Done 2026-05-30. Migration 014 added 12 missing companies (BA, CAT, HD, HON, MCD, MMM, NKE, SHW, WMT, RHP, CLDT, AHT). DB now has 41 companies. |
-| 11 | **Decide latest_ingested_quarter metadata location** | Canonical location for this field per company: Supabase `companies` table, `company.json` per pack, or both. Blocking Group H freshness watcher build. |
+| 11 | **Decide latest_ingested_quarter metadata location** | ✅ Resolved in Group H build: migration 015 adds the column to the Supabase `companies` table. Execute migration 015 after merging PR #23. |
 | 12 | **Review and merge PR #18** | ✅ Merged 2026-05-30. All 17 original blue-chip source manifests on main. |
-| 13 | **Review and merge PR #19** | `feat/remaining-blue-chip-manifests` — 13 remaining blue-chip `company-packs/` entries (MSFT, JPM, GS, AXP, V, TRV, UNH, AMGN, JNJ, MRK, PG, CVX, VZ). All 17 quarters. JNJ `human_review_required`. Codex Priority 3 repair pass for 8 assigned and in progress. |
+| 13 | **Review and merge PR #19** | `feat/remaining-blue-chip-manifests` — 13 remaining blue-chip `company-packs/` entries (MSFT, JPM, GS, AXP, V, TRV, UNH, AMGN, JNJ, MRK, PG, CVX, VZ). Priority 3+4 repairs applied: JPM 8 official rows, MRK 8 official rows, VZ 17/17 official confirmed. MSFT stays on StockAnalysis (official HTML pages return 403). JNJ `human_review_required`. |
 | 14 | **Review and merge PR #20** | `feat/phase2-ops-worker` — Phase 2 Docker ops-worker. End-to-end test passed (NKE: 17 PDFs, 40 phrases, migration.sql). Ready to merge. |
 | 15 | **Review and merge PR #21** | `feat/group-i-public-ux` — Group I landing page additions (companies section, sample card, FAQ). Build passes. |
+| 16 | **Review and merge PR #22** | `feat/group-g-content-qa` — Group G Content QA: expanded `scripts/content-validation.js`, `CONTENT_QA_RUBRIC.md`, Codex editorial review prompt. Ready to merge. |
+| 17 | **Review and merge PR #23** | `feat/group-h-evergreen` — Group H Evergreen: `scripts/transcript-freshness.js`, `EVERGREEN_MAINTENANCE_RUNBOOK.md`, Codex stale exception prompt, migration 015. **After merge: execute migration 015 in Supabase.** |
+| 18 | **Review and merge PR #24** | `feat/group-j-qa-launch` — Group J QA: Playwright tests, `scripts/release-readiness.js`, `RELEASE_CHECKLIST.md`, Codex release-readiness prompt. **After merge: run `npx playwright install-deps` on VPS.** |
+| 19 | **Execute migration 015 after PR #23 merge** | `supabase/migrations/015_latest_ingested_quarter.sql` — adds `latest_ingested_quarter text` column to `companies`. Required for Group H freshness watcher to run. |
+| 20 | **Review Codex LAUNCH_KIT.md draft** | Draft at `codex/staging/docs/program/LAUNCH_KIT.md`. Contains tagline, LinkedIn post, X/Twitter drafts, demo script, beta invite template. Human review required before promotion to `docs/program/LAUNCH_KIT.md`. |
 
 ---
 
 ## Next Recommended Session
 
-**Recommended:** Merge PRs #19, #20, #21, #22. Then:
-- Decide action item #11 (latest_ingested_quarter location) to unblock Group H
-- Run NKE editorial review via Codex once PR #20 merges (use codex-content-editorial-review.md prompt)
-- Start Group H once #11 is decided
+**Recommended:** Six PRs require human merge. Merge in this order:
+1. **PR #22** (Group G) and **PR #24** (Group J) — no migration, no VPS steps, safe to merge immediately
+2. **PR #21** (Group I) — no migration, landing page only
+3. **PR #20** (Phase 2 ops-worker) — Docker only, no migration
+4. **PR #19** (remaining blue-chip manifests) — source manifests only
+5. **PR #23** (Group H) — **merge last**, then immediately execute migration 015 in Supabase and run `npx playwright install-deps` on VPS (can be done in same VPS session as migration)
 
-**Model:** `claude-sonnet-4-6` for Group H implementation. Switch to `claude-opus-4-8` only for Group H architecture if scope is unclear.
+**After all merges:** Await Codex Priority 5 response (link validation for PR #18 companies). That response will either greenlight PR #18 companies for Phase 2 ingestion or trigger a repair pass.
 
-**Session entry point:**
-1. Check Codex Priority 4 inbox (link validation results, AMGN/JPM/MRK repair pass)
-2. Merge PR #20 — runs NKE through Group G validator as first test
-3. Merge PRs #19, #21, #22
-4. Decide `latest_ingested_quarter` location (action item #11) → build Group H
+**Next build task (Claude Code):**
+- Run a second company through Phase 1 ingestion pipeline: **VZ** is the recommended choice (17/17 official PDFs confirmed by Priority 4 validation)
+- Or begin Group K analytics event tracking (Phase 3 — no blockers, but not urgent before launch)
 
-**Blocking human decision still needed:** `latest_ingested_quarter` canonical location (action item #11) — blocks Group H entirely.
+**Blocking human actions before next session:**
+- Merge PR #23 + execute migration 015 (required before `transcript-freshness.js` can produce useful output)
+- Configure at least one Claude Code Routine (action items #2–#3) to enable the agentic PM loop
 
 ---
 
@@ -105,9 +115,13 @@
 | IHG manual sourcing | Low | IHG is set aside from the ingestion pipeline. Non-standard reporting format means it can only be added manually. No ETA. |
 | Low-confidence transcript sources | Low | RHP (Q1/Q4 2022, Q1 2023), CLDT (historical), AHT (Q1 2026 missing), JNJ (several quarters). These are flagged `human_review_required=true` in the source manifest and must be verified before the company is activated. |
 | Choice Hotels ticker typo normalized | Resolved | Was researched under `CCH` (typo), normalized to `CHH` (correct). Manifests updated. No action needed. |
-| IR server bot-blocking | Medium | `ir.homedepot.com` returns 403; StockAnalysis returns 400 for all automated requests. Only Q4CDN vendor-hosted PDFs (`s1/s21/s26.q4cdn.com`) confirmed accessible for Phase 2 fetcher. Companies relying on ir.* or StockAnalysis URLs cannot be processed by Phase 2 until Codex Priority 3 repair resolves official Q4CDN URLs, or a browser-emulation fetch strategy is added. |
+| IR server bot-blocking | Partially resolved | StockAnalysis returns 400. `ir.homedepot.com` HTML catalog pages return 403, but **direct PDF file URLs on ir.homedepot.com pass** (Priority 5 confirmed 17/17 HD PDFs at HTTP 200). The constraint is catalog/navigation pages, not direct PDF links. Phase 2 fetcher can process HD and any company with direct PDF URLs in their source manifest. Companies with only StockAnalysis fallback URLs (AAPL, NVDA, AMZN, CSCO, IBM, CRM, KO, CAT, BA, HON, MMM, SHW, MCD) still need official PDF source repair before Phase 2 can fetch them. |
 | Phase 2 trivia pass rate | Low | Stage 4 Claude Haiku still includes person names in ~75% of trivia despite explicit prompt instruction. Stage 5 correctly rejects them. Prompt strengthened; retry loop not yet built. NKE test: 4/15 trivia passed. Acceptable for now; fix before batch production runs. |
 | Group C platform configuration pending | Medium | All 5 automation prompt files exist but none of the Claude Code Routines or Codex Automations are live. The agentic PM loop does not run until these are configured. |
 | `feat/group-d-admin-console` branch not merged | Low | Local branch exists. Confirm it is fully merged to main; if not, review and merge. |
 | HD/WMT/NKE/DIS source manifests repaired | Resolved | PR #18 merged. All 68 quarters use official IR-domain sources. |
 | Phase 2 Docker ops-worker built and tested | Resolved | NKE end-to-end test passed. PR #20 ready. Awaiting human merge. |
+| Groups G, H, I, J built; PRs open | Info | All four PRs (#21–#24) are open and review-ready. No migration required except PR #23 (migration 015). |
+| KO official PDF access blocked | Low | investors.coca-colacompany.com returns 403 even with browser-like headers. KO ingestion will need manual download or a browser-emulation strategy. Not a blocker for other companies. |
+| MSFT official HTML pages inaccessible | Resolved | Confirmed 403 to Node GET (HTML transcript pages, not PDFs). MSFT Phase 1 pipeline already validated on StockAnalysis fallback; Phase 2 will continue that approach. |
+| Codex Priority 5 outstanding | Low | Link validation for PR #18 companies (AAPL, NVDA, AMZN, CSCO, HD, IBM, CRM, KO, WMT, NKE, DIS, CAT, BA, HON, MMM, SHW, MCD) is assigned and in Codex inbox. No blocker for merges. |
