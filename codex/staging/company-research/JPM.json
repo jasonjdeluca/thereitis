@@ -4,7 +4,7 @@
     "group": "E",
     "status": "review_needed",
     "target_path": "company-research/JPM.json",
-    "notes": "JPMorgan Chase transcript source research deposit for FY Q1 2022 through FY Q1 2026. Official JPMorgan Chase quarterly earnings materials include earnings transcript PDFs; structured StockAnalysis rows are included as readable transcript fallbacks pending direct PDF mapping."
+    "notes": "JPMorgan Chase official source repair pass. Resolved 6 official transcript rows; retained 11 third-party fallback rows where no official direct transcript asset was resolved."
   },
   "company": "JPMorgan Chase",
   "ticker": "JPM",
@@ -14,10 +14,16 @@
     "quarters_expected": 17,
     "quarters_found": 17,
     "complete": true,
-    "primary_structured_source": "StockAnalysis transcript pages with official JPMorgan Chase PDF context",
-    "official_source_context": "JPMorgan Chase quarterly earnings transcript PDFs; StockAnalysis structured fallback",
+    "primary_structured_source": "Official transcript assets where resolved; third-party fallback rows where unresolved",
+    "official_source_context": {
+      "source_type": "official_company_domain",
+      "host": "jpmorganchase.com",
+      "note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved."
+    },
     "human_review_required": false,
-    "human_review_reason": null
+    "human_review_reason": null,
+    "official_rows_resolved": 6,
+    "third_party_fallback_rows": 11
   },
   "official_domains_checked": [
     "jpmorganchase.com",
@@ -30,15 +36,15 @@
       "fiscal_quarter": "FY Q1 2022",
       "call_date": "Apr 13, 2022",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/18667-q1-2022/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -46,15 +52,15 @@
       "fiscal_quarter": "FY Q2 2022",
       "call_date": "Jul 14, 2022",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/19005-q2-2022/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -62,15 +68,15 @@
       "fiscal_quarter": "FY Q3 2022",
       "call_date": "Oct 14, 2022",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/19006-q3-2022/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -78,15 +84,15 @@
       "fiscal_quarter": "FY Q4 2022",
       "call_date": "Jan 13, 2023",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/35976-q4-2022/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -94,15 +100,15 @@
       "fiscal_quarter": "FY Q1 2023",
       "call_date": "Apr 14, 2023",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/36020-q1-2023/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -110,63 +116,60 @@
       "fiscal_quarter": "FY Q2 2023",
       "call_date": "Jul 14, 2023",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/36047-q2-2023/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
       "ticker": "JPM",
       "fiscal_quarter": "FY Q3 2023",
       "call_date": "Oct 13, 2023",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/36068-q3-2023/",
-      "status": "official_source_identified_structured_third_party_fallback",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2023/3rd-quarter/jpm-3q23-earnings-call-transcript.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
       "official_search_exhausted": false,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved."
     },
     {
       "company": "JPMorgan Chase",
       "ticker": "JPM",
       "fiscal_quarter": "FY Q4 2023",
       "call_date": "Jan 12, 2024",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/36086-q4-2023/",
-      "status": "official_source_identified_structured_third_party_fallback",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2023/4th-quarter/jpm-4q23-earnings-call-transcript.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
       "official_search_exhausted": false,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved."
     },
     {
       "company": "JPMorgan Chase",
       "ticker": "JPM",
       "fiscal_quarter": "FY Q1 2024",
       "call_date": "Apr 12, 2024",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/124745-q1-2024/",
-      "status": "official_source_identified_structured_third_party_fallback",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2024/1st-quarter/jpm-1q24-earnings-call-transcript.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
       "official_search_exhausted": false,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved."
     },
     {
       "company": "JPMorgan Chase",
@@ -174,15 +177,15 @@
       "fiscal_quarter": "FY Q2 2024",
       "call_date": "Jul 12, 2024",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/158188-q2-2024/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -190,15 +193,15 @@
       "fiscal_quarter": "FY Q3 2024",
       "call_date": "Oct 11, 2024",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/184711-q3-2024/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -206,15 +209,15 @@
       "fiscal_quarter": "FY Q4 2024",
       "call_date": "Jan 15, 2025",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/214589-q4-2024/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
@@ -222,63 +225,60 @@
       "fiscal_quarter": "FY Q1 2025",
       "call_date": "Apr 11, 2025",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/244537-q1-2025/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     },
     {
       "company": "JPMorgan Chase",
       "ticker": "JPM",
       "fiscal_quarter": "FY Q2 2025",
       "call_date": "Jul 15, 2025",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/307035-q2-2025/",
-      "status": "official_source_identified_structured_third_party_fallback",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2025/2nd-quarter/jpm-2q25-earnings-call-transcript.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
       "official_search_exhausted": false,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved."
     },
     {
       "company": "JPMorgan Chase",
       "ticker": "JPM",
       "fiscal_quarter": "FY Q3 2025",
       "call_date": "Oct 14, 2025",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/337236-q3-2025/",
-      "status": "official_source_identified_structured_third_party_fallback",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2025/3rd-quarter/jpm-3q25-earnings-call-transcript.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
       "official_search_exhausted": false,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved."
     },
     {
       "company": "JPMorgan Chase",
       "ticker": "JPM",
       "fiscal_quarter": "FY Q4 2025",
       "call_date": "Jan 13, 2026",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/364408-q4-2025/",
-      "status": "official_source_identified_structured_third_party_fallback",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2025/4th-quarter/jpm-4q25-earnings-call-transcript.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
       "official_search_exhausted": false,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved."
     },
     {
       "company": "JPMorgan Chase",
@@ -286,21 +286,27 @@
       "fiscal_quarter": "FY Q1 2026",
       "call_date": "Apr 14, 2026",
       "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/415950-q1-2026/",
-      "status": "official_source_identified_structured_third_party_fallback",
+      "status": "official_pdf_not_resolved_third_party_retained",
       "source_type": "third_party_transcript_provider",
       "source_host": "stockanalysis.com",
-      "official_search_exhausted": false,
+      "official_search_exhausted": true,
       "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Transcript index lists a readable full transcript page for this fiscal quarter.",
+      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
       "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
       "confidence": "high",
-      "evidence_note": "Readable transcript page used as structured fallback while official direct transcript assets are validated."
+      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
     }
   ],
   "reconciliation_notes": [
     {
       "date": "2026-05-30",
       "note": "No prior per-quarter Markdown table was found in the repository for this ticker during the reconciliation closure pass; this file is a structured research deposit for Claude Code validation."
+    }
+  ],
+  "repair_notes": [
+    {
+      "date": "2026-05-30",
+      "note": "Targeted official-source repair resolved 6 of 17 rows. 11 rows retain third-party accepted_url with official_search_exhausted=true because no direct official transcript asset was resolved in this pass."
     }
   ]
 }
