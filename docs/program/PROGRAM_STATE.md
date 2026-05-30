@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-30 (session 6 — final update)
+**Last updated:** 2026-05-30 (session 7 — final update)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,9 +8,9 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Session 6 — URL pattern repairs for MRK/JPM/TRV (9/13/11 quarters now); new builders + full pipeline runs for HD/WMT/DIS/NKE (17/17 each); fetcher UA fix; ai-select retry backoff; Codex Priority 8+9 read (NKE not activation-ready; Group C prompt fixes noted). PR #30 open.
-**Awaiting human action:** Review 600 phrases across 11 companies in `/admin` → Phrase Staging Review; merge PR #30; configure Claude Code Routines and Codex Automations (Group C)
-**Awaiting Codex:** Priority 10 release readiness synthesis (waiting on VPS report data); Priority 11 advance notice for BA/TRV/MRK/JPM/MMM editorial reviews
+**Just completed:** Session 7 — Applied Group C prompt targeted edits (PR #32); sent Codex inbox note for Priorities 12/13/14 (HD/WMT/DIS editorial reviews, currently blocked — generated/ files not present). Confirmed no human phrase approvals yet (all 11 companies still ai_selected). No new Codex responses since session 6.
+**Awaiting human action:** Review 600 phrases across 11 companies in `/admin` → Phrase Staging Review; merge PR #30 (URL repairs + builders); merge PR #32 (Group C prompt fixes); configure Claude Code Routines and Codex Automations (Group C)
+**Awaiting Codex:** Priority 10 release readiness synthesis (waiting on VPS report data); Priorities 12/13/14 HD/WMT/DIS editorial reviews (blocked — need Phase 2 ops-worker run to generate files)
 
 ---
 
@@ -20,7 +20,7 @@
 |---|---|---|---|
 | A | Live Game Stability | ✅ Complete | Silent fallback removed, zero-phrase companies fixed, trivia generalized, readiness gate added |
 | B | Deterministic Truth Layer | ✅ Complete | All 4 scripts built and deployed; VPS cron running at 6:00am and 9:00pm ET |
-| C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; naming conflict resolved (Claude Code convention canonical); platform configuration pending — manual setup in Claude Code Routines and Codex Automations platforms. |
+| C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written and quality-edited (PR #32 — Codex Priority 9 targeted fixes applied). Naming conflict resolved. Platform configuration pending — manual setup in Claude Code Routines and Codex Automations. |
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
 | E | Transcript Research | ✅ Complete | All 30 companies researched. Priorities 1–6 done. KO/BA/MMM/HD/WMT/NKE/DIS fully official (17/17 each). VZ 17/17 official confirmed. AAPL/NVDA/AMZN/CSCO/HON/MCD confirmed no written transcript PDFs — structural limitation. JNJ: human_review_required. MSFT: HTML-only, StockAnalysis fallback. All manifests in `company-packs/` (17 on main via PR #18; 13 in codex/staging pending promotion). |
 | F | Ingestion Pipeline | 🔄 In Progress | Phase 1 run for 11 companies (2026-05-30): MSFT, VZ, BA, TRV, MRK, JPM, MMM, HD, WMT, DIS, NKE — all have 50 ai_selected phrases awaiting human approval (JPM/MRK/TRV have 100 each after repair run). Phase 2 ops-worker built and tested (NKE). **Blocker: human phrase review needed before any company can be activated.** |
@@ -57,6 +57,9 @@
 | Phase 1 pipeline + ai-select flow confirmed | Resolved | Session 5: 7 companies processed. Session 6: URL repairs + 4 new builders. Final fetch rates: BA 17/17, MMM 17/17, VZ 17/17, MSFT 15/17, HD 17/17, WMT 17/17, DIS 17/17, NKE 17/17, TRV 11/17, JPM 13/17, MRK 9/17. StockAnalysis 400 failures accepted. |
 | Codex inbox note sent (session 5) | Info | `codex/inbox/session-5-handoff-2026-05-30.md` on `codex/staging` branch. Priority 8: NKE editorial review (unblocked). Priority 9: Group C prompt review. Priority 10: release readiness synthesis (waiting on VPS report data). Priority 11: advance notice of BA/TRV/MRK/JPM/MMM editorial reviews. |
 | Codex Priority 8+9 complete (session 6) | Info | NKE: not activation-ready (16/50 phrases pass after editorial review; 3/12 trivia pass). migration.sql must remain human_decision_needed. Group C: 5 prompt files need targeted edits — see `codex/staging/reports/group-c-prompt-review-2026-05-30.md`. |
+| Group C prompt edits applied (session 7) | Resolved | PR #32 applies all 16 Codex Priority 9 findings as targeted line-level changes to all 5 prompt files. No wholesale rewrites. Awaiting human merge. |
+| Codex inbox note sent (session 7) | Info | `codex/inbox/editorial-reviews-hd-wmt-dis-2026-05-30.md` on `codex/staging`. Assigns Priorities 12 (HD), 13 (WMT), 14 (DIS) editorial reviews. All three currently blocked — Phase 2 ops-worker must generate phrases.json/trivia.json before Codex can review. WMT and DIS flagged as high-priority launch companies. |
+| No human phrase approvals (session 7 check) | Info | All 11 companies remain at ai_selected in phrase_staging. 600 phrases await human review in admin panel. No company is activation-ready yet. |
 | URL pattern strategy: use manifests, not patterns | Decision | buildMrk/buildJpm/buildTrv now use hardcoded URL maps sourced from source_manifest.json. StockAnalysis 400 errors are expected and accepted for quarters with no official PDF. All new builders (HD/WMT/DIS/NKE) use the same manifest-sourced approach. |
 | Fetcher User-Agent changed to browser-like string | Resolved | "ThereItIsBot" UA triggered 403 on ir.homedepot.com. Updated to Chrome/Mac UA. Affects all companies — re-run is safe since each fetch writes to data/raw/ and does not re-download already-fetched rows. |
 | ai-select 429 backoff (65s, 3 retries) | Resolved | Haiku 50k token/min rate limit hit on WMT (3997 phrases, 27 batches). Retry logic added to selectBatch loop. WMT completed on second attempt after 65s wait. |
@@ -73,33 +76,36 @@
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Review 600 phrases in admin panel** | 11 companies with ai_selected phrases. Go to `/admin` → Phrase Staging Review. JPM/MRK/TRV each have 100 — approve the best 50 from each. Companies: MSFT, VZ, BA, TRV (100), MRK (100), JPM (100), MMM, HD, WMT, DIS, NKE. |
+| 1 | **Review 600 phrases in admin panel** | 11 companies with ai_selected phrases. Go to `/admin` → Phrase Staging Review. JPM/MRK/TRV each have 100 — approve the best 50 from each. Companies: MSFT, VZ, BA, TRV (100), MRK (100), JPM (100), MMM, HD, WMT, DIS, NKE. **This is the biggest unlock — no company can be activated until 50 phrases are approved.** |
 | 2 | **Merge PR #30** | Ingestion URL repairs (MRK/JPM/TRV) + new builders (HD/WMT/DIS/NKE) + UA fix + ai-select retry. All tested end-to-end. |
-| 2 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
-| 3 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: schedule, 6:15am ET weekdays. Manual setup in Claude Code Routines platform. |
-| 4 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label on a GitHub issue. Manual setup. |
-| 5 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
-| 6 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET during active onboarding. |
-| 7 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: daily 8:00am ET backup. |
-| 8 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting those companies. |
-| 9 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
+| 3 | **Merge PR #32** | Group C prompt targeted edits (all 16 Codex Priority 9 findings). Required before configuring live automations. |
+| 4 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
+| 5 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md` (updated per PR #32). Trigger: schedule, 6:15am ET weekdays. Manual setup in Claude Code Routines platform. |
+| 6 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md` (updated per PR #32). Trigger: `claude-implement` label on a GitHub issue. Manual setup. |
+| 7 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md` (updated per PR #32). Trigger: Friday 8:00am ET. |
+| 8 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md` (updated per PR #32). Trigger: 9:30pm ET during active onboarding. |
+| 9 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md` (updated per PR #32). Trigger: weekdays 8:00am ET backup. |
+| 10 | **Run Phase 2 ops-worker for HD, WMT, DIS** | Unblocks Codex Priorities 12/13/14 editorial reviews. NKE was the only company run through Phase 2 so far. |
+| 11 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting those companies. |
+| 12 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
 
 ---
 
 ## Next Recommended Session
 
-**Session 6 is complete.** PR #30 open (URL repairs + 4 new builders + UA fix + ai-select retry). 11 companies with 50+ ai_selected each. Total: 600 phrases across 11 companies awaiting human approval.
+**Session 7 is complete.** PR #32 open (Group C prompt edits). Codex inbox note sent (Priorities 12/13/14). No new Codex responses to act on.
 
 **Next session entry point (Claude Code):**
-1. Check `phrase_staging` status — confirm human has approved phrases; if not, surface the admin panel link
-2. Apply Group C prompt fixes from Codex Priority 9 report (`codex/staging/reports/group-c-prompt-review-2026-05-30.md`) — targeted edits to 5 prompt files
-3. Configure at least one Claude Code Routine (action item #3) to start the agentic PM loop
-4. Consider assigning Codex editorial review for new companies (HD, WMT, DIS) now that they have ai_selected phrases
+1. Check `phrase_staging` — if human has approved phrases for any company, surface activation readiness
+2. If PR #30 and PR #32 are merged, configure at least one Claude Code Routine to start the agentic PM loop
+3. If Phase 2 ops-worker has been run for HD/WMT/DIS, check for Codex editorial review responses and act on them
+4. Consider running the Phase 2 ops-worker for HD, WMT, DIS directly if the human hasn't done so
 
 **Human action needed before next session:**
 - Review phrases in admin panel (action item #1 — the most important unlock)
 - Merge PR #30 (ingestion repairs + new builders)
-- Configure at least one Claude Code Routine or Codex Automation (action items #3–#7)
+- Merge PR #32 (Group C prompt edits — required before configuring live automations)
+- Run Phase 2 ops-worker for HD, WMT, DIS (unblocks Codex Priorities 12/13/14)
 
 **Model:** `claude-sonnet-4-6` for all pipeline and repair work. Switch to `claude-opus-4-8` only for architectural decisions.
 
