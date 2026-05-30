@@ -1,0 +1,23 @@
+{
+  "ticker": "NKE",
+  "company_id": "nke",
+  "generated_at": "2026-05-30T12:43:07.267Z",
+  "candidates_raw": 7629,
+  "candidates_after_stage3": 200,
+  "phrases_approved": 40,
+  "trivia_approved": 4,
+  "validation_issues": [
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped"
+  ],
+  "ready_for_migration": false
+}
