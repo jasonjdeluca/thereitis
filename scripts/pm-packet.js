@@ -17,6 +17,11 @@ const REPORT_FILES = {
   migration_check: join(REPORTS_DIR, "migration-check.json"),
 };
 
+// Optional reports — included if present and fresh; silently skipped otherwise.
+const OPTIONAL_REPORT_FILES = {
+  transcript_freshness: join(REPORTS_DIR, "transcript-freshness.json"),
+};
+
 function loadReport(key, filepath) {
   let stat;
   try {
@@ -41,10 +46,21 @@ function loadReport(key, filepath) {
   }
 }
 
+function loadOptionalReport(filepath) {
+  try {
+    const stat = statSync(filepath);
+    if (Date.now() - stat.mtimeMs > TWO_HOURS_MS) return null;
+    return JSON.parse(readFileSync(filepath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
 function run() {
   const cr = loadReport("company_readiness", REPORT_FILES.company_readiness);
   const cv = loadReport("content_validation", REPORT_FILES.content_validation);
   const mc = loadReport("migration_check", REPORT_FILES.migration_check);
+  const tf = loadOptionalReport(OPTIONAL_REPORT_FILES.transcript_freshness);
 
   const critical_issues = [];
   const warnings = [];
@@ -103,6 +119,26 @@ function run() {
     }
   }
 
+  // Transcript freshness issues (optional)
+  if (tf) {
+    for (const flag of (tf.critical_flags || [])) {
+      critical_issues.push({
+        source: "transcript-freshness",
+        company_name: flag.company,
+        type: flag.type,
+        detail: flag.detail,
+      });
+    }
+    for (const flag of (tf.warnings || [])) {
+      warnings.push({
+        source: "transcript-freshness",
+        company_name: flag.company,
+        type: flag.type,
+        detail: flag.detail,
+      });
+    }
+  }
+
   // Migration issues
   for (const issue of (mc.issues || [])) {
     const entry = { source: "migration-check", type: issue.type, detail: `${issue.filename}: ${issue.detail}` };
@@ -119,12 +155,18 @@ function run() {
     const activeZero = critical_issues.find(i => i.type === "active_zero_phrases");
     const tooLong = critical_issues.find(i => i.type === "phrase_too_long");
     const triviaInvalid = critical_issues.find(i => i.type === "trivia_invalid");
+    const stale = critical_issues.find(i => i.source === "transcript-freshness" && i.type === "stale_coverage");
+    const postCall = critical_issues.find(i => i.source === "transcript-freshness" && i.type === "post_call_transcript_needed");
     if (activeZero) {
       recommended_focus = `Deactivate or populate "${activeZero.company_name || activeZero.company_id}" immediately — it is active with zero phrases and will silently fail for players.`;
+    } else if (postCall) {
+      recommended_focus = `Earnings call has passed for "${postCall.company_name}" — locate and ingest the new transcript before the next session.`;
     } else if (tooLong) {
       recommended_focus = `Fix phrase length violations for company "${tooLong.company_id}" — at least one phrase exceeds the 25-character DB constraint and will break ingestion.`;
     } else if (triviaInvalid) {
       recommended_focus = `Fix ${cv.summary?.trivia_flagged_count || "one or more"} trivia questions missing choices or a correct_answer field — they will cause errors during gameplay.`;
+    } else if (stale) {
+      recommended_focus = `Transcript coverage is stale for "${stale.company_name}" — run ingestion to refresh content before players notice outdated phrases.`;
     } else {
       recommended_focus = `Resolve ${critical_issues.length} critical issue(s) before the next run — see critical_issues for details.`;
     }
@@ -141,6 +183,7 @@ function run() {
       company_readiness: cr.generated_at,
       content_validation: cv.generated_at,
       migration_check: mc.generated_at,
+      transcript_freshness: tf?.generated_at || null,
     },
     critical_issues,
     warnings,
