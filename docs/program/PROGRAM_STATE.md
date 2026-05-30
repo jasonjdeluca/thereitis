@@ -20,10 +20,10 @@
 |---|---|---|---|
 | A | Live Game Stability | ✅ Complete | Silent fallback removed, zero-phrase companies fixed, trivia generalized, readiness gate added |
 | B | Deterministic Truth Layer | ✅ Complete | All 4 scripts built and deployed; VPS cron running at 6:00am and 9:00pm ET |
-| C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; platform configuration pending. Prompt file naming conflict between Claude Code and Codex conventions identified — must be resolved before platform configuration can proceed. |
+| C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; naming conflict resolved (Claude Code convention canonical); platform configuration pending — manual setup in Claude Code Routines and Codex Automations platforms. |
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
-| E | Transcript Research | 🔄 In Progress | Hospitality/REIT research complete (32 companies, 5 Codex batches). Blue-chip research partially complete from Codex handover — 11 companies with confirmed official sources; remainder thin or not started. Transcript reconciliation and manifest creation pending. |
-| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 (Node.js pipeline) complete — MSFT validated end-to-end, 4,790 phrases staged; Phase 2 (Docker architecture) not started |
+| E | Transcript Research | 🔄 In Progress | All 30 target companies researched. 5 with fully official IR sources (HD, WMT, NKE, DIS, KO). 8 pending official-source repair pass (MSFT, JPM, V, TRV, AMGN, JNJ, MRK, VZ — assigned to Codex Priority 3). 17 using third-party as best available. JNJ: human_review_required. Reconciliation task closed — no prior tables existed. |
+| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete — MSFT validated end-to-end, 4,790 phrases staged. Phase 2 Docker ops-worker built (fetcher/extractor/validator containers + run-pipeline.sh) on branch feat/phase2-ops-worker — pending end-to-end test and merge. |
 | G | Content QA | ⬜ Not Started | Depends on Group F generating output; no validation expansion or QA rubric written yet |
 | H | Evergreen Maintenance | ⬜ Not Started | Depends on Group F operational; freshness watcher and stale detector not built |
 | I | Public UX and SEO | ⬜ Not Started | Depends on Group A complete (satisfied); no landing page rewrite or SEO tags added yet |
@@ -65,9 +65,11 @@
 | 7 | **IHG manual PDF sourcing** | IHG uses non-standard event format (Trading Updates / Half Year Results). PDFs must be sourced manually and placed into `company-packs/IHG/transcripts/`. |
 | 8 | **Review human_review_required sources before ingestion** | RHP (intermittent PDFs Q1/Q4 2022, Q1 2023), CLDT (historical quarters low-confidence), AHT (Q1 2026 missing), JNJ (several quarters pattern-matched not directly verified). See `docs/research/transcript-source-manifest.md` Open Human Review Items table. |
 | 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ, CLDT, AHT are researched but not yet in the `companies` table. Required before ingestion pipeline can process them. |
-| 10 | **Add 30 blue-chip companies to DB** | Claude Code will output migration SQL. Human executes against production Supabase. Required before blue-chip ingestion pipeline can process any of these companies. |
+| 10 | **DB migration executed** | ✅ Done 2026-05-30. Migration 014 added 12 missing companies (BA, CAT, HD, HON, MCD, MMM, NKE, SHW, WMT, RHP, CLDT, AHT). DB now has 41 companies. |
 | 11 | **Decide latest_ingested_quarter metadata location** | Canonical location for this field per company: Supabase `companies` table, `company.json` per pack, or both. Blocking Group H freshness watcher build. |
-| 12 | **Review and merge PR #18** | `feat/blue-chip-source-manifests` — ready to merge. HD, WMT, NKE, DIS re-researched by Codex and validated by Claude Code. All 68 quarters now use official IR-domain sources. No third-party fallbacks remain. |
+| 12 | **Review and merge PR #18** | ✅ Merged 2026-05-30. All 17 original blue-chip source manifests on main. |
+| 13 | **Review and merge feat/remaining-blue-chip-manifests** | 13 remaining blue-chip `company-packs/` entries (MSFT, JPM, GS, AXP, V, TRV, UNH, AMGN, JNJ, MRK, PG, CVX, VZ). All 17 quarters each. JNJ flagged `human_review_required`. Codex repair pass for 8 in progress. |
+| 14 | **Review and merge feat/phase2-ops-worker** | Phase 2 Docker ops-worker (fetcher/extractor/validator). Needs end-to-end test against one company before merge. |
 
 ---
 
