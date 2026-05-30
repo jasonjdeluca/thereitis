@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-30
+**Last updated:** 2026-05-30 (session 2)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -22,7 +22,7 @@
 | B | Deterministic Truth Layer | ✅ Complete | All 4 scripts built and deployed; VPS cron running at 6:00am and 9:00pm ET |
 | C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; platform configuration pending. Prompt file naming conflict between Claude Code and Codex conventions identified — must be resolved before platform configuration can proceed. |
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
-| E | Transcript Research | 🔄 In Progress | Hospitality/REIT research complete (32 companies, 5 Codex batches). Blue-chip research partially complete from Codex handover — 11 companies with confirmed official sources; remainder thin or not started. Transcript reconciliation and manifest creation pending. |
+| E | Transcript Research | 🔄 In Progress | Hospitality/REIT research complete (32 companies, 5 Codex batches). Blue-chip thin-coverage research complete for 17 companies (AAPL, NVDA, AMZN, CSCO, HD, IBM, CRM, KO, WMT, NKE, DIS, CAT, BA, HON, MMM, SHW, MCD) — all 17/17 quarters sourced via StockAnalysis third-party fallback, validated and promoted to `company-packs/`. All 17 are `ready_for_fetcher: true`. Markdown reconciliation cannot proceed (no prior tables exist). Remaining ~13 blue-chip companies not yet researched. |
 | F | Ingestion Pipeline | 🔄 In Progress | Phase 1 (Node.js pipeline) complete — MSFT validated end-to-end, 4,790 phrases staged; Phase 2 (Docker architecture) not started |
 | G | Content QA | ⬜ Not Started | Depends on Group F generating output; no validation expansion or QA rubric written yet |
 | H | Evergreen Maintenance | ⬜ Not Started | Depends on Group F operational; freshness watcher and stale detector not built |
@@ -67,6 +67,8 @@
 | 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ, CLDT, AHT are researched but not yet in the `companies` table. Required before ingestion pipeline can process them. |
 | 10 | **Add 30 blue-chip companies to DB** | Claude Code will output migration SQL. Human executes against production Supabase. Required before blue-chip ingestion pipeline can process any of these companies. |
 | 11 | **Decide latest_ingested_quarter metadata location** | Canonical location for this field per company: Supabase `companies` table, `company.json` per pack, or both. Blocking Group H freshness watcher build. |
+| 12 | **Review 17 blue-chip source manifests before ingestion** | All 17 companies in `company-packs/` (AAPL, NVDA, AMZN, CSCO, HD, IBM, CRM, KO, WMT, NKE, DIS, CAT, BA, HON, MMM, SHW, MCD) are `ready_for_fetcher: true`. All sources are StockAnalysis third-party fallback — spot-check a sample of URLs to confirm they resolve to full written transcripts before starting the Group F fetcher. |
+| 13 | **Deposit Markdown source tables for blue-chip reconciliation** | Codex reports no prior per-quarter Markdown tables exist in the repo for the 17 blue-chip tickers. Reconciliation backlog task cannot proceed until those tables are deposited. If no prior tables exist, close the reconciliation task as not applicable. |
 
 ---
 

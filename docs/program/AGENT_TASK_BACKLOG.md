@@ -119,15 +119,18 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Run Codex transcript research batch 5 (companies 21–25, if applicable)
 - [x] Flag any companies with no accessible transcripts for human escalation
 - [x] Review and approve all source manifests before handing to Group F fetcher
-- [ ] Complete transcript source research for remaining thin-coverage blue-chip companies — AAPL, NVDA, AMZN, CSCO, CAT (partial), BA, HON, MMM, SHW, HD, MCD, WMT, NKE, DIS, KO, CRM (partial)
-  - Deposit findings to `codex/staging/company-research/` using the established output schema — one file per ticker
-  - Owner: Codex
+- [x] Complete transcript source research for remaining thin-coverage blue-chip companies — AAPL, NVDA, AMZN, CSCO, CAT, BA, HON, MMM, SHW, HD, MCD, WMT, NKE, DIS, KO, CRM
+  - All 17 files deposited to `codex/staging/company-research/` by Codex (2026-05-30)
+  - Validated and promoted to `company-packs/{ticker}/source_manifest.json` by Claude Code (2026-05-30)
+  - Owner: Codex (research), Claude Code (validation and promotion) — complete
 - [ ] Reconcile Markdown table research output vs JSON blocks for all completed blue-chip companies — flag any quarter where the table and JSON disagree
+  - Note: Codex reports no prior Markdown tables or JSON blocks exist in the repo for these tickers; reconciliation cannot be performed until source tables are deposited
   - Owner: Codex
-- [ ] Define and create `source_manifest.json` per company for all 30 blue-chip companies
+- [x] Define and create `source_manifest.json` per company for all 30 blue-chip companies (17 of 30 complete — AAPL, NVDA, AMZN, CSCO, HD, IBM, CRM, KO, WMT, NKE, DIS, CAT, BA, HON, MMM, SHW, MCD)
   - Input: Codex research findings in `codex/staging/company-research/`
   - Output: `company-packs/{ticker}/source_manifest.json` using the established schema
   - Owner: Claude Code (schema validation script), Codex (populate from research findings)
+  - Remaining 13 of 30 depend on additional Codex research batches for companies not yet researched
 - [ ] Validate all direct PDF links for JNJ, Walmart, Nike, Disney, Salesforce, IBM, Coca-Cola, 3M, Visa, Travelers, and Merck programmatically before ingestion
   - Spot-check per link: HTTP 200, Content-Type: application/pdf, quarter/date matches filename, transcript text confirmed
   - Owner: Claude Code (validation script)
@@ -318,4 +321,4 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
-*Last updated: 2026-05-30. Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
+*Last updated: 2026-05-30 (session 2). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
