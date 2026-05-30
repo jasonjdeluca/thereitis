@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-30 (session 4 — final update)
+**Last updated:** 2026-05-30 (session 5)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,10 +8,10 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** All PRs #19–#24 merged; migration 015 live; VZ Phase 1 pipeline (5,120 phrases staged); LAUNCH_KIT.md promoted; queue-builder + validator fixes deployed
-**In progress:** Group C (platform configuration pending), Group E (Codex Priority 7 — NKE editorial review + release readiness synthesis), Group F (Phase 1: MSFT + VZ staged, ai-select.js needed before human review)
-**Pending next session:** Build `scripts/ingestion/ai-select.js` (Stage 4 AI selection for phrase_staging — narrows 5,000+ candidates to 40–50 for human review)
-**Awaiting Codex:** Priority 7 — NKE editorial phrase review + one-off release readiness GitHub issue
+**Just completed:** `ai-select.js` built and run for MSFT (50 selected / 4,740 rejected) and VZ (50 selected / 5,070 rejected); Admin PhraseReviewPanel updated to show ai_selected rows; BA/KO/MMM/CAT/SHW source manifests promoted to official URLs; queue-builder wired with 5 new builders; migration 016 added (RLS policy for ai-select)
+**In progress:** Group C (platform configuration pending), Group E (Codex Priority 7 blocked — NKE generated files not in repo), Group F (MSFT + VZ ready for human phrase review)
+**Awaiting human review:** 50 MSFT ai_selected phrases + 50 VZ ai_selected phrases in admin PhraseReviewPanel
+**Awaiting Codex:** Priority 7 NKE editorial review still blocked (phrases.json + trivia.json not committed); release readiness issue #28 posted with fallback data
 
 ---
 
@@ -24,7 +24,7 @@
 | C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; naming conflict resolved (Claude Code convention canonical); platform configuration pending — manual setup in Claude Code Routines and Codex Automations platforms. |
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
 | E | Transcript Research | ✅ Complete | All 30 companies researched. Priorities 1–6 done. KO/BA/MMM/HD/WMT/NKE/DIS fully official (17/17 each). VZ 17/17 official confirmed. AAPL/NVDA/AMZN/CSCO/HON/MCD confirmed no written transcript PDFs — structural limitation. JNJ: human_review_required. MSFT: HTML-only, StockAnalysis fallback. All manifests in `company-packs/` (17 on main via PR #18; 13 in codex/staging pending promotion). |
-| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete: MSFT 4,790 phrases staged; VZ 5,120 phrases staged (all 17 PDFs, fixed queue-builder + validator). Phase 2 ops-worker merged and tested (NKE: 40 phrases generated). **Blocker: `ai-select.js` needed** — Phase 1 stages 5,000+ candidates without Stage 4 AI selection; human cannot review that volume. Build next session. |
+| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete: MSFT 4,790→50 ai_selected; VZ 5,120→50 ai_selected. `ai-select.js` built and run. Admin panel updated to show ai_selected rows. **Next: human phrase review (50 phrases per company).** Phase 2 ops-worker merged and tested (NKE: 40 phrases generated). |
 | G | Content QA | 🔄 In Progress | Scripts and rubric complete and merged. NKE is first company with Stage 4 output (40 phrases, 4 trivia). Codex Priority 7 editorial review in progress — NKE phrases/trivia assessment against rubric. |
 | H | Evergreen Maintenance | ✅ Complete | `transcript-freshness.js` merged. Migration 015 live (executed 2026-05-30). Runbook and Codex exception prompt merged. Post-call HTTP watch deferred to Phase 3. |
 | I | Public UX and SEO | ✅ Complete | Companies section, interactive sample card, FAQ merged (PR #21). SEO already complete. |
@@ -58,7 +58,8 @@
 | Phase 1 pipeline stages too many candidates | Medium | Phase 1 stages all valid n-gram candidates (4,790 MSFT, 5,120 VZ) — Stage 4 AI selection was never wired into Phase 1. `ai-select.js` must be built before human phrase review is feasible. See next session entry point. |
 | VZ queue-builder was using HTML webcast URLs | Resolved | Fixed in PR #26: updated to use direct PDF download URLs from source_manifest.json. VZ re-run successful (5,120 phrases staged). |
 | PDF character-spaced headers produce garbage n-grams | Resolved | Fixed in PR #26: validator now rejects any phrase where a token is a single non-'a' letter (`single_char_token` rejection reason). VZ re-run confirmed clean top phrases. |
-| Priority 6 company-research JSONs staged but not promoted | Low | BA, KO, MMM (fully official), CAT, SHW, IBM, CRM (partial) updated by Codex in `codex/staging/company-research/`. These need to be validated and promoted to `company-packs/{ticker}/source_manifest.json` and the queue-builder updated for newly-official companies before Phase 2 can process them. |
+| Priority 6 promotions complete (BA/KO/MMM/CAT/SHW) | Resolved | BA (17/17 q4cdn), KO (17/17 official IR), MMM (17/17 CloudFront), CAT (9/17 q4cdn + 8/17 StockAnalysis), SHW (8/17 q4cdn + 9/17 StockAnalysis). source_manifest.json promoted and queue-builder wired for all 5. IBM (4/17) and CRM (1/17) deferred — too few official rows to be useful. |
+| Migration 016 pending execution | Medium | `016_phrase_staging_ai_select_policy.sql` — adds RLS UPDATE policy allowing anon key to transition phrase_staging rows from 'pending' to 'ai_selected' or 'ai_rejected'. Required before `ai-select.js` can update rows in production. |
 | NKE trivia gap | Low | Stage 4 generated only 4 NKE trivia questions; minimum for activation is 12. Codex Priority 7 editorial review will flag this. Stage 4 trivia prompt needs strengthening. |
 
 ---
@@ -67,7 +68,7 @@
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Do NOT review staged phrases yet** | Wait for `ai-select.js` to be built (next session). It will reduce 4,790 MSFT + 5,120 VZ candidates to ~40–50 each via Claude Haiku before presenting them for approval. Reviewing 5,000+ rows is not the intended workflow. |
+| 1 | **Review MSFT and VZ phrases in admin panel** | `ai-select.js` has run for both companies. Admin panel now shows ai_selected rows (50 per company). Go to `/admin` → Phrase Staging Review. Approve or reject each phrase. Run migration 016 first (see item #14 below). |
 | 2 | **`npx playwright install-deps` on VPS** | Required before Playwright tests can run in the cron environment. One-time VPS command after PR #24 merged (now on main). |
 | 3 | **Configure Claude Code Routine: Daily PM Brief** | Prompt file at `docs/program/prompts/routine-pm-brief.md`. Trigger: schedule, 6:15am ET weekdays. Repo: thereitis. Needs manual setup in Claude Code Routines platform. |
 | 4 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt file at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label applied to a GitHub issue. Needs manual setup. |
@@ -79,20 +80,27 @@
 | 10 | **Migrations executed** | ✅ Migration 014 (12 companies added) — done 2026-05-30. ✅ Migration 015 (`latest_ingested_quarter`) — done 2026-05-30. |
 | 11 | **All PRs #19–#24 and #26 merged** | ✅ Done 2026-05-30. All on main. |
 | 12 | **Review LAUNCH_KIT.md** | `docs/program/LAUNCH_KIT.md` promoted and on main. Review copy; replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing anything. |
-| 13 | **Promote Priority 6 Codex company-research JSONs** | BA, KO, MMM (17/17 official), CAT (9/17), SHW (8/17), IBM (4/17), CRM (1/17) updated in `codex/staging/company-research/`. Needs validation and promotion to `company-packs/{ticker}/source_manifest.json` + queue-builder updates. Blocked on next Claude Code session. |
+| 13 | **Priority 6 promotions complete** | ✅ Done 2026-05-30 (session 5). BA, KO, MMM, CAT, SHW manifests promoted and queue-builder wired. |
+| 14 | **Execute migration 016** | `supabase/migrations/016_phrase_staging_ai_select_policy.sql` — run in Supabase SQL editor. Adds RLS UPDATE policy allowing anon key to set ai_selected/ai_rejected. Required before `ai-select.js` can write status updates to phrase_staging. |
+| 15 | **Review MSFT and VZ phrases in admin panel** | Go to `/admin` → Phrase Staging Review. 50 ai_selected phrases per company are ready. Approve the good ones, reject the bad. Run migration 016 first. |
+| 16 | **Deposit NKE generated files for Codex Priority 7** | `company-packs/NKE/generated/phrases.json` and `trivia.json` need to be committed under `codex/staging/` before Codex can do the editorial review. These files are in the ops-worker output volume on the host; they were never committed to the repo. |
 
 ---
 
 ## Next Recommended Session
 
-**Session 4 is complete.** All merges done, VZ staged, Codex tasked. Start a new session.
+**Session 5 is complete.** ai-select.js built, MSFT + VZ phrases narrowed to 50 each, BA/KO/MMM/CAT/SHW manifests promoted.
 
 **Next session entry point (Claude Code):**
-1. Read inbox — check Codex Priority 7 results (NKE editorial review + release readiness GitHub issue)
-2. **Build `scripts/ingestion/ai-select.js`** — reads `phrase_staging` for a given ticker, sends batches to Claude Haiku with `CONTENT_QA_RUBRIC.md` context, marks top 40–50 as `ai_selected`. Admin panel already shows the staging table; filter on `ai_selected` status.
-3. After `ai-select.js` is working: run it for MSFT and VZ, then do human phrase review (only ~40–50 per company)
-4. Promote Priority 6 Codex JSONs (BA, KO, MMM fully official) to `company-packs/` and update queue-builder.js
-5. Configure at least one Claude Code Routine (action item #3) to start the agentic PM loop
+1. Check if migration 016 has been executed; if not, prompt human
+2. Run Phase 2 pipeline for BA (17/17 official q4cdn PDFs — clean ingestion candidate)
+3. Configure at least one Claude Code Routine (action item #3) to start the agentic PM loop
+4. If NKE generated files are deposited: trigger Codex Priority 7 re-run for editorial review
+
+**Human action needed before next session:**
+- Execute migration 016 (action item #14 above)
+- Review MSFT and VZ phrases in admin panel (action item #15)
+- Deposit NKE generated content for Codex editorial review (action item #16)
 
 **Model:** `claude-sonnet-4-6`. Switch to `claude-opus-4-8` only if designing the ai-select prompt or the queue-builder promotion strategy from scratch.
 

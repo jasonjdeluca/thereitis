@@ -138,13 +138,15 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - KO 17/17, BA 17/17, MMM 17/17 fully official; CAT 9/17, SHW 8/17, IBM 4/17, CRM 1/17 partial
   - AAPL, NVDA, AMZN, CSCO, HON, MCD: confirmed no written transcript PDFs — structural limitation
   - Updated research JSONs in `codex/staging/company-research/`
-- [ ] Promote Priority 6 Codex JSONs to `company-packs/` and update queue-builder.js
-  - BA, KO, MMM (17/17 official) are highest priority — update queue-builder for these 3 first
-  - CAT, SHW, IBM, CRM (partial) — update manifest, wire official rows into queue-builder
-  - Owner: Claude Code (next session)
-- [~] NKE editorial phrase review — Codex Priority 7 in progress
-  - 40 phrases + 4 trivia in `company-packs/NKE/generated/` need review against CONTENT_QA_RUBRIC.md
-  - Expected output: `codex/staging/reports/nke-editorial-review-2026-05-30.md`
+- [x] Promote Priority 6 Codex JSONs to `company-packs/` and update queue-builder.js — done 2026-05-30 (session 5)
+  - BA (17/17 q4cdn), KO (17/17 official IR), MMM (17/17 CloudFront): source_manifest.json promoted + buildBa/Ko/Mmm() added
+  - CAT (9/17 q4cdn + 8/17 StockAnalysis), SHW (8/17 q4cdn + 9/17 StockAnalysis): manifests promoted + buildCat/Shw() added
+  - IBM (4/17) and CRM (1/17) deferred — too few official rows for a useful mixed builder
+  - All 5 new tickers added to `docs/research/transcript-sources.json` with `ingestion_status: "ready"`
+- [!] NKE editorial phrase review — Codex Priority 7 blocked
+  - Required files missing from repo: `company-packs/NKE/generated/phrases.json` and `trivia.json`
+  - Codex report at `codex/staging/reports/nke-editorial-review-2026-05-30.md` — confirmed blocked
+  - Human must deposit NKE generated files before Codex can re-run editorial review
   - Note: 4 trivia questions is below minimum (12). Trivia gap must be resolved before NKE activation.
 
 ---
@@ -170,13 +172,11 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] VZ phrases staged to phrase_staging
   - 5,120 unique phrases staged 2026-05-30 (17/17 PDFs; fixed queue-builder + single_char_token validator filter)
 - [x] PR #11 merged
-- [ ] Build `scripts/ingestion/ai-select.js` — **next session priority**
-  - Reads `pending` rows in `phrase_staging` for a given ticker
-  - Batches and sends to Claude Haiku with CONTENT_QA_RUBRIC.md context
-  - Returns top 40–50 phrase recommendations
-  - Marks those rows as `ai_selected` status in `phrase_staging`
-  - Human reviews only `ai_selected` rows in admin panel (admin panel already built — filter on status)
-  - Unblocks MSFT and VZ phrase approval entirely
+- [x] Build `scripts/ingestion/ai-select.js` — done 2026-05-30 (session 5)
+  - Reads `pending` rows (paginated), batches to Claude Haiku, top 40–50 marked ai_selected
+  - Run for MSFT: 4,790→50 ai_selected. Run for VZ: 5,120→50 ai_selected
+  - Admin PhraseReviewPanel updated to show ai_selected rows (falls back to pending pre-run)
+  - Migration 016 added (RLS UPDATE policy for anon key ai-select transitions) — pending human execution
 
 ### Phase 2 — Docker container architecture
 
