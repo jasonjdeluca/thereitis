@@ -43,7 +43,26 @@ function buildSystemPrompt(rubric, companyName) {
 
 You are reviewing phrase candidates extracted from ${companyName} earnings call transcripts.
 
-## Content QA Rubric
+## The core job
+
+Select for SPEAKING STYLE, not subject matter. This is a bingo game — the winning phrase is one that causes a knowing groan or laugh of recognition when heard on a live call.
+
+**KEEP phrases that reveal HOW the executive talks:**
+- Management idioms and metaphors: "boil the ocean", "move the needle", "land and expand"
+- Rhetorical framings: "at the end of the day", "the bottom line is", "we remain focused"
+- Buzzwords and pet phrases the company repeats: "winning in the marketplace", "our flywheel", "long-term value creation"
+- Forward-looking confidence language: "strong momentum", "playing offense", "leaning into"
+
+**REJECT phrases that describe WHAT the company talks about:**
+- Geographic segments: "greater china", "north america", "emerging markets"
+- Product/category names: "footwear franchises", "cloud services", "breast cancer"
+- Financial line items: "gross margin", "basis points", "diluted earnings"
+- Operational labels: "supply chain", "fiscal year", "same-store sales"
+- Boilerplate openers: "good morning everyone", "thank you for joining"
+
+**The test:** If you replaced "${companyName}" with any other company, could this phrase plausibly appear on their card? If yes — it's either too generic or just a topic label. Reject it.
+
+## Content QA Rubric (additional detail)
 
 ${rubric}
 
@@ -51,17 +70,7 @@ ${rubric}
 
 You will receive a batch of phrase candidates. For each batch, select the phrases that would make the best bingo squares. Return ONLY a valid JSON array of IDs — no explanation, no markdown fences, no other text.
 
-Selection criteria summary (from rubric):
-- SPECIFIC to this company — a knowing player would immediately recognize it
-- PLAYABLE — short, punchy, causes the "there it is" moment
-- CEO MODE — executive voice, forward-looking, optimistic, buzzword-rich
-- NOT too_generic (no "strong performance", "revenue growth")
-- NOT jargon_heavy (no "adjusted EBITDA", "basis points")
-- NOT analyst_question (no questions from the floor)
-- NOT boilerplate_opener (no "good morning everyone")
-- Under 25 characters including spaces
-
-Aim to select ${BATCH_TARGET}–${Math.round(BATCH_TARGET * 1.5)} phrases per batch.`;
+Aim to select ${BATCH_TARGET}–${Math.round(BATCH_TARGET * 1.5)} phrases per batch. It is better to select fewer high-quality phrases than to pad with topic labels.`;
 }
 
 async function selectBatch(client, systemPrompt, batch) {

@@ -1,0 +1,90 @@
+[
+  {
+    "question": "What is the approximate number of stores HD operates globally as of 2024?",
+    "option_a": "Over 2,300 stores",
+    "option_b": "Over 1,800 stores",
+    "option_c": "Over 3,100 stores",
+    "option_d": "Over 4,500 stores",
+    "correct_answer": "a"
+  },
+  {
+    "question": "HD's 'Warehouse' concept emphasized which key operational advantage?",
+    "option_a": "High markup pricing",
+    "option_b": "Low costs through bulk purchasing and self-service",
+    "option_c": "Premium customer service only",
+    "option_d": "Designer showroom displays",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What major acquisition did HD make in 2006 that expanded its supply chain?",
+    "option_a": "Acquisition of 60 supply houses",
+    "option_b": "Acquisition of 150 lumber yards",
+    "option_c": "Acquisition of 200 paint stores",
+    "option_d": "Acquisition of 100 tool rental shops",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which digital platform did HD launch to compete in online home improvement retail?",
+    "option_a": "HomeDepot.com launched in 1997",
+    "option_b": "HomeDepot.com launched in 2000",
+    "option_c": "BuilderConnect.com launched in 1999",
+    "option_d": "DIYHub.com launched in 2001",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What was HD's approximate annual revenue in fiscal year 2023?",
+    "option_a": "$120 billion",
+    "option_b": "$152 billion",
+    "option_c": "$180 billion",
+    "option_d": "$210 billion",
+    "correct_answer": "b"
+  },
+  {
+    "question": "HD's 'Services' business line includes which offerings?",
+    "option_a": "Installation, design consultation, and tool rental",
+    "option_b": "Only flooring installation",
+    "option_c": "Only roofing and siding",
+    "option_d": "Only appliance delivery",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which technology initiative did HD implement to enhance in-store navigation and product location?",
+    "option_a": "Mobile app with aisle location mapping",
+    "option_b": "RFID chips on all products",
+    "option_c": "QR codes exclusively",
+    "option_d": "Barcode scanning only",
+    "correct_answer": "a"
+  },
+  {
+    "question": "HD's strategy to achieve omnichannel integration primarily focused on which operational goal?",
+    "option_a": "Eliminating all physical stores",
+    "option_b": "Seamless shopping across online, mobile, and stores",
+    "option_c": "Focusing exclusively on e-commerce",
+    "option_d": "Removing digital capabilities",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What significant market expansion occurred when HD entered Canada in which year?",
+    "option_a": "1994",
+    "option_b": "1999",
+    "option_c": "2001",
+    "option_d": "2005",
+    "correct_answer": "a"
+  },
+  {
+    "question": "HD's dividend history demonstrates which financial commitment to shareholders?",
+    "option_a": "Suspended dividends since 2010",
+    "option_b": "Consistent annual dividend increases for 10+ years",
+    "option_c": "One-time dividend only in 2015",
+    "option_d": "No dividends paid until 2018",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Which strategic pivot did HD prioritize post-2020 pandemic period?",
+    "option_a": "Reducing e-commerce capabilities",
+    "option_b": "Accelerating digital transformation and curbside pickup",
+    "option_c": "Closing all distribution centers",
+    "option_d": "Eliminating professional contractor programs",
+    "correct_answer": "b"
+  }
+]

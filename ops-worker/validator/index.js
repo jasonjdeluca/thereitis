@@ -40,6 +40,34 @@ const FILLER_BLOCKLIST = new Set([
   'please go ahead', 'you may proceed', 'open the line', 'open for questions',
   'joining the call', 'on the call today', 'on the call with us',
   'conference call', 'earnings conference', 'earnings call today',
+  'thanks for joining', 'thanks for taking', 'taking my question',
+  'taking our question', 'morning everyone', 'good morning', 'good afternoon',
+  'listen only mode', 'listen-only mode', 'disconnect your lines',
+  'your line is now', 'first question', 'let me turn', 'my pleasure',
+  'following our prepared', 'during the quarter', 'during the call',
+  // Legal / forward-looking statement boilerplate
+  'differ materially', 'actual results', 'forward looking', 'forward-looking',
+  'cautionary statement', 'safe harbor', 'among other things', 'without limitation',
+  'filings with the sec', 'sec filings', 'risk factors', 'closing comments',
+  'factors identified', 'cautionary note', 'statements regarding',
+  'regarding future events', 'change without notice', 'subject to change',
+  'express implied', 'believe to be reliable', 'basis of investment',
+  'construed as advice', 'constructed as advice', 'available data',
+  'associated with the use',
+  // Financial formula fragments
+  'approximately billion', 'approximately million', 'approximately percent',
+  'approximately basis', 'beginning and ending', 'ending long-term',
+  'average of beginning', 'trailing twelve months', 'twelve months return',
+  'months return on', 'return on invested', 'months return',
+  // Additional legal / FactSet terms
+  'including without', 'without limitation', 'including any', 'hereunder including',
+  'arising under', 'losses arising', 'damages including', 'employees including',
+  'solely for information', 'published solely', 'beliefs of factset',
+  'call is being recorded', 'accompanying slide', 'taking my question',
+  'taking our question', 'following our prepared', 'closing comments',
+  'forward to speaking', 'during the call', 'include forward-looking',
+  'question during the call', 'joining us today', 'like to turn',
+  'let me turn the', 'please limit yourself', 'limit yourself to one',
 ]);
 
 function openDb() {
@@ -47,6 +75,58 @@ function openDb() {
   db.pragma('journal_mode = WAL');
   return db;
 }
+
+// Patterns that indicate non-executive language regardless of frequency.
+// These are applied AFTER the blocklist — catch structural boilerplate
+// that the phrase-level blocklist misses.
+const STAGE3_REJECT_PATTERNS = [
+  // Financial formula fragments
+  /\bpercent\b/,              // "X percent of Y", "rate was percent"
+  /\bquarter of\b/,           // "quarter of last year"
+  /\bquarter our\b/,          // "quarter our gross margin"
+  /\brate was\b/,
+  /\bfrom last year\b/,
+  /\bof last year\b/,
+  // Legal boilerplate — FactSet, forward-looking disclaimers
+  /hereunder/,
+  /arising under/,
+  /\bdamages\b/,
+  /\bwarranties\b/,
+  /\bliabilit/,               // liability / liabilities
+  /\bstatutory\b/,
+  /\bsolely for\b/,
+  /\bpublished solely\b/,
+  /\blosses arising\b/,
+  /reform act/,
+  /\bmeaning of the\b/,       // "within the meaning of the..."
+  /\bact of including\b/,
+  /\bincluding without\b/,    // "including without limitation"
+  /including any reliance/,
+  /beliefs of factset/,
+  /\bfactset\b/,
+  /\bcorrected transcript\b/,
+  /\bsolely for information\b/,
+  /\bquarterly reports\b/,
+  /on form \d/i,              // "on Form 10-K"
+  /\bassumptions regarding\b/,
+  /\bcontrol including\b/,
+  // Call ceremony / roster
+  /analyst\s+\w+/,            // "analyst morgan", "analyst ubs"
+  /\bchief (executive|financial|operating)\b/,
+  /\b(executive|financial) officer\b/,
+  /\binvestor relations\b/,
+  /earnings call\b/,
+  /\baccompanying slide\b/,
+  /\bcall is being recorded\b/,
+  /and good morning/,         // "ted and good morning", "llc and good morning"
+  /\bjoining us today\b/,
+  /\bfollowing our prepared\b/,
+  /\bduring the call\b/,
+  /\bclosing comments\b/,
+  /\bforward to speaking\b/,
+  /\binclude forward-looking\b/,
+  /\bquestion during\b/,
+];
 
 // Stage 3: structural filter — drops filler, enforces 25-char hard cap, min quarters
 function stage3Filter(candidates) {
@@ -58,37 +138,76 @@ function stage3Filter(candidates) {
       if (FILLER_BLOCKLIST.has(p)) return false;
       // Reject all-caps acronyms
       if (/^[A-Z\s]{2,6}$/.test(p)) return false;
+      // Reject patterns that indicate boilerplate / roster language
+      if (STAGE3_REJECT_PATTERNS.some(rx => rx.test(p))) return false;
       return true;
     })
     .slice(0, STAGE3_MAX_CANDIDATES);
 }
 
-// Stage 4: AI enrichment — Claude Haiku selects best phrases + generates trivia
-async function stage4Enrich(candidates, ticker, companyName) {
+// Stage 4a: AI scores each candidate — returns index → score map.
+// Haiku SCORES, code SELECTS. Eliminates hallucination entirely.
+async function stage4Score(candidates, ticker, companyName) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  const candidateList = candidates
-    .map(c => `"${c.phrase}" (${c.quarter_count} qtrs)`)
-    .join('\n');
+  const BATCH = 50;
+  const scores = new Map(); // phrase → score
 
-  const prompt = `You are curating bingo card content for ${companyName} (${ticker}) earnings calls.
+  for (let i = 0; i < candidates.length; i += BATCH) {
+    const batch = candidates.slice(i, i + BATCH);
+    const numbered = batch
+      .map((c, j) => `${i + j}. "${c.phrase}" (${c.quarter_count} quarters in transcripts)`)
+      .join('\n');
 
-HARD RULES — violations cause automatic rejection:
-1. Every phrase: 25 characters or fewer (count spaces; "long term growth" = 16 chars)
-2. STRICTLY NO person names anywhere: not in phrases, not in trivia questions, not in any answer option. This means no first names, no last names, no names of any real person living or dead. Use role titles only (e.g. "the CEO", "the CFO", "the analyst").
-3. Phrases must be specific to ${companyName} — not generic boilerplate any company says
-4. Avoid call-opening ceremony phrases like "good afternoon everyone" or "thank you for joining"
+    const prompt = `You are scoring phrase candidates for a ${companyName} earnings call BINGO game.
 
-CANDIDATE PHRASES (scored by quarters appeared in):
-${candidateList}
+Players mark phrases on their cards when they hear executives say them live. The best bingo phrase causes a knowing groan or laugh — "there it is." Score for SPEAKING STYLE, not subject matter.
 
-Return JSON with exactly:
-{
-  "phrases": ["phrase", ...],   // 40-50 items, each ≤25 chars, no person names
-  "trivia": [                   // 12-18 items about ${companyName} as a company, products, history, financials
-    { "question": "...", "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...", "correct_answer": "a" }
-  ]
+Score each phrase 0–10:
+- 8-10: Executive idiom, rhetorical framing, or CEO buzzword. Sounds like something the speaker says to project confidence. Company-specific feel. ("double down", "playing offense", "unlocking value", "our flywheel")
+- 5-7: Recurring company language, somewhat distinctive, not pure boilerplate.
+- 2-4: Topic label (geographic, product, metric) or generic financial term. Any company could say it.
+- 0-1: Boilerplate, legal text, ceremony filler, vendor disclaimer, operator instructions.
+
+CANDIDATES:
+${numbered}
+
+Return ONLY a JSON array of {index, score} objects, one per candidate, in order. No explanation. Example: [{"index":0,"score":7},{"index":1,"score":2}]`;
+
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const raw = response.content[0].text.trim()
+      .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+    let ratings;
+    try { ratings = JSON.parse(raw); }
+    catch { ratings = []; }
+
+    for (const r of ratings) {
+      if (typeof r.index === 'number' && r.index < candidates.length) {
+        scores.set(candidates[r.index].phrase, r.score ?? 0);
+      }
+    }
+  }
+
+  return scores;
 }
+
+// Stage 4b: generate trivia separately (no phrase selection — avoids hallucination path)
+async function stage4Trivia(ticker, companyName) {
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const prompt = `Generate 15 trivia questions about ${companyName} (${ticker}) as a company — history, strategy, products, financials, milestones. Mix easy, medium, and hard difficulty.
+
+HARD RULES:
+- No person names anywhere — not in questions, not in any answer option. Use role titles only (e.g. "the CEO", "the CFO", "the founder").
+- Each question must have exactly 4 distinct answer options and one correct answer.
+- No answer option over 80 characters.
+
+Return ONLY a JSON array:
+[{"question":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","correct_answer":"a"},...]
 correct_answer must be "a", "b", "c", or "d". JSON only, no markdown.`;
 
   const response = await client.messages.create({
@@ -98,9 +217,29 @@ correct_answer must be "a", "b", "c", or "d". JSON only, no markdown.`;
   });
 
   const raw = response.content[0].text.trim()
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```\s*$/, '');
-  return JSON.parse(raw);
+    .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+  try { return JSON.parse(raw); }
+  catch { return []; }
+}
+
+// Stage 4: AI enrichment — score candidates, code selects top 50, generate trivia
+async function stage4Enrich(candidates, ticker, companyName) {
+  log(`${ticker}: Stage 4a — scoring ${candidates.length} candidates`);
+  const scores = await stage4Score(candidates, ticker, companyName);
+
+  // Select top 50 by AI score, with quarter_count as tiebreaker.
+  // Only include phrases that were actually scored (guards against off-by-one in batching).
+  const scored = candidates
+    .filter(c => scores.has(c.phrase))
+    .map(c => ({ ...c, ai_score: scores.get(c.phrase) }))
+    .sort((a, b) => b.ai_score - a.ai_score || b.quarter_count - a.quarter_count);
+
+  const selected = scored.slice(0, 50).map(c => c.phrase);
+
+  log(`${ticker}: Stage 4b — generating trivia`);
+  const trivia = await stage4Trivia(ticker, companyName);
+
+  return { phrases: selected, trivia };
 }
 
 // Stage 5a: hard validation — enforces all project rules on AI output
