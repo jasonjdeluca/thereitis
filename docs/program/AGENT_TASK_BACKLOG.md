@@ -75,10 +75,12 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - `human-decision-needed` (red) — requires human review before proceeding
   - `content-review` (yellow) — phrase or trivia content needs editorial judgment
   - `migration-ready` (green) — SQL has been reviewed and is ready for human execution
-- [ ] Resolve prompt file naming conflict — Claude Code wrote five prompt files under one naming convention; Codex proposed the same five under different names
-  - Decide canonical filenames and retire the duplicate set
-  - Owner: Claude Code
-  - Note: blocking — Group C platform configuration cannot be finalized until resolved
+- [x] Resolve prompt file naming conflict — Claude Code wrote five prompt files under one naming convention; Codex proposed the same five under different names
+  - Decided canonical filenames; duplicate set retired
+  - Owner: Claude Code — complete
+- [x] Apply Codex Priority 9 targeted edits to all five prompt files (PR #32)
+  - All 16 findings from group-c-prompt-review-2026-05-30.md addressed
+  - Owner: Claude Code — complete (PR #32 open, awaiting merge)
 
 ---
 
@@ -143,11 +145,9 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - CAT (9/17 q4cdn + 8/17 StockAnalysis), SHW (8/17 q4cdn + 9/17 StockAnalysis): manifests promoted + buildCat/Shw() added
   - IBM (4/17) and CRM (1/17) deferred — too few official rows for a useful mixed builder
   - All 5 new tickers added to `docs/research/transcript-sources.json` with `ingestion_status: "ready"`
-- [!] NKE editorial phrase review — Codex Priority 7 blocked
-  - Required files missing from repo: `company-packs/NKE/generated/phrases.json` and `trivia.json`
-  - Codex report at `codex/staging/reports/nke-editorial-review-2026-05-30.md` — confirmed blocked
-  - Human must deposit NKE generated files before Codex can re-run editorial review
-  - Note: 4 trivia questions is below minimum (12). Trivia gap must be resolved before NKE activation.
+- [x] NKE editorial phrase review — Codex Priority 8 complete
+  - Report at `codex/staging/reports/nke-editorial-review-2026-05-30.md`
+  - Result: NKE NOT activation-ready. 16/50 phrases pass editorial review. 3/12 trivia pass person-name filter. Trivia gap must be resolved before activation. migration.sql remains human_decision_needed.
 
 ---
 
@@ -345,4 +345,4 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
-*Last updated: 2026-05-30 (session 4 — final). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
+*Last updated: 2026-05-30 (session 7). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
