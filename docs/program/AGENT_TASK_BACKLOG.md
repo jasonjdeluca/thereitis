@@ -211,15 +211,17 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group H — Evergreen Maintenance
 *Claude Code (build) · Docker/VPS (run) · Codex (exception reports) · Phase 2 · Depends on: Group F pipeline operational*
 
-- [ ] Build transcript freshness watcher → `reports/transcript-freshness.json`
-  - For each active company: check days since last ingested transcript, check next call date, flag if next call date is within 14 days, flag if call date has passed with no new transcript
-- [ ] Add `latest_ingested_quarter` field to companies table in Supabase (migration required, human-approved)
-- [ ] Build stale company detector — flags companies where `latest_ingested_quarter` is more than 2 reporting cycles old
-- [ ] Build post-call transcript watch — for companies with earnings calls in the past 10 days, perform HTTP check on their IR page URL and flag if a new PDF link appears
-- [ ] Write `docs/program/EVERGREEN_MAINTENANCE_RUNBOOK.md`
-- [ ] Configure Codex Automation: weekly stale company exception report
-  - Reads `reports/transcript-freshness.json`
-  - Posts GitHub issue listing stale companies and upcoming call dates requiring transcript research
+- [x] Build transcript freshness watcher → `reports/transcript-freshness.json`
+  - Flags: never_ingested, stale_coverage (3+ quarters), approaching_stale (2 quarters), earnings_approaching (14d), post_call_transcript_needed (0-10d post call), missing_next_earnings_date
+  - Exits non-zero if any critical flags present (cron-detectable)
+- [x] Add `latest_ingested_quarter` field to companies table in Supabase (migration 015 output — human executes)
+- [x] Build stale company detector — integrated into transcript-freshness.js (staleness assessed per company, summary in report)
+- [~] Build post-call transcript watch — date-arithmetic detection implemented (flags companies 0-10 days post-call); automated HTTP check against IR pages deferred to Phase 3 (requires per-company base IR URL not yet stored)
+- [x] Write `docs/program/EVERGREEN_MAINTENANCE_RUNBOOK.md`
+- [x] Configure Codex Automation: weekly stale company exception report
+  - Prompt at `docs/program/prompts/codex-stale-company-exception.md`
+  - Reads `reports/transcript-freshness.json`; posts GitHub issue; silent if report is clean
+  - Note: platform configuration still pending — manual setup in Codex Automations
 
 ---
 

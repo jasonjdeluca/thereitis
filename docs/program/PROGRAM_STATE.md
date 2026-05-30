@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-30 (session 3)
+**Last updated:** 2026-05-30 (session 4)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,10 +8,10 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Group F Phase 2 (Docker ops-worker built and tested NKE end-to-end), Group I (landing page companies + sample card + FAQ)
-**In progress:** Group C (platform configuration pending), Group E (Codex Priority 3 repair pass for 8 companies)
-**Pending human merge:** PR #19 (remaining blue-chip manifests), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX)
-**Ready to start:** Group G, Group H
+**Just completed:** Group G (content QA), Group H (evergreen maintenance)
+**In progress:** Group C (platform configuration pending), Group E (Codex Priority 4 repair pass for AMGN/JPM/MRK + link validation)
+**Pending human merge:** PR #19 (remaining blue-chip manifests — updated with Codex Priority 3 repairs), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX), PR #22 (Group G content QA), PR #23 (Group H evergreen)
+**Blocking migration:** 015_latest_ingested_quarter.sql (output in PR #23 — execute before Group H runs)
 
 ---
 
@@ -26,7 +26,7 @@
 | E | Transcript Research | 🔄 In Progress | All 30 target companies researched. 5 with fully official IR sources (HD, WMT, NKE, DIS, KO). 8 pending official-source repair pass (MSFT, JPM, V, TRV, AMGN, JNJ, MRK, VZ — assigned to Codex Priority 3). 17 using third-party as best available. JNJ: human_review_required. Reconciliation task closed — no prior tables existed. |
 | F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete (MSFT, 4,790 phrases). Phase 2 Docker ops-worker built and tested NKE end-to-end: 17/17 PDFs fetched, 7,629 candidates, 40 phrases + migration.sql generated. PR #20 ready. Key finding: only Q4CDN vendor-hosted PDFs accessible for Phase 2 fetcher — ir.homedepot.com and StockAnalysis both block bots. |
 | G | Content QA | ⬜ Not Started | Depends on Group F generating output; no validation expansion or QA rubric written yet |
-| H | Evergreen Maintenance | ⬜ Not Started | Depends on Group F operational; freshness watcher and stale detector not built |
+| H | Evergreen Maintenance | ✅ Complete | transcript-freshness.js built (all flags), migration 015 output for latest_ingested_quarter, EVERGREEN_MAINTENANCE_RUNBOOK.md written, Codex weekly exception prompt written. ops-worker integration (writing field post-Stage 5) deferred to first production run. Automated IR HTTP check deferred Phase 3. |
 | I | Public UX and SEO | 🔄 In Progress | Active companies section, interactive sample card, FAQ accordion added to landing page. SEO (title, OG, Twitter, JSON-LD, canonical, sitemap, robots) was already complete. PR #21 open. |
 | J | QA and Launch Hardening | ⬜ Not Started | Depends on Groups A–I substantially complete; no Playwright tests or release readiness script |
 | K | Analytics and Launch | ⬜ Not Started | Phase 3 / post-launch; no event tracking, snapshot script, or launch kit |
@@ -52,6 +52,7 @@
 | codex/staging ↔ codex/inbox pipeline | Shared staging branch protocol live on main. Codex deposits work to `codex/staging/`; Claude Code writes task assignments and responses to `codex/inbox/`. `PROTOCOL.md` is the source of truth. |
 | Phase 2 fetcher: Q4CDN only | `ir.homedepot.com` and StockAnalysis both block automated fetching (403/400). Phase 2 Docker fetcher can only reliably download from Q4CDN vendor-hosted PDFs. Confirmed working: NKE (`s1.q4cdn.com`), confirmed in spot checks: V, TRV, MRK. This is why Codex Priority 3 (official source repair) directly unblocks the pipeline. |
 | ANTHROPIC_API_KEY in thereitis/.env | Key is now in `~/thereitis/.env` for docker compose validator service. Never commit `.env`. |
+| `latest_ingested_quarter` lives in Supabase | Decision: Option A — Supabase `companies` table column, not company.json. Written by ops-worker after Stage 5. Read by transcript-freshness.js via Supabase client. Migration 015 required (human-approved). |
 
 ---
 
@@ -69,7 +70,7 @@
 | 8 | **Review human_review_required sources before ingestion** | RHP (intermittent PDFs Q1/Q4 2022, Q1 2023), CLDT (historical quarters low-confidence), AHT (Q1 2026 missing), JNJ (several quarters pattern-matched not directly verified). See `docs/research/transcript-source-manifest.md` Open Human Review Items table. |
 | 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ, CLDT, AHT are researched but not yet in the `companies` table. Required before ingestion pipeline can process them. |
 | 10 | **DB migration executed** | ✅ Done 2026-05-30. Migration 014 added 12 missing companies (BA, CAT, HD, HON, MCD, MMM, NKE, SHW, WMT, RHP, CLDT, AHT). DB now has 41 companies. |
-| 11 | **Decide latest_ingested_quarter metadata location** | Canonical location for this field per company: Supabase `companies` table, `company.json` per pack, or both. Blocking Group H freshness watcher build. |
+| 11 | **Execute migration 015** | `supabase/migrations/015_latest_ingested_quarter.sql` — adds `latest_ingested_quarter text` column to companies table. Required before transcript-freshness.js can write/read this field. Decision: Option A (Supabase only) confirmed. |
 | 12 | **Review and merge PR #18** | ✅ Merged 2026-05-30. All 17 original blue-chip source manifests on main. |
 | 13 | **Review and merge PR #19** | `feat/remaining-blue-chip-manifests` — 13 remaining blue-chip `company-packs/` entries (MSFT, JPM, GS, AXP, V, TRV, UNH, AMGN, JNJ, MRK, PG, CVX, VZ). All 17 quarters. JNJ `human_review_required`. Codex Priority 3 repair pass for 8 assigned and in progress. |
 | 14 | **Review and merge PR #20** | `feat/phase2-ops-worker` — Phase 2 Docker ops-worker. End-to-end test passed (NKE: 17 PDFs, 40 phrases, migration.sql). Ready to merge. |
@@ -79,17 +80,20 @@
 
 ## Next Recommended Session
 
-**Recommended:** Merge PRs #19, #20, #21 (three human merges required — all review-ready). Then build Group G (Content QA) and Group H (Evergreen Maintenance) — both are now unblocked by Phase 2 being complete.
+**Recommended:** Merge PRs #19–23 and execute migration 015. Then:
+- Wire ops-worker to write `latest_ingested_quarter` after Stage 5 success (small follow-up to PR #20 merge)
+- Run NKE editorial review via Codex once PR #20 merges (use `docs/program/prompts/codex-content-editorial-review.md`)
+- Check Codex Priority 4 inbox (AMGN/JPM/MRK repair pass + link validation)
+- Start Group J (Playwright smoke tests, release readiness script)
 
-**Model:** `claude-sonnet-4-6` for implementation. Switch to `claude-opus-4-8` only if designing Group H freshness architecture or Group G QA rubric from scratch.
+**Model:** `claude-sonnet-4-6` for ops-worker wiring and Group J implementation.
 
 **Session entry point:**
-1. Merge PR #20 first (Phase 2 pipeline on main enables Group G/H builds)
-2. Merge PR #19 and #21
-3. Start `Group G` — expand `scripts/content-validation.js` for post-generation checks, write `docs/program/CONTENT_QA_RUBRIC.md`
-4. Or start `Group H` — build `scripts/transcript-freshness.js` once `latest_ingested_quarter` decision is made
-
-**Blocking human decision still needed:** `latest_ingested_quarter` canonical location (action item #11) — blocks Group H entirely.
+1. Check Codex Priority 4 inbox
+2. Merge PRs #19, #20, #21, #22, #23
+3. Execute migration 015 in Supabase (adds `latest_ingested_quarter` column)
+4. Wire `latest_ingested_quarter` write into ops-worker/validator (follow-up to PR #20)
+5. Start Group J — Playwright smoke tests + release readiness script
 
 ---
 
