@@ -204,28 +204,31 @@ async function run({ ticker }) {
 
   // ── 5. Update phrase_staging ───────────────────────────────────────────────
 
-  // Update ai_selected rows.
-  const { error: selErr } = await supabase
-    .from("phrase_staging")
-    .update({ status: "ai_selected" })
-    .in("id", [...finalIds]);
-  if (selErr) {
-    logError("Failed to update ai_selected rows:", selErr.message);
-    process.exit(1);
-  }
-
-  // Update ai_rejected rows in chunks to stay within URL length limits.
-  const CHUNK = 500;
-  for (let i = 0; i < rejectIds.length; i += CHUNK) {
-    const chunk = rejectIds.slice(i, i + CHUNK);
-    const { error: rejErr } = await supabase
+  // Mark selected rows ai_selected using their IDs in chunks (small set, ~50).
+  const SEL_CHUNK = 100;
+  const selectedIdList = [...finalIds];
+  for (let i = 0; i < selectedIdList.length; i += SEL_CHUNK) {
+    const chunk = selectedIdList.slice(i, i + SEL_CHUNK);
+    const { error: selErr } = await supabase
       .from("phrase_staging")
-      .update({ status: "ai_rejected" })
+      .update({ status: "ai_selected" })
       .in("id", chunk);
-    if (rejErr) {
-      logError(`Failed to update ai_rejected chunk ${i}:`, rejErr.message);
+    if (selErr) {
+      logError("Failed to update ai_selected rows:", selErr.message);
       process.exit(1);
     }
+  }
+
+  // Mark ALL remaining pending rows for this company as ai_rejected using a
+  // WHERE clause instead of an ID list — avoids URL-length limits and races.
+  const { error: rejErr } = await supabase
+    .from("phrase_staging")
+    .update({ status: "ai_rejected" })
+    .eq("company_id", companyId)
+    .eq("status", "pending");
+  if (rejErr) {
+    logError("Failed to update ai_rejected rows:", rejErr.message);
+    process.exit(1);
   }
 
   // ── 6. Summary ────────────────────────────────────────────────────────────
