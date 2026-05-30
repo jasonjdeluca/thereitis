@@ -67,7 +67,6 @@
 | 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ, CLDT, AHT are researched but not yet in the `companies` table. Required before ingestion pipeline can process them. |
 | 10 | **Add 30 blue-chip companies to DB** | Claude Code will output migration SQL. Human executes against production Supabase. Required before blue-chip ingestion pipeline can process any of these companies. |
 | 11 | **Decide latest_ingested_quarter metadata location** | Canonical location for this field per company: Supabase `companies` table, `company.json` per pack, or both. Blocking Group H freshness watcher build. |
-| 12 | **Clarify official-linked IR vendor/CDN asset policy** | Confirm whether official IR vendor-linked transcript assets (CDN PDFs linked from company IR pages) count as "official" for source confidence and launch candidacy. Affects JNJ, Visa, Travelers, Nike, and others. |
 
 ---
 
