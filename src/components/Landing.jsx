@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase.js';
+
 const STEPS = [
   {
     num: "1",
@@ -21,7 +24,133 @@ const STEPS = [
   },
 ];
 
-function MobileLanding({ onPickCompany }) {
+const SAMPLE_PHRASES = [
+  "Execution excellence",  "Long-term value",       "Record revenue",
+  "Top-line growth",       "Lean into demand",      "Strong pipeline",
+  "Core business",         "Disciplined approach",  "Margin expansion",
+  "Capital allocation",    "Strategic priorities",  "Operating leverage",
+  null, // FREE
+  "Structural tailwinds",  "Shareholder value",     "Pricing power",
+  "Strong cash flow",      "Go-to-market",          "Durable demand",
+  "Unlock efficiencies",   "Runway ahead of us",    "Premium positioning",
+  "Resilient consumer",    "Healthy balance sheet", "Compounding returns",
+];
+
+const FAQS = [
+  {
+    q: "What is There It Is?",
+    a: "A live multiplayer bingo game built around earnings call language. Pick a company, share a 6-character code, and mark phrases as you hear them on the call.",
+  },
+  {
+    q: "Is this affiliated with any company?",
+    a: "No. Independent hobby project, not affiliated with or endorsed by any company featured. Built entirely on publicly available transcripts.",
+  },
+  {
+    q: "Is it free?",
+    a: "Yes. No accounts, no signup, no cost.",
+  },
+  {
+    q: "Does it work on mobile?",
+    a: "Yes — built mobile-first. Open it on your phone, pick a company, share your code, and play along on the call.",
+  },
+  {
+    q: "How do I get more companies added?",
+    a: "More are being added regularly. Transcripts are already researched — they're working through the ingestion pipeline.",
+  },
+];
+
+function SampleCard() {
+  const [marked, setMarked] = useState(new Set());
+  const toggle = (i) =>
+    setMarked((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
+
+  return (
+    <div className="w-full max-w-sm mx-auto select-none">
+      <p className="text-[10px] uppercase tracking-[0.32em] text-gold/60 text-center mb-3">
+        Sample Card
+      </p>
+      <div className="grid grid-cols-5 gap-px rounded-xl overflow-hidden border border-gold/20 bg-gold/10">
+        {SAMPLE_PHRASES.map((phrase, i) =>
+          phrase === null ? (
+            <div
+              key="free"
+              className="bg-gold/20 flex items-center justify-center aspect-square"
+            >
+              <span className="text-gold font-bold text-[10px] tracking-wide">FREE</span>
+            </div>
+          ) : (
+            <button
+              key={i}
+              onClick={() => toggle(i)}
+              className={`aspect-square flex items-center justify-center p-1 text-center text-[7px] leading-tight transition ${
+                marked.has(i)
+                  ? 'bg-gold text-navy font-bold'
+                  : 'bg-[#0d1e38] text-cream/70 hover:bg-[#14294a]'
+              }`}
+            >
+              {phrase}
+            </button>
+          )
+        )}
+      </div>
+      <p className="text-[9px] text-cream/30 text-center mt-2">Tap to mark — this is just a preview</p>
+    </div>
+  );
+}
+
+function CompaniesSection({ companies }) {
+  if (!companies.length) return null;
+  return (
+    <div className="space-y-3">
+      <p className="text-[10px] uppercase tracking-[0.32em] text-gold/60 text-center">
+        Available Now
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">
+        {companies.map((c) => (
+          <span
+            key={c.id}
+            className="flex items-center gap-1.5 rounded-full border border-gold/20 bg-navy-2/60 px-3 py-1.5 text-xs text-cream/80"
+          >
+            <span>{c.emoji}</span>
+            <span>{c.name}</span>
+          </span>
+        ))}
+      </div>
+      <p className="text-[10px] text-cream/30 text-center">More companies added regularly</p>
+    </div>
+  );
+}
+
+function FAQSection() {
+  const [open, setOpen] = useState(null);
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] uppercase tracking-[0.32em] text-gold/60 text-center mb-3">
+        FAQ
+      </p>
+      {FAQS.map((item, i) => (
+        <div key={i} className="rounded-xl border border-cream/10 overflow-hidden">
+          <button
+            onClick={() => setOpen(open === i ? null : i)}
+            className="w-full flex items-center justify-between px-4 py-3 text-left text-sm font-semibold text-cream"
+          >
+            <span>{item.q}</span>
+            <span className="text-gold/60 ml-2 shrink-0">{open === i ? '−' : '+'}</span>
+          </button>
+          {open === i && (
+            <p className="px-4 pb-3 text-xs text-cream/60 leading-relaxed">{item.a}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MobileLanding({ onPickCompany, companies }) {
   return (
     <div
       className="min-h-full flex flex-col lg:hidden overflow-hidden"
@@ -90,6 +219,14 @@ function MobileLanding({ onPickCompany }) {
 
           <div className="border-t border-gold/20" />
 
+          <CompaniesSection companies={companies} />
+
+          <div className="border-t border-gold/20" />
+
+          <SampleCard />
+
+          <div className="border-t border-gold/20" />
+
           <div className="space-y-4">
             <p className="text-[10px] uppercase tracking-[0.32em] text-gold/60 text-center">
               Where This Came From
@@ -141,6 +278,10 @@ function MobileLanding({ onPickCompany }) {
               Pick a Company &rarr;
             </button>
           </div>
+
+          <div className="border-t border-gold/20" />
+
+          <FAQSection />
 
           <div className="border-t border-gold/20" />
 
@@ -224,7 +365,7 @@ function MobileLanding({ onPickCompany }) {
   );
 }
 
-function DesktopLanding({ onPickCompany }) {
+function DesktopLanding({ onPickCompany, companies }) {
   return (
     <div className="hidden lg:flex flex-col min-h-full bg-radial-navy">
       {/* Nav */}
@@ -292,6 +433,34 @@ function DesktopLanding({ onPickCompany }) {
         </div>
       </section>
 
+      {/* Available Companies + Sample Card */}
+      {companies.length > 0 && (
+        <section className="w-full px-12 py-10 border-b border-gold/10">
+          <div className="flex items-start gap-12">
+            <div className="flex-1">
+              <p className="text-[11px] uppercase tracking-[0.4em] text-gold font-semibold mb-4">
+                Available Now
+              </p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {companies.map((c) => (
+                  <span
+                    key={c.id}
+                    className="flex items-center gap-1.5 rounded-full border border-gold/20 bg-[#111f35] px-3 py-1.5 text-sm text-cream/80"
+                  >
+                    <span>{c.emoji}</span>
+                    <span>{c.name}</span>
+                  </span>
+                ))}
+              </div>
+              <p className="text-xs text-cream/30">More companies added regularly</p>
+            </div>
+            <div className="w-72 shrink-0">
+              <SampleCard />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Where This Came From */}
       <section className="w-full px-12 py-12 border-b border-gold/10">
         <div className="grid grid-cols-3 gap-12">
@@ -328,6 +497,21 @@ function DesktopLanding({ onPickCompany }) {
               <span className="text-gold">"lift up above the noise"</span> for
               the third time — and quietly taps their card.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="w-full px-12 py-10 border-b border-gold/10">
+        <div className="grid grid-cols-3 gap-12">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.4em] text-gold font-semibold mb-4">FAQ</p>
+            <h3 className="font-display text-2xl font-bold text-cream leading-snug">
+              Questions worth answering.
+            </h3>
+          </div>
+          <div className="col-span-2 space-y-2">
+            <FAQSection />
           </div>
         </div>
       </section>
@@ -444,10 +628,21 @@ function DesktopLanding({ onPickCompany }) {
 }
 
 export default function Landing({ onPickCompany }) {
+  const [companies, setCompanies] = useState([]);
+
+  useEffect(() => {
+    supabase
+      .from('companies')
+      .select('id, name, emoji')
+      .eq('is_active', true)
+      .order('name')
+      .then(({ data }) => { if (data?.length) setCompanies(data); });
+  }, []);
+
   return (
     <>
-      <MobileLanding onPickCompany={onPickCompany} />
-      <DesktopLanding onPickCompany={onPickCompany} />
+      <MobileLanding onPickCompany={onPickCompany} companies={companies} />
+      <DesktopLanding onPickCompany={onPickCompany} companies={companies} />
     </>
   );
 }
