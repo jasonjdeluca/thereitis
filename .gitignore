@@ -17,6 +17,8 @@ dist-ssr
 
 # Runtime report artifacts
 reports/
+!codex/staging/reports/
+!codex/staging/reports/**
 
 # Ingestion pipeline runtime artifacts (SQLite queue + raw transcripts)
 # Keep the directory tracked via .gitkeep, ignore everything else.
