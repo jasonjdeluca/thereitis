@@ -176,7 +176,23 @@ async function run({ ticker }) {
   for (let i = 0; i < batches.length; i++) {
     const batch = batches[i];
     log(`  Batch ${i + 1}/${batches.length} (${batch.length} phrases)…`);
-    const selected = await selectBatch(anthropic, systemPrompt, batch);
+    let selected;
+    let attempt = 0;
+    while (true) {
+      try {
+        selected = await selectBatch(anthropic, systemPrompt, batch);
+        break;
+      } catch (err) {
+        if (err.status === 429 && attempt < 3) {
+          attempt++;
+          const wait = 65 * attempt;
+          log(`    → rate limited, waiting ${wait}s before retry (attempt ${attempt}/3)…`);
+          await new Promise((r) => setTimeout(r, wait * 1000));
+        } else {
+          throw err;
+        }
+      }
+    }
     selected.forEach((id) => allSelectedIds.add(id));
     log(`    → ${selected.length} selected (running total: ${allSelectedIds.size})`);
   }

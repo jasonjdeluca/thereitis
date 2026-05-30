@@ -21,7 +21,7 @@
     "quarter_coverage": 16,
     "confidence": "medium",
     "human_review_required": true,
-    "human_review_reason": "Q1 2026 no verified transcript found at time of research \u2014 gap in coverage",
+    "human_review_reason": "Q1 2026 no verified transcript found at time of research — gap in coverage",
     "quarters": []
   },
   {
@@ -60,7 +60,7 @@
     "confidence": "medium",
     "human_review_required": false,
     "human_review_reason": null,
-    "notes": "Archive index URLs \u2014 resolve to per-quarter direct links before ingestion",
+    "notes": "Archive index URLs — resolve to per-quarter direct links before ingestion",
     "quarters": []
   },
   {
@@ -99,7 +99,7 @@
     "confidence": "high",
     "human_review_required": false,
     "human_review_reason": null,
-    "notes": "9/17 quarters official q4cdn PDFs (Q1 2024\u2013Q1 2026); 8/17 StockAnalysis fallback (Q1 2022\u2013Q4 2023). Codex Priority 6 (2026-05-30). Wired in buildCat().",
+    "notes": "9/17 quarters official q4cdn PDFs (Q1 2024–Q1 2026); 8/17 StockAnalysis fallback (Q1 2022–Q4 2023). Codex Priority 6 (2026-05-30). Wired in buildCat().",
     "quarters": []
   },
   {
@@ -112,7 +112,7 @@
     "confidence": "medium",
     "human_review_required": false,
     "human_review_reason": null,
-    "notes": "Q1 2022, Q4 2023, Q1 2024, Q4 2025 official PDFs confirmed; remaining quarters need archive re-open. Ticker was CCH in research \u2014 normalized to CHH.",
+    "notes": "Q1 2022, Q4 2023, Q1 2024, Q4 2025 official PDFs confirmed; remaining quarters need archive re-open. Ticker was CCH in research — normalized to CHH.",
     "quarters": []
   },
   {
@@ -215,7 +215,7 @@
     "confidence": "medium",
     "human_review_required": false,
     "human_review_reason": null,
-    "notes": "Archive index URLs \u2014 resolve to per-quarter direct links before ingestion",
+    "notes": "Archive index URLs — resolve to per-quarter direct links before ingestion",
     "quarters": []
   },
   {
@@ -241,7 +241,7 @@
     "quarter_coverage": 0,
     "confidence": null,
     "human_review_required": true,
-    "human_review_reason": "Manual sourcing \u2014 pipeline cannot handle non-standard IHG event labels without custom mapping",
+    "human_review_reason": "Manual sourcing — pipeline cannot handle non-standard IHG event labels without custom mapping",
     "quarters": []
   },
   {
@@ -253,7 +253,7 @@
     "quarter_coverage": 17,
     "confidence": "medium",
     "human_review_required": true,
-    "human_review_reason": "Q3 2023 directly verified; other quarters pattern-matched from official archive \u2014 spot-check PDF URLs before activation",
+    "human_review_reason": "Q3 2023 directly verified; other quarters pattern-matched from official archive — spot-check PDF URLs before activation",
     "quarters": []
   },
   {
@@ -370,7 +370,7 @@
     "confidence": "medium",
     "human_review_required": false,
     "human_review_reason": null,
-    "notes": "Archive index URLs \u2014 resolve to per-quarter direct links before ingestion",
+    "notes": "Archive index URLs — resolve to per-quarter direct links before ingestion",
     "quarters": []
   },
   {
@@ -408,7 +408,7 @@
     "confidence": "high",
     "human_review_required": false,
     "human_review_reason": null,
-    "notes": "8/17 quarters official q4cdn PDFs (Q2 2024\u2013Q1 2026); 9/17 StockAnalysis fallback (Q1 2022\u2013Q1 2024). Codex Priority 6 (2026-05-30). Wired in buildShw().",
+    "notes": "8/17 quarters official q4cdn PDFs (Q2 2024–Q1 2026); 9/17 StockAnalysis fallback (Q1 2022–Q1 2024). Codex Priority 6 (2026-05-30). Wired in buildShw().",
     "quarters": []
   },
   {
@@ -473,7 +473,46 @@
     "confidence": "medium",
     "human_review_required": false,
     "human_review_reason": null,
-    "notes": "Archive index URLs only \u2014 resolve to per-quarter direct links before ingestion",
+    "notes": "Archive index URLs only — resolve to per-quarter direct links before ingestion",
+    "quarters": []
+  },
+  {
+    "ticker": "HD",
+    "company_name": "Home Depot",
+    "ingestion_status": "ready",
+    "source_type": "official_company_domain",
+    "source_host": "ir.homedepot.com",
+    "quarter_coverage": 17,
+    "confidence": "high",
+    "human_review_required": false,
+    "human_review_reason": null,
+    "notes": "All 17 quarters confirmed official PDFs on ir.homedepot.com. Codex Priority 5 validation: 17/17 HTTP 200.",
+    "quarters": []
+  },
+  {
+    "ticker": "WMT",
+    "company_name": "Walmart",
+    "ingestion_status": "ready",
+    "source_type": "official_company_domain",
+    "source_host": "stock.walmart.com",
+    "quarter_coverage": 17,
+    "confidence": "high",
+    "human_review_required": false,
+    "human_review_reason": null,
+    "notes": "All 17 quarters confirmed official PDFs on stock.walmart.com. Sequential db IDs with consistent path pattern.",
+    "quarters": []
+  },
+  {
+    "ticker": "NKE",
+    "company_name": "Nike",
+    "ingestion_status": "ready",
+    "source_type": "official_ir_vendor_linked_asset",
+    "source_host": "s1.q4cdn.com",
+    "quarter_coverage": 17,
+    "confidence": "high",
+    "human_review_required": false,
+    "human_review_reason": null,
+    "notes": "All 17 quarters confirmed official s1.q4cdn.com PDFs. Nike uses fiscal year labels (FY Q1 = Sep). Phase 2 Docker ops-worker tested NKE end-to-end.",
     "quarters": []
   }
 ]
