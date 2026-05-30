@@ -134,10 +134,18 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - 13 PR #18 companies have no official URLs (all StockAnalysis): AAPL, NVDA, AMZN, CSCO, IBM, CRM, KO, CAT, BA, HON, MMM, SHW, MCD
   - Key finding: ir.homedepot.com direct PDF URLs accessible (HTTP 200); bot-blocking applies only to HTML catalog pages
   - Owner: Codex — report at `codex/staging/reports/pr18-url-validation-2026-05-30.md`
-- [ ] Find official PDF sources for 13 StockAnalysis-only PR #18 companies — Priority 6 Codex assignment
-  - Companies: AAPL, NVDA, AMZN, CSCO, IBM, CRM, KO, CAT, BA, HON, MMM, SHW, MCD
-  - Task assigned in `codex/inbox/session-4-acknowledgment-2026-05-30.md` — human fills in specifics before Codex is invoked
-  - Owner: Codex (research), Claude Code (validation and promotion)
+- [x] Find official PDF sources for 13 StockAnalysis-only PR #18 companies — Priority 6 complete
+  - KO 17/17, BA 17/17, MMM 17/17 fully official; CAT 9/17, SHW 8/17, IBM 4/17, CRM 1/17 partial
+  - AAPL, NVDA, AMZN, CSCO, HON, MCD: confirmed no written transcript PDFs — structural limitation
+  - Updated research JSONs in `codex/staging/company-research/`
+- [ ] Promote Priority 6 Codex JSONs to `company-packs/` and update queue-builder.js
+  - BA, KO, MMM (17/17 official) are highest priority — update queue-builder for these 3 first
+  - CAT, SHW, IBM, CRM (partial) — update manifest, wire official rows into queue-builder
+  - Owner: Claude Code (next session)
+- [~] NKE editorial phrase review — Codex Priority 7 in progress
+  - 40 phrases + 4 trivia in `company-packs/NKE/generated/` need review against CONTENT_QA_RUBRIC.md
+  - Expected output: `codex/staging/reports/nke-editorial-review-2026-05-30.md`
+  - Note: 4 trivia questions is below minimum (12). Trivia gap must be resolved before NKE activation.
 
 ---
 
@@ -159,29 +167,25 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Migration SQL executed (phrase_staging table live) — 013_phrase_staging.sql created and applied via MCP 2026-05-30; table was absent from DB and migration file did not exist prior to this session
 - [x] MSFT phrases staged to phrase_staging
   - 4,790 unique phrases staged 2026-05-30 (7,086 raw candidates across 15 quarters; deduped to 4,790 pending rows in phrase_staging)
+- [x] VZ phrases staged to phrase_staging
+  - 5,120 unique phrases staged 2026-05-30 (17/17 PDFs; fixed queue-builder + single_char_token validator filter)
 - [x] PR #11 merged
+- [ ] Build `scripts/ingestion/ai-select.js` — **next session priority**
+  - Reads `pending` rows in `phrase_staging` for a given ticker
+  - Batches and sends to Claude Haiku with CONTENT_QA_RUBRIC.md context
+  - Returns top 40–50 phrase recommendations
+  - Marks those rows as `ai_selected` status in `phrase_staging`
+  - Human reviews only `ai_selected` rows in admin panel (admin panel already built — filter on status)
+  - Unblocks MSFT and VZ phrase approval entirely
 
 ### Phase 2 — Docker container architecture
 
 - [ ] Define and document `company-pack` directory structure in `docs/program/INGESTION_RUNBOOK.md`
-- [ ] Build `ops-worker/fetcher/` (Node.js Docker container)
-  - Reads SQLite job queue for pending companies
-  - HTTP-fetches PDFs from URLs in source manifests
-  - Saves raw PDFs to `company-packs/{ticker}/transcripts/`
-  - Logs fetch success, failure, and HTTP status per quarter per company
-  - Handles rate limiting with configurable delay between requests
-- [ ] Build `ops-worker/extractor/` (Python Docker container)
-  - PDF text extraction using pdfplumber
-  - Sentence tokenization and n-gram extraction (2–4 word phrases)
-  - Cross-quarter frequency scoring (phrase score = number of distinct quarters it appears in)
-  - Hard filter: drops all phrases over 25 characters before scoring
-  - Outputs `candidate_phrases.json` ranked by frequency score
-- [ ] Build `ops-worker/validator/` (Node.js Docker container)
-  - Stage 3 structural filter: drops phrases appearing in fewer than 2 quarters, removes acronym-only candidates, removes phrases matching generic filler blocklist, flags candidates containing proper nouns
-  - Stage 4 AI enrichment: POST to Claude Haiku API (or GPT-4o Mini as fallback) with ~200 filtered candidates — prompt asks for top 40–50 phrases plus 12–18 trivia questions with 4 choices each
-  - Stage 5 validation: hard-validates all AI output against project rules, rejects any phrase over 25 characters or containing a person name
-  - Generates migration SQL from template
-  - Opens GitHub PR via GitHub API with generated SQL attached as a file
+- [x] Build `ops-worker/fetcher/` (Node.js Docker container) — merged PR #20
+- [x] Build `ops-worker/extractor/` (Python Docker container) — merged PR #20
+- [x] Build `ops-worker/validator/` (Node.js Docker container, Stages 3+4+5) — merged PR #20
+  - NKE end-to-end test: 17/17 PDFs, 7,629 candidates, 40 phrases + 4 trivia generated
+  - Note: trivia pass rate low (~4/15 pass Stage 5 person-name filter). Prompt needs strengthening before batch runs.
 - [ ] Build `ops-worker/queue/` (SQLite) — tracks ingestion state per company
   - States: not_started, sources_ready, fetching, fetched, extracting, extracted, generating, generated, validation_failed, ready_for_review, pr_opened, migration_applied, active
 - [ ] Write `ops-worker/docker-compose.yml` for local pipeline testing
@@ -332,4 +336,4 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
-*Last updated: 2026-05-30 (session 4). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
+*Last updated: 2026-05-30 (session 4 — final). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
