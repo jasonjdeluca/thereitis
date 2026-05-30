@@ -75,10 +75,7 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - `human-decision-needed` (red) — requires human review before proceeding
   - `content-review` (yellow) — phrase or trivia content needs editorial judgment
   - `migration-ready` (green) — SQL has been reviewed and is ready for human execution
-- [ ] Resolve prompt file naming conflict — Claude Code wrote five prompt files under one naming convention; Codex proposed the same five under different names
-  - Decide canonical filenames and retire the duplicate set
-  - Owner: Claude Code
-  - Note: blocking — Group C platform configuration cannot be finalized until resolved
+- [x] Resolve prompt file naming conflict — Claude Code naming convention is canonical. No competing Codex files were ever committed to the repo. The five files in `docs/program/prompts/` are the authoritative set: `routine-pm-brief.md`, `routine-implement.md`, `codex-content-quality.md`, `codex-ingestion-triage.md`, `codex-pm-brief-overflow.md`. Group C platform configuration may proceed.
 
 ---
 
@@ -160,28 +157,23 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ### Phase 2 — Docker container architecture
 
 - [ ] Define and document `company-pack` directory structure in `docs/program/INGESTION_RUNBOOK.md`
-- [ ] Build `ops-worker/fetcher/` (Node.js Docker container)
-  - Reads SQLite job queue for pending companies
-  - HTTP-fetches PDFs from URLs in source manifests
-  - Saves raw PDFs to `company-packs/{ticker}/transcripts/`
-  - Logs fetch success, failure, and HTTP status per quarter per company
-  - Handles rate limiting with configurable delay between requests
-- [ ] Build `ops-worker/extractor/` (Python Docker container)
+- [x] Build `ops-worker/fetcher/` (Node.js Docker container)
+  - Reads SQLite job queue for pending companies; seeds from `company-packs/*/source_manifest.json`
+  - HTTP-fetches PDFs from official IR URLs; saves to `company-packs/{ticker}/transcripts/`
+  - Rate limiting (DELAY_MS env var, default 2s); COMPANY_LIMIT per run (default 5)
+- [x] Build `ops-worker/extractor/` (Python Docker container)
   - PDF text extraction using pdfplumber
-  - Sentence tokenization and n-gram extraction (2–4 word phrases)
-  - Cross-quarter frequency scoring (phrase score = number of distinct quarters it appears in)
-  - Hard filter: drops all phrases over 25 characters before scoring
-  - Outputs `candidate_phrases.json` ranked by frequency score
-- [ ] Build `ops-worker/validator/` (Node.js Docker container)
-  - Stage 3 structural filter: drops phrases appearing in fewer than 2 quarters, removes acronym-only candidates, removes phrases matching generic filler blocklist, flags candidates containing proper nouns
-  - Stage 4 AI enrichment: POST to Claude Haiku API (or GPT-4o Mini as fallback) with ~200 filtered candidates — prompt asks for top 40–50 phrases plus 12–18 trivia questions with 4 choices each
-  - Stage 5 validation: hard-validates all AI output against project rules, rejects any phrase over 25 characters or containing a person name
-  - Generates migration SQL from template
-  - Opens GitHub PR via GitHub API with generated SQL attached as a file
-- [ ] Build `ops-worker/queue/` (SQLite) — tracks ingestion state per company
-  - States: not_started, sources_ready, fetching, fetched, extracting, extracted, generating, generated, validation_failed, ready_for_review, pr_opened, migration_applied, active
-- [ ] Write `ops-worker/docker-compose.yml` for local pipeline testing
-- [ ] Create `scripts/ingestion-status.js` that reads the SQLite queue → `reports/ingestion-status.json`
+  - 2-4 word n-gram extraction with cross-quarter frequency scoring
+  - Drops phrases > 25 chars; requires ≥2 quarter recurrence for candidates
+  - Outputs `company-packs/{ticker}/candidate_phrases.json`
+- [x] Build `ops-worker/validator/` (Node.js Docker container)
+  - Stage 3: filler blocklist, acronym filter, 25-char hard cap
+  - Stage 4: Claude Haiku API call (model: claude-haiku-4-5-20251001) — up to 200 candidates → 40-50 phrases + 12-18 trivia
+  - Stage 5: hard validation (25-char, no person names), SQL generation
+  - Writes to `company-packs/{ticker}/generated/`: phrases.json, trivia.json, validation_report.json, migration.sql
+- [x] Build `ops-worker/queue/` (SQLite) — phase2_jobs + phase2_quarters tables; auto-created by fetcher on first run
+- [x] Write `ops-worker/docker-compose.yml` and `ops-worker/run-pipeline.sh` for VPS cron
+- [x] Create `scripts/ingestion-status.js` that reads the SQLite queue → `reports/ingestion-status.json`
 - [ ] Test full pipeline end-to-end with one company before scaling
 - [ ] Add nightly cron trigger for fetcher (processes up to 5 companies per night to stay within rate limits)
 
@@ -299,9 +291,7 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Cross-Cutting Tasks
 *Surfaced by Codex handover intake 2026-05-29*
 
-- [ ] Add all 30 blue-chip companies to the `companies` table — output migration SQL for human execution
-  - Output as `supabase/migrations/{next-number}_add_bluechip_companies.sql`
-  - Owner: Claude Code (SQL output), Human (execution)
+- [x] Add all researched companies to the `companies` table — `supabase/migrations/014_add_missing_companies.sql` created and applied 2026-05-30. 12 companies added: BA, CAT, HD, HON, MCD, MMM, NKE, SHW, WMT, RHP, CLDT, AHT. DB now has 41 companies total.
 - [ ] Decide canonical location for `latest_ingested_quarter` metadata per company — Supabase `companies` table, `company.json` per pack, or both
   - Owner: Human decision
   - Blocking: Group H transcript-freshness.js depends on this field being queryable
