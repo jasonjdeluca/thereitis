@@ -25,7 +25,7 @@ async function pdfToText(buffer) {
 const DELAY_MS = 1500;
 const DEFAULT_LIMIT = 50;
 const USER_AGENT =
-  "Mozilla/5.0 (compatible; ThereItIsBot/1.0; +https://thereitis.live)";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 const HTML_HOSTS = [
   "fool.com",
