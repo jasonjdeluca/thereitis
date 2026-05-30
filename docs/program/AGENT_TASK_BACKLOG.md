@@ -134,7 +134,7 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] End-to-end MSFT validation (15/17 quarters fetched, 7086 valid candidates)
 - [x] Admin phrase review UI (`PhraseReviewPanel` in `Admin.jsx`)
 - [x] Migration SQL executed (phrase_staging table live)
-- [ ] MSFT phrases staged to phrase_staging — BLOCKED: re-run staged 0, skipped 7086 (no `msft` company row). The migration created/seeded the table but the `companies` row for MSFT is missing; staging cannot proceed until it exists.
+- [x] MSFT phrases staged to phrase_staging
 - [x] PR #11 merged
 
 ### Phase 2 — Docker container architecture
