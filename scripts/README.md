@@ -80,6 +80,25 @@ This packet is the input for the Claude Code Routine daily PM brief and Codex Au
 
 ---
 
+## release-readiness.js
+
+**Input:** `reports/company-readiness.json`, `reports/content-validation.json`,
+`reports/migration-check.json` (required); `reports/transcript-freshness.json`,
+`reports/playwright-results.json` (optional).
+
+**Output:** `reports/release-readiness.json`
+
+Aggregates all report files into a single go/no-go posture:
+- **Red** — blocker present (active company with 0 phrases, phrase too long, migration error, smoke test failure, no active company with ≥50 phrases)
+- **Yellow** — warnings only (stale reports, companies below threshold, missing optional reports)
+- **Green** — all clear
+
+Exits code 1 if posture is Red. Run manually or via weekly Codex Automation.
+
+**Run manually:** `node scripts/release-readiness.js`
+
+---
+
 ## Cron Schedule (VPS)
 
 ```

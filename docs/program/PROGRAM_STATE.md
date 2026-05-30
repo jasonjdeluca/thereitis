@@ -8,9 +8,9 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Group F Phase 2 (Docker ops-worker built and tested NKE end-to-end), Group I (landing page companies + sample card + FAQ)
+**Just completed:** Group J (QA and launch hardening — Playwright tests, release-readiness.js, RELEASE_CHECKLIST.md)
 **In progress:** Group C (platform configuration pending), Group E (Codex Priority 3 repair pass for 8 companies)
-**Pending human merge:** PR #19 (remaining blue-chip manifests), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX)
+**Pending human merge:** PR #19 (remaining blue-chip manifests — Priority 3+4 repairs applied), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX), PR #22 (Group G content QA), PR #23 (Group H evergreen), PR #24 (Group J QA)
 **Ready to start:** Group G, Group H
 
 ---
@@ -28,7 +28,7 @@
 | G | Content QA | ⬜ Not Started | Depends on Group F generating output; no validation expansion or QA rubric written yet |
 | H | Evergreen Maintenance | ⬜ Not Started | Depends on Group F operational; freshness watcher and stale detector not built |
 | I | Public UX and SEO | 🔄 In Progress | Active companies section, interactive sample card, FAQ accordion added to landing page. SEO (title, OG, Twitter, JSON-LD, canonical, sitemap, robots) was already complete. PR #21 open. |
-| J | QA and Launch Hardening | ⬜ Not Started | Depends on Groups A–I substantially complete; no Playwright tests or release readiness script |
+| J | QA and Launch Hardening | ✅ Complete | Playwright smoke + game flow tests written; release-readiness.js built (Green/Yellow/Red posture); RELEASE_CHECKLIST.md; Codex synthesis prompt. Requires system deps on VPS (npx playwright install-deps). |
 | K | Analytics and Launch | ⬜ Not Started | Phase 3 / post-launch; no event tracking, snapshot script, or launch kit |
 
 ---

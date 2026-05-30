@@ -242,27 +242,30 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group J — QA and Launch Hardening
 *Claude Code (build) · Docker/VPS (run) · Codex (go/no-go synthesis) · Phase 2–3 · Depends on: Groups A–I substantially complete*
 
-- [ ] Build Playwright public smoke test suite in `tests/smoke/`
-  - Homepage loads and contains expected title and meta
-  - Start game route loads without error
-  - Join game route loads without error
-  - Company selector loads and shows at least one active company
-  - Admin route at /gate redirects or prompts for password
-  - Mobile viewport (375px) renders without layout overflow
-- [ ] Build game flow smoke test in `tests/game-flow/`
-  - Create session via API
-  - Join session with a second player
-  - Verify card renders with 25 phrases
-  - Mark a phrase and verify state updates
-  - Verify bingo detection fires when a row is complete
-  - Verify post-game screen renders
-- [ ] Create `scripts/release-readiness.js` → `reports/release-readiness.json`
-  - Aggregates pass/fail status from all report files
-  - Produces overall posture: Green (ready) / Yellow (minor issues) / Red (blocker present)
-- [ ] Write `docs/program/RELEASE_CHECKLIST.md`
-- [ ] Configure Codex Automation: weekly release readiness synthesis
-  - Reads `reports/release-readiness.json` and all sub-reports
-  - Posts GitHub issue "Release Readiness — [date]" with go/no-go posture and list of remaining blockers
+- [x] Build Playwright public smoke test suite in `tests/smoke/public.spec.js`
+  - Homepage title, meta description, Pick a Company link, mobile viewport overflow
+  - Company selector shows ≥1 active company
+  - /play/hilton loads ModeSelect with Play Bingo option
+  - /gate requires authentication (admin content not visible unauthenticated)
+  - Mobile layout bingo card overflow check
+- [x] Build game flow smoke test in `tests/game-flow/game.spec.js`
+  - Create session and render 25-cell bingo grid
+  - Mark a tile and verify aria-pressed state updates
+  - Complete a row (5 cells) and verify bingo detection fires
+  - End Game leads to leaderboard/post-game screen
+  - Two-player join via session code
+  - Note: requires system Playwright deps (`npx playwright install-deps`) on VPS; runs against live site
+- [x] Create `scripts/release-readiness.js` → `reports/release-readiness.json`
+  - Aggregates all reports; posture: Green / Yellow / Red
+  - Exits non-zero if Red (CI/cron detectable)
+  - Optional inputs: transcript-freshness.json, playwright-results.json
+- [x] Write `docs/program/RELEASE_CHECKLIST.md`
+  - Blockers vs. preferred items clearly separated
+  - Current status marked inline
+- [x] Configure Codex Automation: weekly release readiness synthesis
+  - Prompt at `docs/program/prompts/codex-release-readiness.md`
+  - Reads `reports/release-readiness.json`; posts GitHub issue; silent on sustained Green
+  - Note: platform configuration still pending — manual setup in Codex Automations
 
 ---
 
