@@ -67,6 +67,7 @@
 | 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ, CLDT, AHT are researched but not yet in the `companies` table. Required before ingestion pipeline can process them. |
 | 10 | **Add 30 blue-chip companies to DB** | Claude Code will output migration SQL. Human executes against production Supabase. Required before blue-chip ingestion pipeline can process any of these companies. |
 | 11 | **Decide latest_ingested_quarter metadata location** | Canonical location for this field per company: Supabase `companies` table, `company.json` per pack, or both. Blocking Group H freshness watcher build. |
+| 12 | **Review and merge PR #18** | `feat/blue-chip-source-manifests` — on hold pending Codex re-research of HD, WMT, NKE, DIS. Do not merge until Codex deposits updated files and Claude Code re-validates. |
 
 ---
 
@@ -95,3 +96,4 @@
 | Stage 4 AI enrichment deferred | Medium | Phase 1 stages all valid candidates for manual review; no AI ranking yet. Until Stage 4 is built, phrase quality depends entirely on human review of raw n-gram candidates. |
 | Group C platform configuration pending | Medium | All 5 automation prompt files exist but none of the Claude Code Routines or Codex Automations are live. The agentic PM loop does not run until these are configured. |
 | `feat/group-d-admin-console` branch not merged | Low | Local branch exists. Confirm it is fully merged to main; if not, review and merge. |
+| HD/WMT/NKE/DIS source manifests need re-research | Medium | All four companies had `official_search_exhausted: false` but used third-party stockanalysis.com links anyway. Handover identified official sources for all four. Codex is actively re-researching. Claude Code must re-validate and update PR #18 once new files are deposited to `codex/staging/company-research/`. |
