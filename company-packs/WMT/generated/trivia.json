@@ -1,0 +1,90 @@
+[
+  {
+    "question": "In what year was the first discount store opened that became the foundation for this company?",
+    "option_a": "1962",
+    "option_b": "1950",
+    "option_c": "1972",
+    "option_d": "1945",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the primary business model that defines WMT's core operations?",
+    "option_a": "E-commerce only",
+    "option_b": "Discount retail and grocery",
+    "option_c": "Luxury goods distribution",
+    "option_d": "Wholesale memberships",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In what year did WMT become the world's largest retailer by revenue?",
+    "option_a": "1998",
+    "option_b": "2002",
+    "option_c": "2005",
+    "option_d": "2010",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Approximately how many stores does WMT operate globally as of 2023?",
+    "option_a": "5,000",
+    "option_b": "8,000",
+    "option_c": "11,500",
+    "option_d": "15,000",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What percentage of WMT's revenue typically comes from grocery and consumables?",
+    "option_a": "35-40%",
+    "option_b": "50-55%",
+    "option_c": "65-70%",
+    "option_d": "80-85%",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What is WMT's primary strategy for competing with e-commerce giants?",
+    "option_a": "Price cuts only",
+    "option_b": "Omnichannel integration and grocery delivery",
+    "option_c": "Store closures",
+    "option_d": "Luxury product focus",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In what decade did WMT expand significantly beyond its home state into national operations?",
+    "option_a": "1970s",
+    "option_b": "1980s",
+    "option_c": "1990s",
+    "option_d": "2000s",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Approximately what is WMT's annual revenue as of fiscal 2023?",
+    "option_a": "$400 billion",
+    "option_b": "$550 billion",
+    "option_c": "$650 billion",
+    "option_d": "$750 billion",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Which emerging service does WMT actively develop to increase customer engagement and revenue?",
+    "option_a": "Financial services and insurance",
+    "option_b": "Automotive manufacturing",
+    "option_c": "Healthcare clinics and telehealth",
+    "option_d": "All of the above",
+    "correct_answer": "d"
+  },
+  {
+    "question": "What sustainability goal did WMT commit to regarding emissions by 2040?",
+    "option_a": "50% reduction",
+    "option_b": "Net zero emissions",
+    "option_c": "30% reduction",
+    "option_d": "Carbon neutral operations only",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Which technology has WMT increasingly invested in for supply chain and warehouse automation?",
+    "option_a": "Blockchain ledgers only",
+    "option_b": "Robotics and AI systems",
+    "option_c": "Manual labor expansion",
+    "option_d": "Paper-based inventory",
+    "correct_answer": "b"
+  }
+]

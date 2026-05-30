@@ -17,7 +17,7 @@ const DB_PATH = path.join(DATA_DIR, 'ingestion-queue.db');
 const DELAY_MS = parseInt(process.env.DELAY_MS || '2000', 10);
 const COMPANY_LIMIT = parseInt(process.env.COMPANY_LIMIT || '5', 10);
 const TICKER_FILTER = process.env.TICKER?.toUpperCase() || null;
-const USER_AGENT = 'Mozilla/5.0 (compatible; ThereItIsBot/1.0; +https://thereitis.live)';
+const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const ts = () => new Date().toISOString();

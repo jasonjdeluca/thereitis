@@ -40,6 +40,47 @@ STOPWORDS = {
     "look", "really", "actually", "certainly", "absolutely",
 }
 
+# Words that suggest executive speaking-style phrases (boost score).
+ACTION_WORDS = {
+    # Executive-strategy verbs that signal CEO-speak (not financial metric labels)
+    "accelerate", "accelerating", "unlock", "unlocking",
+    "execute", "executing", "win", "winning", "lead", "leading",
+    "lean", "leaning", "capture", "capturing", "strengthen", "strengthening",
+    "prioritize", "prioritizing", "transform", "transforming",
+    "play", "playing", "navigate", "navigating", "capitalize", "capitalizing",
+    "innovate", "innovating", "outperform", "outperforming",
+    "empower", "empowering", "disrupt", "disrupting",
+}
+
+# Words that flag pure domain-vocabulary phrases (penalty — not speaking style).
+DOMAIN_VOCAB = {
+    # Geographic segments
+    "china", "america", "europe", "asia", "pacific", "latin", "india",
+    "japan", "canada", "australia", "emea", "apac", "americas",
+    # Clinical / medical
+    "cancer", "disease", "therapy", "clinical", "patient", "drug",
+    "treatment", "trial", "diagnosis", "tumor", "oncology", "antibody",
+    # Pure financial nouns (when the whole phrase is just metrics)
+    "ebitda", "eps", "dividend", "yield", "bps",
+    # Legal boilerplate words — penalise heavily
+    "materially", "cautionary", "harbor", "litigation", "hereby",
+    "incorporated", "disclaimer", "prospectus", "registrant",
+    "approximately", "beginning", "ending", "trailing",
+}
+
+
+def idiom_signal(words: list[str]) -> float:
+    """Score 0.7–1.5: boosts executive-idiom phrases, penalises pure domain vocab."""
+    phrase_set = set(words)
+    if phrase_set & ACTION_WORDS:
+        return 1.4
+    if phrase_set & DOMAIN_VOCAB:
+        return 0.7
+    # Phrases ending in -ing or containing adverbs/adjectives trend toward idioms.
+    if any(w.endswith(("ing", "ly", "ward")) for w in words):
+        return 1.2
+    return 1.0
+
 
 def ts() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -54,6 +95,40 @@ def open_db() -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     return conn
+
+
+def strip_preamble(text: str) -> str:
+    """Remove operator boilerplate, legal disclaimer, and participant roster.
+
+    Earnings call transcripts open with ~500-2000 words of noise before
+    any executive actually speaks. We skip to the first substantive remark
+    by searching for common prepared-remarks markers. If no marker is found,
+    we drop the first 2000 characters as a conservative fallback.
+    """
+    # Markers that typically appear just before the first executive speaks.
+    # Listed in rough order of reliability.
+    markers = [
+        "prepared remarks",
+        "prepared statement",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "thank you, operator",
+        "thank you operator",
+        "thank you for joining",
+        "ladies and gentlemen",
+    ]
+    lower = text.lower()
+    best = len(text)
+    for m in markers:
+        idx = lower.find(m)
+        if 200 < idx < best:  # ignore matches in the very first 200 chars
+            best = idx
+
+    if best < len(text):
+        return text[best:]
+    # Fallback: drop first 2000 characters
+    return text[min(2000, len(text) // 4):]
 
 
 def extract_text(transcript_path: Path) -> str:
@@ -135,6 +210,7 @@ def process_company(conn: sqlite3.Connection, company_id: str, ticker: str) -> N
             text = extract_text(transcript_path)
             if not text.strip():
                 raise ValueError("Extracted text is empty")
+            text = strip_preamble(text)
 
             txt_path = extracted_dir / f"{fq.replace(' ', '-')}.txt"
             txt_path.write_text(text, encoding="utf-8")
@@ -160,11 +236,12 @@ def process_company(conn: sqlite3.Connection, company_id: str, ticker: str) -> N
             fail += 1
             log(f"  [{fq}] ✗ {e}")
 
-    # Score candidates; require MIN_QUARTER_FREQ distinct quarters
+    # Score candidates; require MIN_QUARTER_FREQ distinct quarters.
+    # idiom_signal boosts CEO-speak phrases and penalises pure domain vocab.
     candidates = [
         {
             "phrase": p,
-            "score": len(qs),
+            "score": round(len(qs) * idiom_signal(p.split()), 3),
             "quarter_count": len(qs),
             "quarters": sorted(qs),
         }
