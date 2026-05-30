@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-30 (session 3)
+**Last updated:** 2026-05-30 (session 4)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,10 +8,10 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Group F Phase 2 (Docker ops-worker built and tested NKE end-to-end), Group I (landing page companies + sample card + FAQ)
-**In progress:** Group C (platform configuration pending), Group E (Codex Priority 3 repair pass for 8 companies)
-**Pending human merge:** PR #19 (remaining blue-chip manifests), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX)
-**Ready to start:** Group G, Group H
+**Just completed:** Group G (content-validation.js expanded, CONTENT_QA_RUBRIC.md, Codex editorial prompt)
+**In progress:** Group C (platform configuration pending), Group E (Codex Priority 4 repair pass for AMGN/JPM/MRK + link validation)
+**Pending human merge:** PR #19 (remaining blue-chip manifests — updated with Codex Priority 3 repairs), PR #20 (Phase 2 ops-worker), PR #21 (Group I UX), PR #22 (Group G content QA)
+**Ready to start:** Group H (blocked on action item #11 — latest_ingested_quarter decision)
 
 ---
 
@@ -25,7 +25,7 @@
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
 | E | Transcript Research | 🔄 In Progress | All 30 target companies researched. 5 with fully official IR sources (HD, WMT, NKE, DIS, KO). 8 pending official-source repair pass (MSFT, JPM, V, TRV, AMGN, JNJ, MRK, VZ — assigned to Codex Priority 3). 17 using third-party as best available. JNJ: human_review_required. Reconciliation task closed — no prior tables existed. |
 | F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete (MSFT, 4,790 phrases). Phase 2 Docker ops-worker built and tested NKE end-to-end: 17/17 PDFs fetched, 7,629 candidates, 40 phrases + migration.sql generated. PR #20 ready. Key finding: only Q4CDN vendor-hosted PDFs accessible for Phase 2 fetcher — ir.homedepot.com and StockAnalysis both block bots. |
-| G | Content QA | ⬜ Not Started | Depends on Group F generating output; no validation expansion or QA rubric written yet |
+| G | Content QA | ✅ Complete | content-validation.js expanded (Part B: generated pack checks), CONTENT_QA_RUBRIC.md written, codex-content-editorial-review.md prompt written. Codex trigger is manual per company until Routines are configured. |
 | H | Evergreen Maintenance | ⬜ Not Started | Depends on Group F operational; freshness watcher and stale detector not built |
 | I | Public UX and SEO | 🔄 In Progress | Active companies section, interactive sample card, FAQ accordion added to landing page. SEO (title, OG, Twitter, JSON-LD, canonical, sitemap, robots) was already complete. PR #21 open. |
 | J | QA and Launch Hardening | ⬜ Not Started | Depends on Groups A–I substantially complete; no Playwright tests or release readiness script |
@@ -79,15 +79,18 @@
 
 ## Next Recommended Session
 
-**Recommended:** Merge PRs #19, #20, #21 (three human merges required — all review-ready). Then build Group G (Content QA) and Group H (Evergreen Maintenance) — both are now unblocked by Phase 2 being complete.
+**Recommended:** Merge PRs #19, #20, #21, #22. Then:
+- Decide action item #11 (latest_ingested_quarter location) to unblock Group H
+- Run NKE editorial review via Codex once PR #20 merges (use codex-content-editorial-review.md prompt)
+- Start Group H once #11 is decided
 
-**Model:** `claude-sonnet-4-6` for implementation. Switch to `claude-opus-4-8` only if designing Group H freshness architecture or Group G QA rubric from scratch.
+**Model:** `claude-sonnet-4-6` for Group H implementation. Switch to `claude-opus-4-8` only for Group H architecture if scope is unclear.
 
 **Session entry point:**
-1. Merge PR #20 first (Phase 2 pipeline on main enables Group G/H builds)
-2. Merge PR #19 and #21
-3. Start `Group G` — expand `scripts/content-validation.js` for post-generation checks, write `docs/program/CONTENT_QA_RUBRIC.md`
-4. Or start `Group H` — build `scripts/transcript-freshness.js` once `latest_ingested_quarter` decision is made
+1. Check Codex Priority 4 inbox (link validation results, AMGN/JPM/MRK repair pass)
+2. Merge PR #20 — runs NKE through Group G validator as first test
+3. Merge PRs #19, #21, #22
+4. Decide `latest_ingested_quarter` location (action item #11) → build Group H
 
 **Blocking human decision still needed:** `latest_ingested_quarter` canonical location (action item #11) — blocks Group H entirely.
 

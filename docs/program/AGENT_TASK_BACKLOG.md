@@ -190,19 +190,20 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group G — Content QA
 *Claude Code (build validation) · Docker/VPS (run hard checks) · Codex (editorial review) · Phase 2 · Depends on: Group F generating output*
 
-- [ ] Expand `scripts/content-validation.js` with post-generation checks
+- [x] Expand `scripts/content-validation.js` with post-generation checks
   - Validates phrases in `company-packs/{ticker}/generated/phrases.json` against all rules
   - Validates trivia in `company-packs/{ticker}/generated/trivia.json` (all choices present, correct answer is one of the choices, no answer over 80 characters)
-  - Writes `company-packs/{ticker}/generated/validation_report.json`
-- [ ] Write `docs/program/CONTENT_QA_RUBRIC.md`
+  - Writes `company-packs/{ticker}/generated/validation_report.json` (merges with ops-worker report)
+- [x] Write `docs/program/CONTENT_QA_RUBRIC.md`
   - What makes a phrase good: specific to that company, would cause a knowing groan or laugh, recurs across multiple quarters, fits the CEO Mode voice
   - What makes a phrase bad: pure financial jargon, too generic to identify the company, sounds like an analyst question rather than an executive answer, references a person by name
-  - Rejection taxonomy: too_generic, person_name, jargon_heavy, wrong_company, too_long, low_frequency
-- [ ] Configure Codex editorial QA task: triggered once per company when Stage 4 generation is complete
+  - Rejection taxonomy: too_generic, person_name, jargon_heavy, wrong_company, too_long, low_frequency, boilerplate_opener, operational_minutia, analyst_question
+- [x] Configure Codex editorial QA task: triggered once per company when Stage 4 generation is complete
   - Reads `generated/phrases.json` and `generated/trivia.json`
   - Reviews candidates against QA rubric
   - Posts review as GitHub comment on the ingestion PR with recommended approvals, rejections, and edits
-- [ ] Write `docs/program/prompts/codex-content-editorial-review.md`
+  - Note: trigger is manual (human-initiated per company) until Claude Code Routine automation is configured
+- [x] Write `docs/program/prompts/codex-content-editorial-review.md`
   - Prompt for Codex editorial review triggered once per company when Stage 4 generation is complete
   - Owner: Claude Code
 
