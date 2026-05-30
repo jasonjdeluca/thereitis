@@ -1,0 +1,6 @@
+{
+  "ticker": "DIS",
+  "display_name": "Walt Disney",
+  "source_manifest_complete": true,
+  "ingestion_status": "sources_ready"
+}

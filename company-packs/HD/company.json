@@ -1,0 +1,6 @@
+{
+  "ticker": "HD",
+  "display_name": "Home Depot",
+  "source_manifest_complete": true,
+  "ingestion_status": "sources_ready"
+}
