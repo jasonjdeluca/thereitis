@@ -133,8 +133,9 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Pipeline runner (`run-pipeline.js`)
 - [x] End-to-end MSFT validation (15/17 quarters fetched, 7086 valid candidates)
 - [x] Admin phrase review UI (`PhraseReviewPanel` in `Admin.jsx`)
-- [x] Migration SQL executed (phrase_staging table live)
+- [x] Migration SQL executed (phrase_staging table live) — 013_phrase_staging.sql created and applied via MCP 2026-05-30; table was absent from DB and migration file did not exist prior to this session
 - [x] MSFT phrases staged to phrase_staging
+  - 4,790 unique phrases staged 2026-05-30 (7,086 raw candidates across 15 quarters; deduped to 4,790 pending rows in phrase_staging)
 - [x] PR #11 merged
 
 ### Phase 2 — Docker container architecture
