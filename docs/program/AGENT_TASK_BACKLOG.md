@@ -183,9 +183,9 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - MMM 17/17 fetched → 4,506 staged → 50 ai_selected
   - MSFT 15/17 (prior session), VZ 17/17 (prior session) — all confirmed clean
   - **350 ai_selected phrases total across 7 companies awaiting human approval**
-- [ ] Repair MRK, JPM, TRV URL patterns — inspect failed queue rows, fix URL generation to capture older quarters
-- [ ] Add queue-builder builders for HD, WMT, DIS, NKE (all have confirmed official PDFs — high-value launch companies)
-- [ ] Run pipeline for HD, WMT, DIS, NKE once builders are wired
+- [x] Repair MRK, JPM, TRV URL patterns — manifest-sourced URL maps replace guessed patterns; MRK 3→9/17, JPM 5→13/17, TRV 9→11/17. Remaining failures are StockAnalysis 400 (bot-blocking, known constraint). PR #30.
+- [x] Add queue-builder builders for HD, WMT, DIS, NKE (all have confirmed official PDFs — high-value launch companies). PR #30.
+- [x] Run pipeline for HD, WMT, DIS, NKE once builders are wired — all 17/17 fetched, staged, ai_selected. PR #30.
 
 ### Phase 2 — Docker container architecture
 
