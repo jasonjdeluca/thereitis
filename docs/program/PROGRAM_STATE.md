@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-30 (session 5)
+**Last updated:** 2026-05-30 (session 5 — final update)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,10 +8,9 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** `ai-select.js` built and run for MSFT (50 selected / 4,740 rejected) and VZ (50 selected / 5,070 rejected); Admin PhraseReviewPanel updated to show ai_selected rows; BA/KO/MMM/CAT/SHW source manifests promoted to official URLs; queue-builder wired with 5 new builders; migration 016 added (RLS policy for ai-select)
-**In progress:** Group C (platform configuration pending), Group E (Codex Priority 7 blocked — NKE generated files not in repo), Group F (MSFT + VZ ready for human phrase review)
-**Awaiting human review:** 50 MSFT ai_selected phrases + 50 VZ ai_selected phrases in admin PhraseReviewPanel
-**Awaiting Codex:** Priority 7 NKE editorial review still blocked (phrases.json + trivia.json not committed); release readiness issue #28 posted with fallback data
+**Just completed:** Phase 1 ingestion pipeline run for 7 companies (MSFT, VZ, BA, TRV, MRK, JPM, MMM); all narrowed to 50 ai_selected phrases via ai-select.js; NKE generated files committed (unblocks Codex); Codex inbox note sent (Priority 8–11)
+**Awaiting human action:** Review 350 phrases across 7 companies in `/admin` → Phrase Staging Review; configure Claude Code Routines and Codex Automations (Group C)
+**Awaiting Codex:** Priority 8 NKE editorial review (now unblocked); Priority 9 Group C prompt review
 
 ---
 
@@ -24,8 +23,8 @@
 | C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; naming conflict resolved (Claude Code convention canonical); platform configuration pending — manual setup in Claude Code Routines and Codex Automations platforms. |
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
 | E | Transcript Research | ✅ Complete | All 30 companies researched. Priorities 1–6 done. KO/BA/MMM/HD/WMT/NKE/DIS fully official (17/17 each). VZ 17/17 official confirmed. AAPL/NVDA/AMZN/CSCO/HON/MCD confirmed no written transcript PDFs — structural limitation. JNJ: human_review_required. MSFT: HTML-only, StockAnalysis fallback. All manifests in `company-packs/` (17 on main via PR #18; 13 in codex/staging pending promotion). |
-| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete: MSFT 4,790→50 ai_selected; VZ 5,120→50 ai_selected. `ai-select.js` built and run. Admin panel updated to show ai_selected rows. **Next: human phrase review (50 phrases per company).** Phase 2 ops-worker merged and tested (NKE: 40 phrases generated). |
-| G | Content QA | 🔄 In Progress | Scripts and rubric complete and merged. NKE is first company with Stage 4 output (40 phrases, 4 trivia). Codex Priority 7 editorial review in progress — NKE phrases/trivia assessment against rubric. |
+| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 run for 7 companies (2026-05-30): MSFT, VZ, BA, TRV, MRK, JPM, MMM — all have 50 ai_selected phrases awaiting human approval. Phase 2 ops-worker built and tested (NKE). **Blocker: human phrase review needed before any company can be activated.** |
+| G | Content QA | 🔄 In Progress | Scripts and rubric complete. NKE generated files committed (PR #29). Codex Priority 8 editorial review assigned — should run next Codex session. |
 | H | Evergreen Maintenance | ✅ Complete | `transcript-freshness.js` merged. Migration 015 live (executed 2026-05-30). Runbook and Codex exception prompt merged. Post-call HTTP watch deferred to Phase 3. |
 | I | Public UX and SEO | ✅ Complete | Companies section, interactive sample card, FAQ merged (PR #21). SEO already complete. |
 | J | QA and Launch Hardening | ✅ Complete | Playwright tests, release-readiness.js, RELEASE_CHECKLIST.md all merged. VPS needs `npx playwright install-deps`. Current posture: **Yellow** (0 blockers, 13 warnings). Codex Priority 7 release readiness synthesis in progress. |
@@ -55,7 +54,8 @@
 | MSFT official HTML confirmed inaccessible | Codex Priority 4 validation: 15 MSFT official IR HTML pages return 403 to Node GET. These are transcript web pages, not PDFs. MSFT stays on StockAnalysis fallback for Phase 2; Phase 1 ingest (4,790 phrases staged) is unaffected since the extractor works against pre-downloaded text. |
 | VZ fully official — prime Phase 2 candidate | Codex Priority 4 validated all 17 VZ official PDFs (verizon.com/about/file/* token URLs): 17/17 pass with correct Content-Type and PDF signature. TRV (s26.q4cdn.com) also 10/10 pass. VZ and TRV are the next lowest-risk companies to run through the Phase 2 pipeline. |
 | KO official PDF returns 403 | Codex Priority 2 spot check: KO Q1 2026 official transcript PDF on investors.coca-colacompany.com returns 403 application/xml even with browser-like headers. Ingestion access issue — KO may require a different fetch approach or manual download. |
-| Phase 1 pipeline stages too many candidates | Medium | Phase 1 stages all valid n-gram candidates (4,790 MSFT, 5,120 VZ) — Stage 4 AI selection was never wired into Phase 1. `ai-select.js` must be built before human phrase review is feasible. See next session entry point. |
+| Phase 1 pipeline + ai-select flow confirmed | Resolved | Pipeline run 2026-05-30: 7 companies processed. All narrowed to exactly 50 ai_selected phrases via ai-select.js. Fetch rates: BA 17/17, MMM 17/17, VZ 17/17, TRV 9/17, JPM 5/17, MRK 3/17, MSFT 15/17. TRV/MRK/JPM URL patterns need repair for older quarters. |
+| Codex inbox note sent (session 5) | Info | `codex/inbox/session-5-handoff-2026-05-30.md` on `codex/staging` branch. Priority 8: NKE editorial review (unblocked). Priority 9: Group C prompt review. Priority 10: release readiness synthesis (waiting on VPS report data). Priority 11: advance notice of BA/TRV/MRK/JPM/MMM editorial reviews. |
 | VZ queue-builder was using HTML webcast URLs | Resolved | Fixed in PR #26: updated to use direct PDF download URLs from source_manifest.json. VZ re-run successful (5,120 phrases staged). |
 | PDF character-spaced headers produce garbage n-grams | Resolved | Fixed in PR #26: validator now rejects any phrase where a token is a single non-'a' letter (`single_char_token` rejection reason). VZ re-run confirmed clean top phrases. |
 | Priority 6 promotions complete (BA/KO/MMM/CAT/SHW) | Resolved | BA (17/17 q4cdn), KO (17/17 official IR), MMM (17/17 CloudFront), CAT (9/17 q4cdn + 8/17 StockAnalysis), SHW (8/17 q4cdn + 9/17 StockAnalysis). source_manifest.json promoted and queue-builder wired for all 5. IBM (4/17) and CRM (1/17) deferred — too few official rows to be useful. |
@@ -68,45 +68,33 @@
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Review MSFT and VZ phrases in admin panel** | `ai-select.js` has run for both companies. Admin panel now shows ai_selected rows (50 per company). Go to `/admin` → Phrase Staging Review. Approve or reject each phrase. Run migration 016 first (see item #14 below). |
-| 2 | **`npx playwright install-deps` on VPS** | Required before Playwright tests can run in the cron environment. One-time VPS command after PR #24 merged (now on main). |
-| 3 | **Configure Claude Code Routine: Daily PM Brief** | Prompt file at `docs/program/prompts/routine-pm-brief.md`. Trigger: schedule, 6:15am ET weekdays. Repo: thereitis. Needs manual setup in Claude Code Routines platform. |
-| 4 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt file at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label applied to a GitHub issue. Needs manual setup. |
-| 5 | **Configure Codex Automation: Weekly content quality summary** | Prompt file at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
-| 6 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt file at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET during active onboarding. |
-| 7 | **Configure Codex Automation: Overflow PM brief** | Prompt file at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: daily 8:00am ET, fires only if no Routine brief posted today. |
-| 8 | **Review human_review_required sources before ingestion** | RHP (intermittent PDFs Q1/Q4 2022, Q1 2023), CLDT (historical quarters low-confidence), AHT (Q1 2026 missing), JNJ (several quarters pattern-matched not directly verified). |
-| 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ are researched but not in the `companies` table. Required before pipeline can process them. (RHP, CLDT, AHT added via migration 014.) |
-| 10 | **Migrations executed** | ✅ Migration 014 (12 companies added) — done 2026-05-30. ✅ Migration 015 (`latest_ingested_quarter`) — done 2026-05-30. |
-| 11 | **All PRs #19–#24 and #26 merged** | ✅ Done 2026-05-30. All on main. |
-| 12 | **Review LAUNCH_KIT.md** | `docs/program/LAUNCH_KIT.md` promoted and on main. Review copy; replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing anything. |
-| 13 | **Priority 6 promotions complete** | ✅ Done 2026-05-30 (session 5). BA, KO, MMM, CAT, SHW manifests promoted and queue-builder wired. |
-| 14 | **Migration 016 applied** | ✅ Done 2026-05-30 (session 5). |
-| 15 | **Review MSFT and VZ phrases in admin panel** | Go to `/admin` → Phrase Staging Review. 50 ai_selected phrases per company are ready. Approve the good ones, reject the bad. |
-| 16 | **Deposit NKE generated files for Codex Priority 7** | `company-packs/NKE/generated/phrases.json` and `trivia.json` need to be committed under `codex/staging/` before Codex can do the editorial review. These files are in the ops-worker output volume on the host; they were never committed to the repo. |
+| 1 | **Review 350 phrases in admin panel** | 7 companies × 50 ai_selected phrases each. Go to `/admin` → Phrase Staging Review. Approve or reject each phrase. A company needs 50 approved before it can be activated. Companies: MSFT, VZ, BA, TRV, MRK, JPM, MMM. |
+| 2 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
+| 3 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: schedule, 6:15am ET weekdays. Manual setup in Claude Code Routines platform. |
+| 4 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label on a GitHub issue. Manual setup. |
+| 5 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
+| 6 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET during active onboarding. |
+| 7 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: daily 8:00am ET backup. |
+| 8 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting those companies. |
+| 9 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
 
 ---
 
 ## Next Recommended Session
 
-**Session 5 is complete.** ai-select.js built, MSFT + VZ phrases narrowed to 50 each, BA/KO/MMM/CAT/SHW manifests promoted.
+**Session 5 is complete.** 7 companies through Phase 1 pipeline. 350 phrases staged and ai_selected. Codex inbox note sent. PR #29 merged.
 
 **Next session entry point (Claude Code):**
-1. Check if migration 016 has been executed; if not, prompt human
-2. Run Phase 2 pipeline for BA (17/17 official q4cdn PDFs — clean ingestion candidate)
-3. Configure at least one Claude Code Routine (action item #3) to start the agentic PM loop
-4. If NKE generated files are deposited: trigger Codex Priority 7 re-run for editorial review
+1. Check `phrase_staging` status — confirm human has approved phrases; if not, surface the admin panel link
+2. Run MRK and JPM URL repair — only 3/17 and 5/17 quarters fetched; inspect queue for failed rows and fix URL patterns to get more transcript coverage
+3. Add queue-builder builders for HD, WMT, DIS, NKE (all have confirmed official PDF URLs) and run them through the pipeline — these are high-quality companies for launch
+4. Configure at least one Claude Code Routine (action item #3) to start the agentic PM loop
 
 **Human action needed before next session:**
-- Execute migration 016 (action item #14 above)
-- Review MSFT and VZ phrases in admin panel (action item #15)
-- Deposit NKE generated content for Codex editorial review (action item #16)
+- Review phrases in admin panel (action item #1 — the most important unlock)
+- Configure at least one Claude Code Routine or Codex Automation (action items #3–#7)
 
-**Model:** `claude-sonnet-4-6`. Switch to `claude-opus-4-8` only if designing the ai-select prompt or the queue-builder promotion strategy from scratch.
-
-**Human action needed before session:**
-- Run `npx playwright install-deps` on VPS (one-time, unblocks test cron)
-- Review and configure at least one Routine (action items #3–#4)
+**Model:** `claude-sonnet-4-6` for all pipeline and repair work. Switch to `claude-opus-4-8` only for architectural decisions.
 
 ---
 

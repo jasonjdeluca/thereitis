@@ -174,9 +174,18 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] PR #11 merged
 - [x] Build `scripts/ingestion/ai-select.js` — done 2026-05-30 (session 5)
   - Reads `pending` rows (paginated), batches to Claude Haiku, top 40–50 marked ai_selected
-  - Run for MSFT: 4,790→50 ai_selected. Run for VZ: 5,120→50 ai_selected
-  - Admin PhraseReviewPanel updated to show ai_selected rows (falls back to pending pre-run)
-  - Migration 016 added (RLS UPDATE policy for anon key ai-select transitions) — pending human execution
+  - Migration 016 live (RLS UPDATE policy). WHERE-clause reject confirmed clean.
+- [x] Phase 1 pipeline run: 7 companies — 2026-05-30 (session 5)
+  - BA 17/17 fetched → 2,771 staged → 50 ai_selected
+  - TRV 9/17 fetched → 1,950 staged → 50 ai_selected (URL repair needed for older quarters)
+  - MRK 3/17 fetched → 985 staged → 50 ai_selected (URL repair needed)
+  - JPM 5/17 fetched → 1,369 staged → 50 ai_selected (URL repair needed)
+  - MMM 17/17 fetched → 4,506 staged → 50 ai_selected
+  - MSFT 15/17 (prior session), VZ 17/17 (prior session) — all confirmed clean
+  - **350 ai_selected phrases total across 7 companies awaiting human approval**
+- [ ] Repair MRK, JPM, TRV URL patterns — inspect failed queue rows, fix URL generation to capture older quarters
+- [ ] Add queue-builder builders for HD, WMT, DIS, NKE (all have confirmed official PDFs — high-value launch companies)
+- [ ] Run pipeline for HD, WMT, DIS, NKE once builders are wired
 
 ### Phase 2 — Docker container architecture
 
