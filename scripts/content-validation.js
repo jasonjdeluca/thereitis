@@ -1,16 +1,23 @@
 #!/usr/bin/env node
-// content-validation.js — validates all phrases and trivia for content quality issues.
-// Checks: over-length phrases, blank phrases, cross-company duplicates, possible person
-// names (two consecutive Title-Case words), trivia missing choices or correct_answer.
-// Output: reports/content-validation.json
+// content-validation.js — validates phrases and trivia for content quality issues.
+// Part A — DB checks: queries Supabase phrases and trivia_questions tables.
+// Part B — generated pack checks: scans company-packs/{ticker}/generated/ on disk.
+// Outputs: reports/content-validation.json
+//          company-packs/{ticker}/generated/validation_report.json (per pack, if generated/)
 
 import { createClient } from "@supabase/supabase-js";
-import { writeFileSync, mkdirSync } from "fs";
+import { writeFileSync, mkdirSync, readFileSync, readdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPORTS_DIR = join(__dirname, "../reports");
+const PACKS_DIR = join(__dirname, "../company-packs");
+
+const MAX_PHRASE_CHARS = 25;
+const MAX_TRIVIA_ANSWER_CHARS = 80;
+const MIN_PHRASES_READY = 50;
+const MIN_TRIVIA_READY = 12;
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
@@ -70,6 +77,141 @@ function looksLikePersonName(phrase) {
   }
   return null;
 }
+
+// ── Part B: generated pack checks ─────────────────────────────────────────────
+
+function validateGeneratedPack(ticker) {
+  const packDir = join(PACKS_DIR, ticker, "generated");
+  const phrasesPath = join(packDir, "phrases.json");
+  const triviaPath = join(packDir, "trivia.json");
+  const reportPath = join(packDir, "validation_report.json");
+
+  const issues = [];
+
+  // ── Phrases ──────────────────────────────────────────────────────────────────
+  let phrases = [];
+  if (!existsSync(phrasesPath)) {
+    issues.push({ type: "missing_file", file: "phrases.json", severity: "critical" });
+  } else {
+    try {
+      phrases = JSON.parse(readFileSync(phrasesPath, "utf8"));
+    } catch (e) {
+      issues.push({ type: "parse_error", file: "phrases.json", detail: e.message, severity: "critical" });
+    }
+  }
+
+  const seenPhrases = new Set();
+  for (const phrase of phrases) {
+    if (typeof phrase !== "string") {
+      issues.push({ type: "non_string_phrase", content: String(phrase), severity: "critical" });
+      continue;
+    }
+    const p = phrase.trim();
+    if (!p) {
+      issues.push({ type: "blank_phrase", severity: "critical" });
+      continue;
+    }
+    if (p.length > MAX_PHRASE_CHARS) {
+      issues.push({ type: "phrase_too_long", content: p, detail: `${p.length} chars`, severity: "critical" });
+    }
+    const nameMatch = looksLikePersonName(p);
+    if (nameMatch) {
+      issues.push({ type: "possible_person_name", content: p, detail: nameMatch, severity: "review" });
+    }
+    const key = p.toLowerCase();
+    if (seenPhrases.has(key)) {
+      issues.push({ type: "duplicate_phrase", content: p, severity: "warning" });
+    }
+    seenPhrases.add(key);
+  }
+
+  // ── Trivia ───────────────────────────────────────────────────────────────────
+  let trivia = [];
+  if (!existsSync(triviaPath)) {
+    issues.push({ type: "missing_file", file: "trivia.json", severity: "critical" });
+  } else {
+    try {
+      trivia = JSON.parse(readFileSync(triviaPath, "utf8"));
+    } catch (e) {
+      issues.push({ type: "parse_error", file: "trivia.json", detail: e.message, severity: "critical" });
+    }
+  }
+
+  for (const q of trivia) {
+    const requiredFields = ["question", "option_a", "option_b", "option_c", "option_d", "correct_answer"];
+    const missing = requiredFields.filter(k => !q[k]);
+    if (missing.length) {
+      issues.push({ type: "trivia_missing_fields", content: q.question || "(no question)", detail: missing.join(", "), severity: "critical" });
+      continue;
+    }
+    if (!["a", "b", "c", "d"].includes(q.correct_answer)) {
+      issues.push({ type: "trivia_invalid_answer", content: q.question, detail: `correct_answer="${q.correct_answer}"`, severity: "critical" });
+    }
+    const answers = [q.option_a, q.option_b, q.option_c, q.option_d];
+    for (const ans of answers) {
+      if (ans.length > MAX_TRIVIA_ANSWER_CHARS) {
+        issues.push({ type: "trivia_answer_too_long", content: q.question, detail: `"${ans.slice(0, 40)}…" (${ans.length} chars)`, severity: "warning" });
+      }
+    }
+    const allText = [q.question, q.option_a, q.option_b, q.option_c, q.option_d].join(" ");
+    const nameMatch = looksLikePersonName(allText);
+    if (nameMatch) {
+      issues.push({ type: "trivia_possible_person_name", content: q.question, detail: nameMatch, severity: "review" });
+    }
+  }
+
+  // ── Readiness assessment ──────────────────────────────────────────────────────
+  const criticalCount = issues.filter(i => i.severity === "critical").length;
+  const phraseReadiness = phrases.length >= MIN_PHRASES_READY ? "ready" : phrases.length >= 25 ? "below_target" : "insufficient";
+  const triviaReadiness = trivia.length >= MIN_TRIVIA_READY ? "ready" : "insufficient";
+  const ready = criticalCount === 0 && phraseReadiness === "ready" && triviaReadiness === "ready";
+
+  const result = {
+    ticker,
+    validated_at: new Date().toISOString(),
+    phrase_count: phrases.length,
+    trivia_count: trivia.length,
+    issues_critical: criticalCount,
+    issues_review: issues.filter(i => i.severity === "review").length,
+    issues_warning: issues.filter(i => i.severity === "warning").length,
+    phrase_readiness: phraseReadiness,
+    trivia_readiness: triviaReadiness,
+    ready_for_migration: ready,
+    issues,
+  };
+
+  // Merge into the existing ops-worker validation_report.json if present
+  if (existsSync(reportPath)) {
+    try {
+      const existing = JSON.parse(readFileSync(reportPath, "utf8"));
+      const merged = { ...existing, content_qa: result };
+      writeFileSync(reportPath, JSON.stringify(merged, null, 2));
+    } catch {
+      writeFileSync(reportPath, JSON.stringify({ content_qa: result }, null, 2));
+    }
+  } else {
+    writeFileSync(reportPath, JSON.stringify({ content_qa: result }, null, 2));
+  }
+
+  return result;
+}
+
+function scanGeneratedPacks() {
+  if (!existsSync(PACKS_DIR)) return [];
+  const results = [];
+  const tickers = readdirSync(PACKS_DIR, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => d.name);
+  for (const ticker of tickers) {
+    const genDir = join(PACKS_DIR, ticker, "generated");
+    if (existsSync(genDir)) {
+      results.push(validateGeneratedPack(ticker));
+    }
+  }
+  return results;
+}
+
+// ── Part A: DB checks ──────────────────────────────────────────────────────────
 
 async function run() {
   const { data: phrases, error: phraseErr } = await supabase
@@ -150,19 +292,31 @@ async function run() {
     }
   }
 
+  // Part B: scan generated packs on disk
+  const packResults = scanGeneratedPacks();
+  const packsReadyCount = packResults.filter(r => r.ready_for_migration).length;
+  const packsWithCritical = packResults.filter(r => r.issues_critical > 0).map(r => r.ticker);
+
   const report = {
     generated_at: new Date().toISOString(),
     summary: {
       total_phrases: phrases.length,
       flagged_count: flags.filter(f => f.type !== "trivia_invalid").length,
       trivia_flagged_count,
+      generated_packs_scanned: packResults.length,
+      generated_packs_ready: packsReadyCount,
+      generated_packs_with_critical_issues: packsWithCritical,
     },
     flags,
+    generated_packs: packResults,
   };
 
   mkdirSync(REPORTS_DIR, { recursive: true });
   writeFileSync(join(REPORTS_DIR, "content-validation.json"), JSON.stringify(report, null, 2));
-  console.log(`content-validation: ${phrases.length} phrases, ${flags.length} flags (${trivia_flagged_count} trivia)`);
+  console.log(
+    `content-validation: ${phrases.length} DB phrases, ${flags.length} DB flags (${trivia_flagged_count} trivia);` +
+    ` ${packResults.length} generated packs scanned, ${packsReadyCount} ready`
+  );
 }
 
 run().catch(err => {
