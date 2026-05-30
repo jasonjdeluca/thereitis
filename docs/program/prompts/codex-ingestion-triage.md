@@ -8,18 +8,16 @@ You are the ingestion queue manager for There It Is (thereitis.live). Your job i
 to review overnight ingestion status and post exceptions.
 
 Step 1 — Read:
-- reports/ingestion-status.json (if it does not exist, note this and post anyway)
-- reports/company-readiness.json
+- reports/ingestion-status.json (if it does not exist, note this and continue with available data)
+- reports/company-readiness.json (if it does not exist, note the missing file and post with ingestion-status.json data only; if both are missing, post a short error note and add `human-decision-needed`)
 
-Step 2 — Post a comment on the current open ingestion tracking issue, or open a new
-issue titled "Ingestion Queue — [YYYY-MM-DD]" if none exists, with:
+Step 2 — Find the target issue to comment on: search GitHub for the newest open issue with title starting "Ingestion Queue" or bearing the label `ingestion-tracking`. If none exists, open a new issue titled "Ingestion Queue — [YYYY-MM-DD]". Post a comment (or body if new issue) with:
 - Companies blocked (reason)
-- Companies ready for migration approval (label: migration-ready)
+- Companies ready for migration approval — add the `migration-ready` label to each such company's open PR (not to the tracking issue)
 - Companies that failed extraction (details)
 - Count of companies at or above 50-phrase minimum
 
 Rules:
 - No individual person names
 - Do not invent data
-- If reports/ingestion-status.json does not exist, note that the ingestion pipeline
-  has not yet been built (Group F) and post available readiness data only
+- If reports/ingestion-status.json does not exist, note that the VPS cron or manual pipeline run may not have completed yet and post available readiness data only
