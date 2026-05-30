@@ -53,13 +53,38 @@ function buildJpm() {
 }
 
 function buildVz() {
-  return quarterRange().map(({ q, year }) => ({
-    fiscal_quarter: quarterLabel(q, year),
-    call_date: null,
-    url: `https://www.verizon.com/about/investors/quarterly-reports/${q}q-${year}-earnings-conference-call-webcast`,
-    source_type: "html",
-    fetch_status: "pending",
-  }));
+  // Direct PDF download URLs from company-packs/VZ/source_manifest.json.
+  // Confirmed HTTP 200 + application/pdf by Codex Priority 4 validation.
+  const urls = {
+    "Q1 2022": "https://www.verizon.com/about/file/62151/download?token=HC6WCwrP",
+    "Q2 2022": "https://www.verizon.com/about/file/62865/download?token=sjehxgfb",
+    "Q3 2022": "https://www.verizon.com/about/file/64425/download?token=BUiaOe0M",
+    "Q4 2022": "https://www.verizon.com/about/file/65603/download?token=DwhjI6ap",
+    "Q1 2023": "https://www.verizon.com/about/file/66881/download?token=DQQDczTF",
+    "Q2 2023": "https://www.verizon.com/about/file/67335/download?token=xX3vz8CD",
+    "Q3 2023": "https://www.verizon.com/about/file/68583/download?token=jZUCSp3S",
+    "Q4 2023": "https://www.verizon.com/about/file/69609/download?token=7JlmsuAz",
+    "Q1 2024": "https://www.verizon.com/about/file/70909/download?token=Q7bcBEuq",
+    "Q2 2024": "https://www.verizon.com/about/file/72035/download?token=fhg2UZfo",
+    "Q3 2024": "https://www.verizon.com/about/sites/default/files/2024-10/VZ-Analyst-Meeting-Transcript-102224_0.pdf",
+    "Q4 2024": "https://www.verizon.com/about/file/74443/download?token=S12AI4uX",
+    "Q1 2025": "https://www.verizon.com/about/file/75373/download?token=zTlud4Fy",
+    "Q2 2025": "https://www.verizon.com/about/file/75853/download?token=I0qvRZQd",
+    "Q3 2025": "https://www.verizon.com/about/file/76679/download?token=ct6jo14C",
+    "Q4 2025": "https://www.verizon.com/about/file/77405/download?token=XTRzK52Y",
+    "Q1 2026": "https://www.verizon.com/about/file/77847/download?token=DCOVBtyf",
+  };
+  return quarterRange().map(({ q, year }) => {
+    const label = quarterLabel(q, year);
+    const key = `Q${q} ${year}`;
+    return {
+      fiscal_quarter: label,
+      call_date: null,
+      url: urls[key] || null,
+      source_type: "pdf",
+      fetch_status: urls[key] ? "pending" : "failed",
+    };
+  });
 }
 
 function buildTrv() {

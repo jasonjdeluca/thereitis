@@ -27,6 +27,11 @@ function validatePhrase(phrase, flags) {
   if (!phrase.includes(" ")) {
     return { status: "rejected", reason: "single_word" };
   }
+  // Reject character-spaced PDF artifacts: any token that is a single non-'a' letter
+  const tokens = phrase.split(/\s+/);
+  if (tokens.some((t) => t.length === 1 && /[b-z]/i.test(t))) {
+    return { status: "rejected", reason: "single_char_token" };
+  }
   return { status: "valid", reason: null };
 }
 
