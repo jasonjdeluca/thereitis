@@ -4,7 +4,7 @@
     "group": "E",
     "status": "review_needed",
     "target_path": "company-research/HON.json",
-    "notes": "Honeywell transcript source research deposit for FY Q1 2022 through FY Q1 2026. Official search in prior handover found no accepted written transcript; StockAnalysis provides readable speaker-by-speaker transcript pages for all in-scope fiscal quarters."
+    "notes": "Honeywell Priority 6 official PDF source repair: 0/17 rows now point to official or official-vendor transcript PDFs; 17/17 remain StockAnalysis fallback with official_search_exhausted=true."
   },
   "company": "Honeywell",
   "ticker": "HON",
@@ -15,7 +15,9 @@
     "quarters_found": 17,
     "complete": true,
     "primary_structured_source": "StockAnalysis transcript pages",
-    "official_source_context": null
+    "official_source_context": "Official Honeywell IR quarterly-results and online investor-kit pages checked; releases, presentations, filings, and webcasts found, but no transcript PDFs.",
+    "official_rows_resolved": 0,
+    "third_party_fallback_rows": 17
   },
   "official_domains_checked": [
     "investor.honeywell.com"
