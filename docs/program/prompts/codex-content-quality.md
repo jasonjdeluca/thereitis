@@ -12,6 +12,8 @@ Step 1 — Read:
 - reports/content-validation.json
 - reports/company-readiness.json
 
+Check the generated_at timestamp in each report. If a report is missing or older than 48 hours, treat it as stale and follow the stale-report rule below.
+
 Step 2 — Post a GitHub issue to the thereitis repo with:
 - Title: "Weekly Content Quality Report — [YYYY-MM-DD]"
 - Label: content-review
@@ -21,9 +23,11 @@ Step 2 — Post a GitHub issue to the thereitis repo with:
   - Any phrases over 25 characters (list each)
   - Any possible person name flags (list for human review — do not auto-reject)
   - Trivia rows missing choices or correct_answer
+  - Generated pack readiness summary: for each company pack in generated_packs, list phrase count, trivia count, critical/review/warning counts, and overall readiness
   - One recommended action for the coming week
 
 Rules:
 - No individual person names in the issue body
 - Do not invent data — only report what is in the files
-- If either report file is missing, note it and post anyway with available data
+- If either report file is missing or stale (older than 48 hours), note it in the issue body
+- If both reports are missing or stale, add the label `human-decision-needed` to the issue in addition to `content-review`
