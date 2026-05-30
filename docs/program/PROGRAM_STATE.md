@@ -59,7 +59,7 @@
 | VZ queue-builder was using HTML webcast URLs | Resolved | Fixed in PR #26: updated to use direct PDF download URLs from source_manifest.json. VZ re-run successful (5,120 phrases staged). |
 | PDF character-spaced headers produce garbage n-grams | Resolved | Fixed in PR #26: validator now rejects any phrase where a token is a single non-'a' letter (`single_char_token` rejection reason). VZ re-run confirmed clean top phrases. |
 | Priority 6 promotions complete (BA/KO/MMM/CAT/SHW) | Resolved | BA (17/17 q4cdn), KO (17/17 official IR), MMM (17/17 CloudFront), CAT (9/17 q4cdn + 8/17 StockAnalysis), SHW (8/17 q4cdn + 9/17 StockAnalysis). source_manifest.json promoted and queue-builder wired for all 5. IBM (4/17) and CRM (1/17) deferred — too few official rows to be useful. |
-| Migration 016 pending execution | Medium | `016_phrase_staging_ai_select_policy.sql` — adds RLS UPDATE policy allowing anon key to transition phrase_staging rows from 'pending' to 'ai_selected' or 'ai_rejected'. Required before `ai-select.js` can update rows in production. |
+| Migration 016 applied | Resolved | `016_phrase_staging_ai_select_policy.sql` applied via MCP 2026-05-30 (session 5). RLS UPDATE policy live. `ai-select.js` writes confirmed working: MSFT 50 ai_selected / 4,740 ai_rejected; VZ 50 ai_selected / 5,070 ai_rejected. |
 | NKE trivia gap | Low | Stage 4 generated only 4 NKE trivia questions; minimum for activation is 12. Codex Priority 7 editorial review will flag this. Stage 4 trivia prompt needs strengthening. |
 
 ---
@@ -81,8 +81,8 @@
 | 11 | **All PRs #19–#24 and #26 merged** | ✅ Done 2026-05-30. All on main. |
 | 12 | **Review LAUNCH_KIT.md** | `docs/program/LAUNCH_KIT.md` promoted and on main. Review copy; replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing anything. |
 | 13 | **Priority 6 promotions complete** | ✅ Done 2026-05-30 (session 5). BA, KO, MMM, CAT, SHW manifests promoted and queue-builder wired. |
-| 14 | **Execute migration 016** | `supabase/migrations/016_phrase_staging_ai_select_policy.sql` — run in Supabase SQL editor. Adds RLS UPDATE policy allowing anon key to set ai_selected/ai_rejected. Required before `ai-select.js` can write status updates to phrase_staging. |
-| 15 | **Review MSFT and VZ phrases in admin panel** | Go to `/admin` → Phrase Staging Review. 50 ai_selected phrases per company are ready. Approve the good ones, reject the bad. Run migration 016 first. |
+| 14 | **Migration 016 applied** | ✅ Done 2026-05-30 (session 5). |
+| 15 | **Review MSFT and VZ phrases in admin panel** | Go to `/admin` → Phrase Staging Review. 50 ai_selected phrases per company are ready. Approve the good ones, reject the bad. |
 | 16 | **Deposit NKE generated files for Codex Priority 7** | `company-packs/NKE/generated/phrases.json` and `trivia.json` need to be committed under `codex/staging/` before Codex can do the editorial review. These files are in the ops-worker output volume on the host; they were never committed to the repo. |
 
 ---
