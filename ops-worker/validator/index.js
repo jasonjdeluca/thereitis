@@ -32,6 +32,14 @@ const FILLER_BLOCKLIST = new Set([
   'moving forward', 'we believe that', 'we continue to', 'we are pleased',
   'very pleased', 'very excited', 'we remain focused', 'remain focused',
   'on a year', 'year over year', 'basis points', 'earnings per share',
+  // Call ceremony phrases (operator/host boilerplate)
+  'good afternoon everyone', 'good morning everyone', 'good evening everyone',
+  'thank you for joining', 'thank you for joining us', 'thank you operator',
+  'for your question', 'for the question', 'questions and answers',
+  'our next question', 'your next question', 'next question please',
+  'please go ahead', 'you may proceed', 'open the line', 'open for questions',
+  'joining the call', 'on the call today', 'on the call with us',
+  'conference call', 'earnings conference', 'earnings call today',
 ]);
 
 function openDb() {
@@ -65,32 +73,23 @@ async function stage4Enrich(candidates, ticker, companyName) {
 
   const prompt = `You are curating bingo card content for ${companyName} (${ticker}) earnings calls.
 
-NON-NEGOTIABLE RULES:
-- Every phrase must be 25 characters or fewer (count all spaces and characters)
-- CEO Mode: zero individual person names anywhere in phrases, questions, or answers
-- Phrases must be specific to ${companyName}'s voice — not generic financial jargon any company says
-- Prefer phrases that sound like they come from an actual earnings call script
+HARD RULES — violations cause automatic rejection:
+1. Every phrase: 25 characters or fewer (count spaces; "long term growth" = 16 chars)
+2. STRICTLY NO person names anywhere: not in phrases, not in trivia questions, not in any answer option. This means no first names, no last names, no names of any real person living or dead. Use role titles only (e.g. "the CEO", "the CFO", "the analyst").
+3. Phrases must be specific to ${companyName} — not generic boilerplate any company says
+4. Avoid call-opening ceremony phrases like "good afternoon everyone" or "thank you for joining"
 
-CANDIDATE PHRASES (pre-filtered, scored by how many quarters they appeared in):
+CANDIDATE PHRASES (scored by quarters appeared in):
 ${candidateList}
 
-Return valid JSON with exactly two keys:
+Return JSON with exactly:
 {
-  "phrases": ["phrase 1", "phrase 2"],
-  "trivia": [
-    {
-      "question": "...",
-      "option_a": "...",
-      "option_b": "...",
-      "option_c": "...",
-      "option_d": "...",
-      "correct_answer": "a"
-    }
+  "phrases": ["phrase", ...],   // 40-50 items, each ≤25 chars, no person names
+  "trivia": [                   // 12-18 items about ${companyName} as a company, products, history, financials
+    { "question": "...", "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...", "correct_answer": "a" }
   ]
 }
-
-Target: 40-50 phrases, 12-18 trivia items. No person names anywhere. correct_answer is "a", "b", "c", or "d".
-Respond with JSON only — no markdown, no explanation.`;
+correct_answer must be "a", "b", "c", or "d". JSON only, no markdown.`;
 
   const response = await client.messages.create({
     model: 'claude-haiku-4-5-20251001',

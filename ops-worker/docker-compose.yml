@@ -28,5 +28,3 @@ services:
       - ../data:/app/data
     env_file:
       - ../.env
-    environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}

@@ -56,9 +56,11 @@ def open_db() -> sqlite3.Connection:
     return conn
 
 
-def extract_text(pdf_path: Path) -> str:
+def extract_text(transcript_path: Path) -> str:
+    if transcript_path.suffix.lower() == '.txt':
+        return transcript_path.read_text(encoding='utf-8', errors='replace')
     parts = []
-    with pdfplumber.open(pdf_path) as pdf:
+    with pdfplumber.open(transcript_path) as pdf:
         for page in pdf.pages:
             text = page.extract_text()
             if text:
@@ -118,19 +120,19 @@ def process_company(conn: sqlite3.Connection, company_id: str, ticker: str) -> N
 
     for row in quarters:
         fq = row["fiscal_quarter"]
-        pdf_path = Path(row["transcript_path"])
+        transcript_path = Path(row["transcript_path"])
 
-        if not pdf_path.exists():
+        if not transcript_path.exists():
             conn.execute(
                 "UPDATE phase2_quarters SET extract_status='failed', extract_error=?, updated_at=datetime('now') WHERE company_id=? AND fiscal_quarter=?",
-                ("PDF file not found", company_id, fq),
+                ("Transcript file not found", company_id, fq),
             )
             conn.commit()
             fail += 1
             continue
 
         try:
-            text = extract_text(pdf_path)
+            text = extract_text(transcript_path)
             if not text.strip():
                 raise ValueError("Extracted text is empty")
 

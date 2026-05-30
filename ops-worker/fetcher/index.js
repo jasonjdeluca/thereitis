@@ -91,23 +91,41 @@ function seedJobs(db) {
     const quarters = manifest.quarters ?? [];
     if (!quarters.length) continue;
 
-    // Only seed companies where all quarters have direct PDF URLs (no crawl needed)
-    const directUrls = quarters.filter(q => q.accepted_url &&
-      (q.source_type === 'official_company_domain' ||
-       q.source_type === 'official_ir_subdomain' ||
-       q.source_type === 'official_ir_vendor_linked_asset'));
-
-    if (directUrls.length === 0) continue;
+    // Accept both official PDF sources and third-party HTML transcript pages
+    const queueable = quarters.filter(q => q.accepted_url);
+    if (queueable.length === 0) continue;
 
     const companyId = ticker.toLowerCase();
-    upsertJob.run(companyId, ticker, directUrls.length);
-    for (const q of directUrls) {
+    upsertJob.run(companyId, ticker, queueable.length);
+    for (const q of queueable) {
       upsertQ.run(companyId, q.fiscal_quarter, q.accepted_url, q.source_type);
     }
     seeded++;
   }
 
-  log(`Seeded ${seeded} companies with direct PDF URLs.`);
+  log(`Seeded ${seeded} companies (official PDF + third-party HTML).`);
+}
+
+const THIRD_PARTY_HTML_HOSTS = ['stockanalysis.com', 'fool.com', 'nasdaq.com', 'seekingalpha.com'];
+
+function isHtmlSource(source_type, url) {
+  if (source_type === 'third_party_transcript_provider') return true;
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return THIRD_PARTY_HTML_HOSTS.some(h => host === h || host.endsWith('.' + h));
+  } catch { return false; }
+}
+
+function extractHtmlText(html) {
+  // Strip tags, collapse whitespace — lightweight text extraction without cheerio
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 async function downloadPdf(url, destPath) {
@@ -164,15 +182,26 @@ async function main() {
       if (i > 0) await sleep(DELAY_MS);
 
       const safeFQ = q.fiscal_quarter.replace(/\s+/g, '-').replace(/[^\w.-]/g, '');
-      const pdfPath = path.join(transcriptsDir, `${safeFQ}.pdf`);
+      const useHtml = isHtmlSource(q.source_type, q.accepted_url);
+      const destPath = path.join(transcriptsDir, `${safeFQ}.${useHtml ? 'txt' : 'pdf'}`);
 
-      log(`  [${q.fiscal_quarter}] ${q.accepted_url}`);
+      log(`  [${q.fiscal_quarter}] ${useHtml ? 'html' : 'pdf'} — ${q.accepted_url}`);
       try {
-        const bytes = await downloadPdf(q.accepted_url, pdfPath);
-        setQ.run('fetched', pdfPath, null, job.company_id, q.fiscal_quarter);
+        let bytes;
+        if (useHtml) {
+          const res = await fetch(q.accepted_url, { headers: { 'User-Agent': USER_AGENT }, redirect: 'follow' });
+          if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+          const text = extractHtmlText(await res.text());
+          if (text.length < 500) throw new Error(`Extracted text too short (${text.length} chars)`);
+          writeFileSync(destPath, text, 'utf8');
+          bytes = text.length;
+        } else {
+          bytes = await downloadPdf(q.accepted_url, destPath);
+        }
+        setQ.run('fetched', destPath, null, job.company_id, q.fiscal_quarter);
         incrFetched.run(job.company_id);
         fetched++;
-        log(`  → ${bytes.toLocaleString()} bytes`);
+        log(`  → ${bytes.toLocaleString()} chars/bytes`);
       } catch (e) {
         setQ.run('failed', null, e.message, job.company_id, q.fiscal_quarter);
         failed++;
