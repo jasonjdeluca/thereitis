@@ -75,6 +75,10 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - `human-decision-needed` (red) — requires human review before proceeding
   - `content-review` (yellow) — phrase or trivia content needs editorial judgment
   - `migration-ready` (green) — SQL has been reviewed and is ready for human execution
+- [ ] Resolve prompt file naming conflict — Claude Code wrote five prompt files under one naming convention; Codex proposed the same five under different names
+  - Decide canonical filenames and retire the duplicate set
+  - Owner: Claude Code
+  - Note: blocking — Group C platform configuration cannot be finalized until resolved
 
 ---
 
@@ -115,6 +119,18 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Run Codex transcript research batch 5 (companies 21–25, if applicable)
 - [x] Flag any companies with no accessible transcripts for human escalation
 - [x] Review and approve all source manifests before handing to Group F fetcher
+- [ ] Complete transcript source research for remaining thin-coverage blue-chip companies — AAPL, NVDA, AMZN, CSCO, CAT (partial), BA, HON, MMM, SHW, HD, MCD, WMT, NKE, DIS, KO, CRM (partial)
+  - Deposit findings to `codex/staging/company-research/` using the established output schema — one file per ticker
+  - Owner: Codex
+- [ ] Reconcile Markdown table research output vs JSON blocks for all completed blue-chip companies — flag any quarter where the table and JSON disagree
+  - Owner: Codex
+- [ ] Define and create `source_manifest.json` per company for all 30 blue-chip companies
+  - Input: Codex research findings in `codex/staging/company-research/`
+  - Output: `company-packs/{ticker}/source_manifest.json` using the established schema
+  - Owner: Claude Code (schema validation script), Codex (populate from research findings)
+- [ ] Validate all direct PDF links for JNJ, Walmart, Nike, Disney, Salesforce, IBM, Coca-Cola, 3M, Visa, Travelers, and Merck programmatically before ingestion
+  - Spot-check per link: HTTP 200, Content-Type: application/pdf, quarter/date matches filename, transcript text confirmed
+  - Owner: Claude Code (validation script)
 
 ---
 
@@ -183,6 +199,9 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - Reads `generated/phrases.json` and `generated/trivia.json`
   - Reviews candidates against QA rubric
   - Posts review as GitHub comment on the ingestion PR with recommended approvals, rejections, and edits
+- [ ] Write `docs/program/prompts/codex-content-editorial-review.md`
+  - Prompt for Codex editorial review triggered once per company when Stage 4 generation is complete
+  - Owner: Claude Code
 
 ---
 
@@ -274,6 +293,18 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
+## Cross-Cutting Tasks
+*Surfaced by Codex handover intake 2026-05-29*
+
+- [ ] Add all 30 blue-chip companies to the `companies` table — output migration SQL for human execution
+  - Output as `supabase/migrations/{next-number}_add_bluechip_companies.sql`
+  - Owner: Claude Code (SQL output), Human (execution)
+- [ ] Decide canonical location for `latest_ingested_quarter` metadata per company — Supabase `companies` table, `company.json` per pack, or both
+  - Owner: Human decision
+  - Blocking: Group H transcript-freshness.js depends on this field being queryable
+
+---
+
 ## Decision Log
 
 | Date | Decision | Rationale |
@@ -287,4 +318,4 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
-*Last updated: May 2026. Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
+*Last updated: 2026-05-30. Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*

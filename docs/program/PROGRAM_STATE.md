@@ -20,9 +20,9 @@
 |---|---|---|---|
 | A | Live Game Stability | ✅ Complete | Silent fallback removed, zero-phrase companies fixed, trivia generalized, readiness gate added |
 | B | Deterministic Truth Layer | ✅ Complete | All 4 scripts built and deployed; VPS cron running at 6:00am and 9:00pm ET |
-| C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; Claude Code Routines and Codex Automations not yet configured in their platforms |
+| C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written; platform configuration pending. Prompt file naming conflict between Claude Code and Codex conventions identified — must be resolved before platform configuration can proceed. |
 | D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
-| E | Transcript Research | ✅ Complete | 32 companies researched across 5 Codex batches; source manifests complete; 6 open human review items documented |
+| E | Transcript Research | 🔄 In Progress | Hospitality/REIT research complete (32 companies, 5 Codex batches). Blue-chip research partially complete from Codex handover — 11 companies with confirmed official sources; remainder thin or not started. Transcript reconciliation and manifest creation pending. |
 | F | Ingestion Pipeline | 🔄 In Progress | Phase 1 (Node.js pipeline) complete — MSFT validated end-to-end, 4,790 phrases staged; Phase 2 (Docker architecture) not started |
 | G | Content QA | ⬜ Not Started | Depends on Group F generating output; no validation expansion or QA rubric written yet |
 | H | Evergreen Maintenance | ⬜ Not Started | Depends on Group F operational; freshness watcher and stale detector not built |
@@ -48,6 +48,7 @@
 | Opus for architecture, Sonnet for execution | Use `claude-opus-4-8` when designing new systems or making architectural decisions. Use `claude-sonnet-4-6` for well-defined implementation tickets and inspection work. |
 | Model ID strings | Opus 4.8: `claude-opus-4-8` · Sonnet 4.6: `claude-sonnet-4-6` · Haiku 4.5: `claude-haiku-4-5-20251001` |
 | Production SQL requires human approval | All Supabase migrations must be output as SQL files and executed manually by the human. Never auto-run. |
+| codex/staging ↔ codex/inbox pipeline | Shared staging branch protocol live on main. Codex deposits work to `codex/staging/`; Claude Code writes task assignments and responses to `codex/inbox/`. `PROTOCOL.md` is the source of truth. |
 
 ---
 
@@ -64,7 +65,9 @@
 | 7 | **IHG manual PDF sourcing** | IHG uses non-standard event format (Trading Updates / Half Year Results). PDFs must be sourced manually and placed into `company-packs/IHG/transcripts/`. |
 | 8 | **Review human_review_required sources before ingestion** | RHP (intermittent PDFs Q1/Q4 2022, Q1 2023), CLDT (historical quarters low-confidence), AHT (Q1 2026 missing), JNJ (several quarters pattern-matched not directly verified). See `docs/research/transcript-source-manifest.md` Open Human Review Items table. |
 | 9 | **Add hospitality REIT companies to DB** | HST, RHP, APLE, PK, RLJ, CLDT, AHT are researched but not yet in the `companies` table. Required before ingestion pipeline can process them. |
-| 10 | **Third-party transcript licensing review** | Before ingesting from StockAnalysis, MarketBeat, Motley Fool, etc. — confirm reuse is permitted. Policy decision, not a code task. |
+| 10 | **Add 30 blue-chip companies to DB** | Claude Code will output migration SQL. Human executes against production Supabase. Required before blue-chip ingestion pipeline can process any of these companies. |
+| 11 | **Decide latest_ingested_quarter metadata location** | Canonical location for this field per company: Supabase `companies` table, `company.json` per pack, or both. Blocking Group H freshness watcher build. |
+| 12 | **Clarify official-linked IR vendor/CDN asset policy** | Confirm whether official IR vendor-linked transcript assets (CDN PDFs linked from company IR pages) count as "official" for source confidence and launch candidacy. Affects JNJ, Visa, Travelers, Nike, and others. |
 
 ---
 
