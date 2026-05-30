@@ -396,7 +396,13 @@ function PhraseReviewPanel() {
     const statusCounts = {};
     (stagingRes.data || []).forEach((r) => {
       if (!statusCounts[r.company_id]) {
-        statusCounts[r.company_id] = { pending: 0, approved: 0, rejected: 0 };
+        statusCounts[r.company_id] = {
+          pending: 0,
+          ai_selected: 0,
+          ai_rejected: 0,
+          approved: 0,
+          rejected: 0,
+        };
       }
       if (statusCounts[r.company_id][r.status] != null) {
         statusCounts[r.company_id][r.status] += 1;
@@ -405,7 +411,15 @@ function PhraseReviewPanel() {
 
     setCompaniesMap(cmap);
     setCounts(statusCounts);
-    setPending((stagingRes.data || []).filter((r) => r.status === "pending"));
+    // Show ai_selected rows if any exist; fall back to pending for companies
+    // that have not yet been run through ai-select.js.
+    const allRows = stagingRes.data || [];
+    const hasAiSelected = allRows.some((r) => r.status === "ai_selected");
+    setPending(
+      allRows.filter((r) =>
+        r.status === (hasAiSelected ? "ai_selected" : "pending"),
+      ),
+    );
     setTableMissing(false);
     setLoading(false);
   }
@@ -416,7 +430,13 @@ function PhraseReviewPanel() {
 
   function bumpCounts(companyId, from, to) {
     setCounts((prev) => {
-      const c = prev[companyId] || { pending: 0, approved: 0, rejected: 0 };
+      const c = prev[companyId] || {
+        pending: 0,
+        ai_selected: 0,
+        ai_rejected: 0,
+        approved: 0,
+        rejected: 0,
+      };
       return {
         ...prev,
         [companyId]: {
@@ -452,7 +472,7 @@ function PhraseReviewPanel() {
       return false;
     }
     setPending((prev) => prev.filter((r) => r.id !== row.id));
-    bumpCounts(row.company_id, "pending", "approved");
+    bumpCounts(row.company_id, row.status, "approved");
     return true;
   }
 
@@ -469,7 +489,7 @@ function PhraseReviewPanel() {
       return;
     }
     setPending((prev) => prev.filter((r) => r.id !== row.id));
-    bumpCounts(row.company_id, "pending", "rejected");
+    bumpCounts(row.company_id, row.status, "rejected");
   }
 
   async function bulkApprove(companyId) {
@@ -509,12 +529,13 @@ function PhraseReviewPanel() {
     );
   }
 
-  // Companies that currently have pending phrases, in a stable order.
+  // Companies that currently have reviewable phrases, in a stable order.
   const companyIds = [...new Set(pending.map((r) => r.company_id))].sort(
     (a, b) =>
       (companiesMap[a]?.name || a).localeCompare(companiesMap[b]?.name || b),
   );
   const visibleIds = filter === "all" ? companyIds : companyIds.filter((id) => id === filter);
+  const reviewStatus = pending[0]?.status === "ai_selected" ? "ai-selected" : "pending";
 
   return (
     <section className="rounded-2xl bg-navy-2/80 border border-cream/10 overflow-hidden">
@@ -524,7 +545,7 @@ function PhraseReviewPanel() {
             Phrase Staging Review
           </h2>
           <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gold/15 text-gold border border-gold/30">
-            {pending.length} pending
+            {pending.length} {reviewStatus}
           </span>
         </div>
         <select
@@ -549,13 +570,19 @@ function PhraseReviewPanel() {
 
       {pending.length === 0 ? (
         <div className="text-cream/40 text-sm text-center py-6">
-          No pending phrases to review.
+          No phrases to review. Run <code className="text-gold text-[10px]">ai-select.js</code> to stage candidates.
         </div>
       ) : (
         <div className="divide-y divide-cream/10">
           {visibleIds.map((id) => {
             const company = companiesMap[id];
-            const c = counts[id] || { pending: 0, approved: 0, rejected: 0 };
+            const c = counts[id] || {
+              pending: 0,
+              ai_selected: 0,
+              ai_rejected: 0,
+              approved: 0,
+              rejected: 0,
+            };
             const groupRows = pending.filter((r) => r.company_id === id);
             return (
               <div key={id} className="p-4">
@@ -566,13 +593,16 @@ function PhraseReviewPanel() {
                       {company?.name || id}
                     </span>
                     <span className="text-[10px] text-cream/40">
-                      {c.pending} pending · {c.approved} approved · {c.rejected} rejected
+                      {c.ai_selected > 0
+                        ? `${c.ai_selected} ai-selected`
+                        : `${c.pending} pending`}
+                      {" · "}{c.approved} approved · {c.rejected} rejected
                     </span>
                   </div>
                   <button
                     onClick={() => bulkApprove(id)}
                     className="rounded-lg bg-gold/10 border border-gold/30 text-gold px-3 py-1.5 text-xs font-semibold hover:bg-gold/20 transition"
-                    title="Approve all pending phrases for this company that have no flags"
+                    title="Approve all reviewable phrases for this company that have no flags"
                   >
                     Bulk approve (no flags)
                   </button>

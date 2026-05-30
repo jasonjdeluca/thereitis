@@ -1,0 +1,34 @@
+[
+  {
+    "question": "In what year was Nike founded?",
+    "option_a": "1964",
+    "option_b": "1972",
+    "option_c": "1980",
+    "option_d": "1995",
+    "correct_answer": "a"
+  },
+  {
+    "question": "When did Nike go public?",
+    "option_a": "1980",
+    "option_b": "1982",
+    "option_c": "1985",
+    "option_d": "1990",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What percentage of Nike's revenue comes from women?",
+    "option_a": "20%",
+    "option_b": "35%",
+    "option_c": "50%",
+    "option_d": "65%",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In what year did Nike acquire Converse?",
+    "option_a": "2001",
+    "option_b": "2002",
+    "option_c": "2003",
+    "option_d": "2004",
+    "correct_answer": "b"
+  }
+]

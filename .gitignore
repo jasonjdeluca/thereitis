@@ -23,6 +23,15 @@ reports/
 data/*
 !data/.gitkeep
 
+# Company-pack runtime artifacts (raw PDFs, extracted text, intermediate candidates)
+# The generated/ subdirectory is intentionally committed; everything else is runtime.
+company-packs/*/transcripts/
+company-packs/*/extracted/
+company-packs/*/candidate_phrases.json
+
+# Test artifacts
+test-results/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
