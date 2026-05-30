@@ -1,0 +1,30 @@
+# Phase 2 ingestion pipeline — three one-shot containers.
+# Run in sequence via ops-worker/run-pipeline.sh:
+#   fetcher → extractor → validator
+# All three share the company-packs volume and SQLite queue DB.
+
+services:
+  fetcher:
+    build: ./fetcher
+    volumes:
+      - ../company-packs:/app/company-packs
+      - ../data:/app/data
+    env_file:
+      - ../.env
+    environment:
+      - DELAY_MS=${DELAY_MS:-2000}
+      - COMPANY_LIMIT=${COMPANY_LIMIT:-5}
+
+  extractor:
+    build: ./extractor
+    volumes:
+      - ../company-packs:/app/company-packs
+      - ../data:/app/data
+
+  validator:
+    build: ./validator
+    volumes:
+      - ../company-packs:/app/company-packs
+      - ../data:/app/data
+    env_file:
+      - ../.env

@@ -80,25 +80,22 @@ This packet is the input for the Claude Code Routine daily PM brief and Codex Au
 
 ---
 
-## transcript-freshness.js
+## release-readiness.js
 
-**Input:** Supabase `companies` table — `latest_ingested_quarter`, `next_earnings_date`, `is_active`.
+**Input:** `reports/company-readiness.json`, `reports/content-validation.json`,
+`reports/migration-check.json` (required); `reports/transcript-freshness.json`,
+`reports/playwright-results.json` (optional).
 
-**Output:** `reports/transcript-freshness.json`
+**Output:** `reports/release-readiness.json`
 
-Checks every company for transcript coverage health:
-- Never ingested (active company, `latest_ingested_quarter` is null) — critical
-- Stale coverage (3+ calendar quarters since last ingestion) — critical
-- Approaching stale (2 quarters behind) — warning
-- Earnings approaching within 14 days — info/warning
-- Post-call transcript needed (earnings passed 0–10 days ago without updated quarter) — critical
-- Active company missing `next_earnings_date` — warning
+Aggregates all report files into a single go/no-go posture:
+- **Red** — blocker present (active company with 0 phrases, phrase too long, migration error, smoke test failure, no active company with ≥50 phrases)
+- **Yellow** — warnings only (stale reports, companies below threshold, missing optional reports)
+- **Green** — all clear
 
-Exits with code 1 if any critical flags are present.
+Exits code 1 if posture is Red. Run manually or via weekly Codex Automation.
 
-See `docs/program/EVERGREEN_MAINTENANCE_RUNBOOK.md` for the full field format and workflow.
-
-**Cron:** 6:00am ET and 9:00pm ET daily (Group H).
+**Run manually:** `node scripts/release-readiness.js`
 
 ---
 
@@ -109,14 +106,12 @@ See `docs/program/EVERGREEN_MAINTENANCE_RUNBOOK.md` for the full field format an
 0 11 * * * cd /path/to/thereitis && node scripts/company-readiness.js >> /var/log/thereitis-cron.log 2>&1
 0 11 * * * cd /path/to/thereitis && node scripts/content-validation.js >> /var/log/thereitis-cron.log 2>&1
 0 11 * * * cd /path/to/thereitis && node scripts/migration-check.js >> /var/log/thereitis-cron.log 2>&1
-0 11 * * * cd /path/to/thereitis && node scripts/transcript-freshness.js >> /var/log/thereitis-cron.log 2>&1
 15 11 * * * cd /path/to/thereitis && node scripts/pm-packet.js >> /var/log/thereitis-cron.log 2>&1
 
 # 9:00pm ET — refresh before overnight AI runs
 0 2 * * * cd /path/to/thereitis && node scripts/company-readiness.js >> /var/log/thereitis-cron.log 2>&1
 0 2 * * * cd /path/to/thereitis && node scripts/content-validation.js >> /var/log/thereitis-cron.log 2>&1
 0 2 * * * cd /path/to/thereitis && node scripts/migration-check.js >> /var/log/thereitis-cron.log 2>&1
-0 2 * * * cd /path/to/thereitis && node scripts/transcript-freshness.js >> /var/log/thereitis-cron.log 2>&1
 15 2 * * * cd /path/to/thereitis && node scripts/pm-packet.js >> /var/log/thereitis-cron.log 2>&1
 ```
 
