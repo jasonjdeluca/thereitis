@@ -4,7 +4,7 @@
     "group": "E",
     "status": "review_needed",
     "target_path": "company-research/JPM.json",
-    "notes": "JPMorgan Chase official source repair pass. Resolved 6 official transcript rows; retained 11 third-party fallback rows where no official direct transcript asset was resolved."
+    "notes": "JPMorgan Chase deeper official source repair pass. Resolved 8 official transcript rows; retained 9 fallback rows where no official direct transcript asset was resolved."
   },
   "company": "JPMorgan Chase",
   "ticker": "JPM",
@@ -22,8 +22,8 @@
     },
     "human_review_required": false,
     "human_review_reason": null,
-    "official_rows_resolved": 6,
-    "third_party_fallback_rows": 11
+    "official_rows_resolved": 8,
+    "third_party_fallback_rows": 9
   },
   "official_domains_checked": [
     "jpmorganchase.com",
@@ -176,32 +176,30 @@
       "ticker": "JPM",
       "fiscal_quarter": "FY Q2 2024",
       "call_date": "Jul 12, 2024",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/158188-q2-2024/",
-      "status": "official_pdf_not_resolved_third_party_retained",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
-      "official_search_exhausted": true,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2024/2nd-quarter/jpm-2q24-earnings-call-transcript-final.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
+      "official_search_exhausted": false,
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved during deeper repair."
     },
     {
       "company": "JPMorgan Chase",
       "ticker": "JPM",
       "fiscal_quarter": "FY Q3 2024",
       "call_date": "Oct 11, 2024",
-      "accepted_url": "https://stockanalysis.com/stocks/jpm/transcripts/184711-q3-2024/",
-      "status": "official_pdf_not_resolved_third_party_retained",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
-      "official_search_exhausted": true,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "accepted_url": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/quarterly-earnings/2024/3rd-quarter/jpmc-third-quarter-2024-earnings-conference-call-transcript.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "jpmorganchase.com",
+      "official_search_exhausted": false,
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
+      "evidence_note": "Official JPMorgan Chase quarterly earnings transcript PDF resolved during deeper repair."
     },
     {
       "company": "JPMorgan Chase",
@@ -307,6 +305,10 @@
     {
       "date": "2026-05-30",
       "note": "Targeted official-source repair resolved 6 of 17 rows. 11 rows retain third-party accepted_url with official_search_exhausted=true because no direct official transcript asset was resolved in this pass."
+    },
+    {
+      "date": "2026-05-30",
+      "note": "Priority 4 deeper repair added 2 official transcript rows. Current official coverage: 8/17; fallback rows: 9/17."
     }
   ]
 }

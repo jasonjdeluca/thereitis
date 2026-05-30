@@ -4,7 +4,7 @@
     "group": "E",
     "status": "review_needed",
     "target_path": "company-research/MRK.json",
-    "notes": "Merck & Co. official source repair pass. Resolved 4 official transcript rows; retained 13 third-party fallback rows where no official direct transcript asset was resolved."
+    "notes": "Merck & Co. deeper official source repair pass. Resolved 8 official transcript rows; retained 9 fallback rows where no official direct transcript asset was resolved."
   },
   "company": "Merck & Co.",
   "ticker": "MRK",
@@ -22,8 +22,8 @@
     },
     "human_review_required": false,
     "human_review_reason": null,
-    "official_rows_resolved": 4,
-    "third_party_fallback_rows": 13
+    "official_rows_resolved": 8,
+    "third_party_fallback_rows": 9
   },
   "official_domains_checked": [
     "merck.com",
@@ -239,64 +239,60 @@
       "ticker": "MRK",
       "fiscal_quarter": "FY Q2 2025",
       "call_date": "Jul 29, 2025",
-      "accepted_url": "https://stockanalysis.com/stocks/mrk/transcripts/311230-q2-2025/",
-      "status": "official_pdf_not_resolved_third_party_retained",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
-      "official_search_exhausted": true,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "accepted_url": "https://www.merck.com/wp-content/uploads/sites/124/2025/07/MRK-USQ_Transcript_2025-07-29.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "merck.com",
+      "official_search_exhausted": false,
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
+      "evidence_note": "Official Merck event-page transcript PDF resolved during deeper repair."
     },
     {
       "company": "Merck & Co.",
       "ticker": "MRK",
       "fiscal_quarter": "FY Q3 2025",
       "call_date": "Oct 30, 2025",
-      "accepted_url": "https://stockanalysis.com/stocks/mrk/transcripts/368149-q3-2025/",
-      "status": "official_pdf_not_resolved_third_party_retained",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
-      "official_search_exhausted": true,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "accepted_url": "https://www.merck.com/wp-content/uploads/sites/124/2025/10/MRK-USQ_Transcript_2025-10-30.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "merck.com",
+      "official_search_exhausted": false,
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
+      "evidence_note": "Official Merck event-page transcript PDF resolved during deeper repair."
     },
     {
       "company": "Merck & Co.",
       "ticker": "MRK",
       "fiscal_quarter": "FY Q4 2025",
       "call_date": "Feb 3, 2026",
-      "accepted_url": "https://stockanalysis.com/stocks/mrk/transcripts/373102-q4-2025/",
-      "status": "official_pdf_not_resolved_third_party_retained",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
-      "official_search_exhausted": true,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "accepted_url": "https://www.merck.com/wp-content/uploads/sites/124/2026/02/MRK-USQ_Transcript_2026-02-03.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "merck.com",
+      "official_search_exhausted": false,
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
+      "evidence_note": "Official Merck event-page transcript PDF resolved during deeper repair."
     },
     {
       "company": "Merck & Co.",
       "ticker": "MRK",
       "fiscal_quarter": "FY Q1 2026",
       "call_date": "Apr 30, 2026",
-      "accepted_url": "https://stockanalysis.com/stocks/mrk/transcripts/408604-q1-2026/",
-      "status": "official_pdf_not_resolved_third_party_retained",
-      "source_type": "third_party_transcript_provider",
-      "source_host": "stockanalysis.com",
-      "official_search_exhausted": true,
-      "third_party_verified_as_written_transcript": true,
-      "verification_basis": "Official search attempted during targeted repair; no direct official transcript asset was resolved for this quarter.",
-      "usage_caution": "Third-party transcript; requires human awareness before ingestion.",
+      "accepted_url": "https://www.merck.com/wp-content/uploads/sites/124/2026/05/MRK-USQ_Transcript_2026-04-30.pdf",
+      "status": "official_transcript_resolved",
+      "source_type": "official_company_domain",
+      "source_host": "merck.com",
+      "official_search_exhausted": false,
+      "verification_basis": "Official investor archive or event page resolves a direct readable transcript asset for this fiscal quarter.",
+      "usage_caution": "Official transcript; review source terms before ingestion.",
       "confidence": "high",
-      "evidence_note": "Official direct transcript asset was not resolved during this repair pass; readable third-party transcript row retained for Claude Code review."
+      "evidence_note": "Official Merck event-page transcript PDF resolved during deeper repair."
     }
   ],
   "reconciliation_notes": [
@@ -309,6 +305,10 @@
     {
       "date": "2026-05-30",
       "note": "Targeted official-source repair resolved 4 of 17 rows. 13 rows retain third-party accepted_url with official_search_exhausted=true because no direct official transcript asset was resolved in this pass."
+    },
+    {
+      "date": "2026-05-30",
+      "note": "Priority 4 deeper repair added 4 official transcript rows. Current official coverage: 8/17; fallback rows: 9/17."
     }
   ]
 }
