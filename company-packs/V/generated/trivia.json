@@ -1,0 +1,98 @@
+[
+  {
+    "question": "In what year was the company founded?",
+    "option_a": "1932",
+    "option_b": "1945",
+    "option_c": "1962",
+    "option_d": "1975",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Approximately how many stores did the company operate at its peak in the early 2000s?",
+    "option_a": "Over 1,200 stores",
+    "option_b": "Around 800 stores",
+    "option_c": "Roughly 500 stores",
+    "option_d": "About 300 stores",
+    "correct_answer": "a"
+  },
+  {
+    "question": "In what year did the company acquire a major luxury department store chain that became a key brand?",
+    "option_a": "1988",
+    "option_b": "1994",
+    "option_c": "2001",
+    "option_d": "2010",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What was the company's annual revenue approximately in 2020?",
+    "option_a": "$15 billion",
+    "option_b": "$28 billion",
+    "option_c": "$42 billion",
+    "option_d": "$67 billion",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In what year did the company rebrand under its current corporate name?",
+    "option_a": "2011",
+    "option_b": "2016",
+    "option_c": "2019",
+    "option_d": "2022",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Approximately how many employees did the company have as of 2023?",
+    "option_a": "45,000",
+    "option_b": "78,000",
+    "option_c": "120,000",
+    "option_d": "180,000",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In what year did the company emerge from Chapter 11 bankruptcy after a major restructuring?",
+    "option_a": "2020",
+    "option_b": "2021",
+    "option_c": "2022",
+    "option_d": "2023",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What percentage of the company's revenue came from e-commerce in 2022?",
+    "option_a": "12%",
+    "option_b": "24%",
+    "option_c": "38%",
+    "option_d": "51%",
+    "correct_answer": "c"
+  },
+  {
+    "question": "In how many states did the company operate retail locations as of 2023?",
+    "option_a": "28 states",
+    "option_b": "38 states",
+    "option_c": "48 states",
+    "option_d": "All 50 states",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What was a major strategic focus of the company's post-bankruptcy transformation?",
+    "option_a": "Expansion into Asia markets",
+    "option_b": "Digital-first omnichannel integration",
+    "option_c": "Opening small format stores",
+    "option_d": "Launching private label brands",
+    "correct_answer": "b"
+  },
+  {
+    "question": "How many distinct nameplates/brands did the company operate after its 2022 restructuring?",
+    "option_a": "2 major brands",
+    "option_b": "3 major brands",
+    "option_c": "5 major brands",
+    "option_d": "8 major brands",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Which financial metric improved most significantly for the company in 2023?",
+    "option_a": "Net debt reduction",
+    "option_b": "Market share gains",
+    "option_c": "Same-store sales growth",
+    "option_d": "International expansion",
+    "correct_answer": "a"
+  }
+]

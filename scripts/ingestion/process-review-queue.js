@@ -16,7 +16,7 @@ import { DATA_DIR, DB_PATH, REPO_ROOT, log, logError } from './lib/common.js';
 const PACKS_DIR = path.join(REPO_ROOT, 'company-packs');
 const REVIEW_QUEUE_DIR = path.join(DATA_DIR, 'review-queue');
 const MAX_PHRASE_CHARS = 25;
-const MIN_APPROVED_PHRASES = 15;
+const MIN_APPROVED_PHRASES = 12;
 
 // ─── Stage 4 (paragraph mode): identify CEO idioms from prepared remarks ─────
 

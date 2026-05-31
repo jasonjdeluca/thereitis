@@ -1,0 +1,15 @@
+{
+  "ticker": "V",
+  "company_id": "v",
+  "generated_at": "2026-05-31T12:42:17.521Z",
+  "mode": "paragraphs",
+  "quarters_processed": 10,
+  "phrases_approved": 13,
+  "trivia_approved": 12,
+  "validation_issues": [
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped"
+  ],
+  "ready_for_migration": false
+}
