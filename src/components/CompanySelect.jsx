@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
-const COMPANY_ORDER = ["hilton", "ko", "marriott", "hyatt", "ihg", "wyndham", "choice"];
-
+// Overrides for companies whose DB id is not their stock ticker
 const TICKERS = {
   hilton: "HLT",
-  ko: "KO",
   marriott: "MAR",
   hyatt: "H",
   ihg: "IHG",
@@ -91,36 +89,43 @@ export default function CompanySelect({ onSelectCompany, onBack }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
       const { data } = await supabase
         .from("companies")
-        .select("*");
+        .select("*")
+        .eq("is_active", true)
+        .order("name");
+
+      if (cancelled) return;
 
       if (data) {
-        const sorted = COMPANY_ORDER
-          .map((id) => data.find((c) => c.id === id))
-          .filter(Boolean);
+        // Live calls surface first, then alphabetical
+        const sorted = [...data].sort((a, b) => {
+          const aLive = isLive(a.next_earnings_date) ? 0 : 1;
+          const bLive = isLive(b.next_earnings_date) ? 0 : 1;
+          return aLive - bLive || a.name.localeCompare(b.name);
+        });
         setCompanies(sorted);
       }
       setLoading(false);
     }
+
     load();
 
+    // Reload full list on any company change (activation, deactivation, date update)
     const channel = supabase
       .channel("companies-realtime")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "companies" },
-        (payload) => {
-          const updated = payload.new;
-          setCompanies((prev) =>
-            prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c)),
-          );
-        },
+        load,
       )
       .subscribe();
 
     return () => {
+      cancelled = true;
       channel.unsubscribe();
     };
   }, []);
@@ -145,7 +150,8 @@ export default function CompanySelect({ onSelectCompany, onBack }) {
           ) : (
             <div className="space-y-0">
               {companies.map((company, i) => {
-                const live = company.is_active && isLive(company.next_earnings_date);
+                const live = isLive(company.next_earnings_date);
+                const ticker = TICKERS[company.id] || company.id.toUpperCase();
                 return (
                   <div key={company.id}>
                     {i > 0 && (
@@ -160,7 +166,7 @@ export default function CompanySelect({ onSelectCompany, onBack }) {
                           <div className="font-display text-xl font-bold text-cream">
                             {company.name}{" "}
                             <span className="text-cream/40 font-sans text-sm font-normal">
-                              ({TICKERS[company.id]})
+                              ({ticker})
                             </span>
                           </div>
                           <div className="mt-1 text-sm text-cream/60">
@@ -172,26 +178,19 @@ export default function CompanySelect({ onSelectCompany, onBack }) {
                         </div>
                       </div>
                       <div className="mt-4">
-                        {company.is_active && company.phrase_count >= 50 ? (
+                        {company.phrase_count >= 50 ? (
                           <button
                             onClick={() => onSelectCompany(company)}
                             className="w-full rounded-2xl bg-gold py-3 text-center font-semibold text-navy tracking-wide active:bg-gold-bright active:scale-[0.99] transition"
                           >
                             {live ? "Join the Live Call" : "Start a Game"} &rarr;
                           </button>
-                        ) : company.is_active ? (
-                          <button
-                            disabled
-                            className="w-full rounded-2xl bg-cream/10 py-3 text-center font-semibold text-cream/30 tracking-wide cursor-not-allowed"
-                          >
-                            Phrases Not Ready
-                          </button>
                         ) : (
                           <button
                             disabled
                             className="w-full rounded-2xl bg-cream/10 py-3 text-center font-semibold text-cream/30 tracking-wide cursor-not-allowed"
                           >
-                            Coming Soon
+                            Phrases Not Ready
                           </button>
                         )}
                       </div>
