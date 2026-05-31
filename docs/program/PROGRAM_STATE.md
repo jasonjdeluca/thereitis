@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-31 (session 10)
+**Last updated:** 2026-05-31 (session 11)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,8 +8,8 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Sessions 9–10 — Layer 2 pipeline (sentence-level extraction) built and deployed; HD/WMT/DIS/NKE re-run with clean CEO-idiom phrases; admin panel RLS bug fixed (approve was silently broken); all phrase/trivia migrations applied to Supabase; staging-approved phrases promoted to phrases table; HD trivia prompt strengthened (0→11 trivia, factual errors corrected).
-**Awaiting human action:** Approve remaining ai_selected phrases from admin panel (203 candidates across 11 companies); activate HD phrases + trivia via SQL (see below); Layer 2 run for VZ/JPM/TRV/MMM/MRK/MSFT/BA (needs fetcher + extractor); configure Group C automations
+**Just completed:** Session 11 — Admin RLS approve bug fully fixed (root cause: getSession() passed expired tokens; fixed with getUser() + onAuthStateChange + upsert ignoreDuplicates); phrase_staging RLS policies patched (migration 017 applied); Docker ops-worker user permissions fixed (user: 1001:1001); Layer 2 re-run complete for VZ (26 phrases, 8 trivia), TRV (20 phrases, 11 trivia), HD refreshed (37 phrases, 11 trivia); migration.sql generator now uses ON CONFLICT DO NOTHING. StockAnalysis now fully 400s in Phase 2 Docker — MSFT/GS/AXP/JPM/MRK all blocked (0/17); only companies with official q4cdn or direct IR PDF URLs can be fetched.
+**Awaiting human action:** Apply migration.sql for HD/VZ/TRV; then activate phrases; approve ai_selected candidates in admin panel (panel RLS now fixed); configure Group C automations
 **Awaiting Codex:** Nothing — Codex inbox is clear
 
 ---
@@ -76,29 +76,34 @@
 | Priority 6 promotions complete (BA/KO/MMM/CAT/SHW) | Resolved | BA (17/17 q4cdn), KO (17/17 official IR), MMM (17/17 CloudFront), CAT (9/17 q4cdn + 8/17 StockAnalysis), SHW (8/17 q4cdn + 9/17 StockAnalysis). source_manifest.json promoted and queue-builder wired for all 5. IBM (4/17) and CRM (1/17) deferred — too few official rows to be useful. |
 | Migration 016 applied | Resolved | `016_phrase_staging_ai_select_policy.sql` applied via MCP 2026-05-30 (session 5). RLS UPDATE policy live. `ai-select.js` writes confirmed working: MSFT 50 ai_selected / 4,740 ai_rejected; VZ 50 ai_selected / 5,070 ai_rejected. |
 | NKE trivia gap | Low | Stage 4 generated only 4 NKE trivia questions; minimum for activation is 12. Codex Priority 7 editorial review will flag this. Stage 4 trivia prompt needs strengthening. |
+| Admin RLS true root cause (session 11) | Resolved | Prior "fix" changed phrases INSERT policy to auth.uid() IS NOT NULL but still reported broken. Root cause: Admin.jsx used getSession() which reads cached localStorage token without server validation — expired tokens passed the gate but failed on writes. Fix: getUser() (server-validated) + onAuthStateChange subscription + upsert with ignoreDuplicates in approveRow. phrase_staging UPDATE/DELETE policies also patched (migration 017). |
+| StockAnalysis Phase 2 fully blocked | Confirmed | MSFT/GS/AXP all return HTTP 400 from Phase 2 Docker fetcher (0/17 each). StockAnalysis now blocks the Chrome UA used by Docker. Phase 1 could get MSFT 15/17 via a different UA or timing. Companies with no official PDFs (MSFT, GS, AXP, JPM partial, MRK partial) cannot expand via Phase 2 Layer 2 without official source repair. |
+| Docker review-queue permissions fixed | Resolved | Docker containers ran as root, writing review-queue files owned by root (causing unlinkSync EACCES). Fixed by adding user: 1001:1001 to all services in docker-compose.yml. |
+| ON CONFLICT DO NOTHING in migration.sql | Resolved | process-review-queue.js generator now adds ON CONFLICT (company_id, phrase) DO NOTHING and ON CONFLICT DO NOTHING to phrase and trivia INSERTs. Prevents duplicate-phrase failures when migration.sql overlaps with previously applied rows. |
+| Phase 2 Layer 2 results (session 11) | Info | VZ: 17/17 fetched (official verizon.com PDFs), 26 phrases, 8 trivia. TRV: 10/17 fetched (q4cdn), 20 phrases, 11 trivia. JPM: 8/17 fetched, 3 phrases (below 15 threshold — batch retained). MRK: 8/17 fetched, 9 phrases (below 15 threshold). HD refreshed: 37 phrases, 11 trivia. Migration files in company-packs/{VZ,TRV,HD}/generated/migration.sql. |
 
 ---
 
-## Activation Readiness (as of 2026-05-31)
+## Activation Readiness (as of 2026-05-31 session 11)
 
-| Company | Phrases (total/active) | Trivia | Gap to Activation | Remaining candidates |
+| Company | Phrases (total/active) | Trivia | Gap to Activation | Layer 2 migration ready? |
 |---|---|---|---|---|
 | **Hilton** | 51 / 51 | 42 | ✅ LIVE | — |
-| HD | 46 / 4 | 11 | 4 phrases + 1 trivia | 18 ai_selected |
-| NKE | 43 / 5 | 6 | 7 phrases + 6 trivia | 18 ai_selected |
-| WMT | 20 / 0 | 8 | 30 phrases + 4 trivia | 15 ai_selected |
-| DIS | 16 / 0 | 6 | 34 phrases + 6 trivia | 11 ai_selected |
-| JPM | 7 / 7 | 0 | 43 phrases + 12 trivia | 26 ai_selected |
-| VZ | 7 / 7 | 0 | 43 phrases + 12 trivia | 15 ai_selected |
-| MMM | 5 / 5 | 0 | 45 phrases + 12 trivia | 15 ai_selected |
-| MRK | 2 / 2 | 0 | 48 phrases + 12 trivia | 24 ai_selected |
-| MSFT | 2 / 2 | 0 | 48 phrases + 12 trivia | 20 ai_selected |
-| BA | 1 / 1 | 0 | 49 phrases + 12 trivia | 15 ai_selected |
-| TRV | 0 / 0 | 0 | 50 phrases + 12 trivia | 26 ai_selected |
+| HD | 46 / 4 | 11 | 4 phrases + 1 trivia | ✅ 37 phrases, 11 trivia — apply migration.sql |
+| NKE | 43 / 5 | 6 | 7 phrases + 6 trivia | ❌ (no new Layer 2 batch this session) |
+| WMT | 20 / 0 | 8 | 30 phrases + 4 trivia | ❌ |
+| DIS | 16 / 0 | 6 | 34 phrases + 6 trivia | ❌ |
+| VZ | 7 / 7 | 0 | 43 phrases + 12 trivia | ✅ 26 phrases, 8 trivia — apply migration.sql |
+| TRV | 0 / 0 | 0 | 50 phrases + 12 trivia | ✅ 20 phrases, 11 trivia — apply migration.sql |
+| JPM | 7 / 7 | 0 | 43 phrases + 12 trivia | ❌ 3 phrases (below threshold, StockAnalysis blocked) |
+| MMM | 5 / 5 | 0 | 45 phrases + 12 trivia | ❌ |
+| MRK | 2 / 2 | 0 | 48 phrases + 12 trivia | ❌ 9 phrases (below threshold) |
+| MSFT | 2 / 2 | 0 | 48 phrases + 12 trivia | ❌ StockAnalysis 100% blocked in Phase 2 Docker |
+| BA | 1 / 1 | 0 | 49 phrases + 12 trivia | ❌ |
 
-**Note:** phrases.total includes is_active=false rows from migration.sql. For game playability, all phrases must be is_active=true. Before activating any company run: `UPDATE phrases SET is_active=true WHERE company_id='{id}';`
+**Note:** phrases.total includes is_active=false rows. Before activating, run: `UPDATE phrases SET is_active=true WHERE company_id='{id}';`
 
-**HD is closest:** 4 more phrase approvals from admin panel + 1 trivia + activate all phrases → activation-ready.
+**HD is closest:** Apply migration.sql (37 new phrases) → approve 4 more from admin panel → run `UPDATE phrases SET is_active=true WHERE company_id='hd';` → activate in admin. VZ and TRV also have new migration.sql files ready for human review.
 
 ---
 
@@ -106,35 +111,36 @@
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Approve phrases in admin panel** | Admin panel RLS is fixed. Go to `/admin` → Phrase Staging Review. Approve ai_selected candidates. HD needs 4 more, NKE needs 7 more. Also approve the best from JPM (26), TRV (26), MRK (24), MSFT (20), VZ (15), MMM/NKE/HD (15-18). |
-| 2 | **Activate HD phrases + trivia via SQL** | Run: `UPDATE phrases SET is_active=true WHERE company_id='hd';` — then activate HD in admin panel once at 50 phrases + 12 trivia. HD is only 4 approvals away. |
-| 3 | **Layer 2 re-run for VZ, JPM, TRV, MRK, MSFT** | These have sources_ready status. Run fetcher first, then extractor, then process-review-queue.js. Will dramatically increase phrase counts for these companies. |
-| 4 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
-| 5 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
-| 6 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
-| 7 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
-| 8 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET. |
-| 9 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: weekdays 8:00am ET. |
-| 10 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting. |
-| 11 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
+| 1 | **Apply HD migration.sql** | `company-packs/HD/generated/migration.sql` — 37 phrases + 11 trivia. Uses ON CONFLICT DO NOTHING so safe to run even with overlap. After applying, run `UPDATE phrases SET is_active=true WHERE company_id='hd';` and activate in admin. |
+| 2 | **Apply VZ migration.sql** | `company-packs/VZ/generated/migration.sql` — 26 phrases + 8 trivia. VZ trivia is thin (7 person-name rejections). May need admin panel phrase-staging approvals (15 ai_selected) to supplement. |
+| 3 | **Apply TRV migration.sql** | `company-packs/TRV/generated/migration.sql` — 20 phrases + 11 trivia. Good company-specific phrases (earnings engine, risk selection, virtuous cycle). Still needs ~30 more phrases for activation. |
+| 4 | **Approve phrases in admin panel** | RLS bug is fully fixed. Go to `/admin` → Phrase Staging Review. Approve ai_selected candidates for HD (18 remaining), NKE (18), JPM (26), TRV (26), MRK (24), MSFT (20), VZ (15), MMM (15), BA (15). |
+| 5 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
+| 6 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
+| 7 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
+| 8 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
+| 9 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET. |
+| 10 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: weekdays 8:00am ET. |
+| 11 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting. |
+| 12 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
 
 ---
 
 ## Next Recommended Session
 
-**Sessions 9–10 complete.** PR #40 merged. RLS fixed. All four companies have phrases+trivia in DB. HD is the closest company to activation.
+**Session 11 complete.** Admin approve button is genuinely fixed. Layer 2 re-run produced HD/VZ/TRV migrations.
 
 **Next session entry point (Claude Code):**
-1. Check if human has approved phrases via admin panel — if HD reaches 50 total phrases, activate via SQL + admin toggle
-2. Run Layer 2 pipeline for remaining companies: VZ, JPM, TRV, MRK, MSFT (sources_ready; need fetcher → extractor → process-review-queue)
-3. After Layer 2 runs, apply migration.sql for each company + activate phrases
-4. If Group C automations are configured, verify first PM Brief posted correctly
-4. Pipeline next: sentence-level extraction (replace n-gram counting) for better CEO-idiom candidates
+1. Check if human applied migration.sql files and approved phrases — if HD reaches 50 phrases + 12 trivia, activate via SQL + admin toggle
+2. For VZ/TRV/JPM/MRK: supplement Layer 2 phrases with Phase 1 ai_selected approvals from admin panel to close the gaps
+3. Re-run Phase 1 ai-select.js for MMM/BA if they still need phrases (Phase 1 PDFs already in data/raw/)
+4. For MSFT: StockAnalysis now fully blocked — only Phase 1 staged phrases (20 ai_selected) are available; unlikely to reach activation without official PDF source repair
+5. If Group C automations are configured, verify first PM Brief posted correctly
 
 **Human action needed before next session:**
-- Review phrases in admin panel (#1 — biggest unlock)
-- Merge PR #34 (pipeline improvements + HD/WMT/DIS generated content)
-- Configure at least one Claude Code Routine or Codex Automation (items #4–#8)
+- Apply migration.sql files for HD, VZ, TRV (#1–#3 above — biggest unlock)
+- Approve phrases in admin panel (#4)
+- Configure at least one Claude Code Routine or Codex Automation (#6–#10)
 
 **Model:** `claude-sonnet-4-6` for all pipeline and repair work. Switch to `claude-opus-4-8` only for architectural decisions.
 
