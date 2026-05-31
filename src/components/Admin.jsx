@@ -790,7 +790,11 @@ function GateForm({ onAuth }) {
     });
     setLoading(false);
     if (authError) {
-      setError("Invalid credentials");
+      setError(
+        authError.status === 429
+          ? "Too many attempts — wait a few minutes and try again"
+          : "Invalid credentials",
+      );
     } else {
       onAuth();
     }
