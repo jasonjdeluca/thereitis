@@ -451,14 +451,9 @@ function PhraseReviewPanel() {
   async function approveRow(row) {
     setBusyIds((b) => ({ ...b, [row.id]: true }));
     setActionError("");
-    // Refresh the session before writing. getSession() reads from cache and may
-    // return an expired token; refreshSession() validates with the server.
-    const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
-    if (refreshErr || !refreshData.session) {
-      setActionError("Session expired — sign out and sign back in");
-      setBusyIds((b) => ({ ...b, [row.id]: false }));
-      return false;
-    }
+    // No manual refresh here. autoRefreshToken keeps the access token fresh; a
+    // genuinely expired session surfaces as an error on the write below and, via
+    // onAuthStateChange(SIGNED_OUT), bounces to the login screen.
     // upsert with ignoreDuplicates: if the phrase already exists in phrases
     // (e.g. inserted by migration.sql), skip the insert and proceed to mark staging approved.
     const ins = await supabase.from("phrases").upsert(
@@ -1290,64 +1285,35 @@ function AdminPanel({ onSignOut }) {
 
 // ─── Root export ──────────────────────────────────────────────────────────────
 
-// Supabase persists the session under localStorage key sb-<ref>-auth-token.
-// We read and validate it ourselves instead of calling getSession()/getUser():
-// __loadSession() (behind both) calls _callRefreshToken() whenever the stored
-// token is expired, regardless of autoRefreshToken. If that refresh endpoint
-// rate-limits (HTTP 429), auth-js treats it as non-retryable, removes the
-// session, and fires SIGNED_OUT -- trapping the admin in a login loop. Reading
-// storage directly never refreshes, so it can never trigger that 429.
-function readStoredSession() {
-  try {
-    for (const k of Object.keys(window.localStorage)) {
-      if (!k.startsWith("sb-") || !k.endsWith("-auth-token")) continue;
-      const raw = window.localStorage.getItem(k);
-      if (!raw) continue;
-      let obj;
-      try {
-        obj = JSON.parse(raw);
-      } catch {
-        continue;
-      }
-      const session = obj?.currentSession || obj?.session || obj;
-      if (session && typeof session.expires_at === "number") {
-        return { key: k, session };
-      }
-    }
-  } catch {
-    // localStorage unavailable (e.g. blocked) -- treat as no session
-  }
-  return { key: null, session: null };
-}
-
-function clearStoredSession() {
-  try {
-    Object.keys(window.localStorage)
-      .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token"))
-      .forEach((k) => window.localStorage.removeItem(k));
-  } catch {
-    // ignore
-  }
-}
-
+// Canonical Supabase SPA auth gate: read the session once at mount, then let
+// onAuthStateChange be the single source of truth for auth state. Both run
+// against the one shared client whose autoRefreshToken handles renewal with an
+// internal single-flight lock, so there is exactly one refresh path and it
+// cannot storm the /auth/v1/token endpoint. If the stored session is expired
+// and its refresh fails, auth-js fires SIGNED_OUT and the gate falls back to
+// the login form, where a fresh sign-in mints a new (un-poisoned) token.
 export default function Admin() {
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const { session } = readStoredSession();
-    const valid = !!session && session.expires_at * 1000 > Date.now();
-    if (!valid) {
-      // Purge any stale token so no later auth call tries (and fails) to refresh it.
-      clearStoredSession();
-    }
-    setAuthed(valid);
-    setChecking(false);
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      setAuthed(!!session);
+      setChecking(false);
+    });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, _session) => { if (event === 'SIGNED_OUT') setAuthed(false); }
+      (_event, session) => {
+        if (mounted) setAuthed(!!session);
+      },
     );
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (checking) {
