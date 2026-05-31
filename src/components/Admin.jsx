@@ -1291,17 +1291,16 @@ export default function Admin() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      console.log('[auth] getUser resolved — user:', !!user, new Date().toISOString());
-      setAuthed(!!user);
+    // getSession() reads from localStorage — no network call, no 429 risk.
+    // The actual write guard is refreshSession() inside approveRow, which
+    // catches expired tokens at the point they matter.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthed(!!session);
       setChecking(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('[auth] onAuthStateChange —', event, '— session:', !!session, new Date().toISOString());
-        if (event === 'SIGNED_OUT') setAuthed(false);
-      }
+      (event, _session) => { if (event === 'SIGNED_OUT') setAuthed(false); }
     );
     return () => subscription.unsubscribe();
   }, []);
@@ -1315,7 +1314,7 @@ export default function Admin() {
   }
 
   if (!authed) {
-    return <GateForm onAuth={() => { console.log('[auth] onAuth called', new Date().toISOString()); setAuthed(true); }} />;
+    return <GateForm onAuth={() => setAuthed(true)} />;
   }
 
   return <AdminPanel onSignOut={() => setAuthed(false)} />;
