@@ -1290,19 +1290,59 @@ function AdminPanel({ onSignOut }) {
 
 // ─── Root export ──────────────────────────────────────────────────────────────
 
+// Supabase persists the session under localStorage key sb-<ref>-auth-token.
+// We read and validate it ourselves instead of calling getSession()/getUser():
+// __loadSession() (behind both) calls _callRefreshToken() whenever the stored
+// token is expired, regardless of autoRefreshToken. If that refresh endpoint
+// rate-limits (HTTP 429), auth-js treats it as non-retryable, removes the
+// session, and fires SIGNED_OUT -- trapping the admin in a login loop. Reading
+// storage directly never refreshes, so it can never trigger that 429.
+function readStoredSession() {
+  try {
+    for (const k of Object.keys(window.localStorage)) {
+      if (!k.startsWith("sb-") || !k.endsWith("-auth-token")) continue;
+      const raw = window.localStorage.getItem(k);
+      if (!raw) continue;
+      let obj;
+      try {
+        obj = JSON.parse(raw);
+      } catch {
+        continue;
+      }
+      const session = obj?.currentSession || obj?.session || obj;
+      if (session && typeof session.expires_at === "number") {
+        return { key: k, session };
+      }
+    }
+  } catch {
+    // localStorage unavailable (e.g. blocked) -- treat as no session
+  }
+  return { key: null, session: null };
+}
+
+function clearStoredSession() {
+  try {
+    Object.keys(window.localStorage)
+      .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token"))
+      .forEach((k) => window.localStorage.removeItem(k));
+  } catch {
+    // ignore
+  }
+}
+
 export default function Admin() {
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // getSession() reads from localStorage only — no network call, no 429 risk
-    // (background auto-refresh is disabled in lib/supabase.js). Treat an expired
-    // cached token as logged-out so a stale token doesn't briefly flash the panel.
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const valid = !!session && (session.expires_at ?? 0) * 1000 > Date.now();
-      setAuthed(valid);
-      setChecking(false);
-    });
+    const { session } = readStoredSession();
+    const valid = !!session && session.expires_at * 1000 > Date.now();
+    if (!valid) {
+      // Purge any stale token so no later auth call tries (and fails) to refresh it.
+      clearStoredSession();
+    }
+    setAuthed(valid);
+    setChecking(false);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, _session) => { if (event === 'SIGNED_OUT') setAuthed(false); }
