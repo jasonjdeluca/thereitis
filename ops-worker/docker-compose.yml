@@ -26,5 +26,3 @@ services:
     volumes:
       - ../company-packs:/app/company-packs
       - ../data:/app/data
-    env_file:
-      - ../.env

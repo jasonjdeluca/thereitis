@@ -17,6 +17,7 @@ docker compose run --rm extractor
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Extractor complete"
 
 docker compose run --rm validator
-echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Validator complete"
+echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Validator complete — batch files written to data/review-queue/"
 
 echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Pipeline run finished"
+echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Next step: run 'node scripts/ingestion/process-review-queue.js' in a Claude Code session"
