@@ -107,7 +107,7 @@ def find_qa_boundary(text: str) -> int:
     earliest = len(text)
     for pattern in patterns:
         m = re.search(pattern, lower)
-        if m and m.start() > 300:
+        if m and m.start() > 1500:
             earliest = min(earliest, m.start())
     return earliest
 
