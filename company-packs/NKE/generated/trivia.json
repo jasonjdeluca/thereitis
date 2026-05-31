@@ -1,34 +1,50 @@
 [
   {
-    "question": "In what year was Nike founded?",
-    "option_a": "1964",
-    "option_b": "1972",
-    "option_c": "1980",
-    "option_d": "1995",
-    "correct_answer": "a"
-  },
-  {
-    "question": "When did Nike go public?",
-    "option_a": "1980",
-    "option_b": "1982",
-    "option_c": "1985",
-    "option_d": "1990",
-    "correct_answer": "a"
-  },
-  {
-    "question": "What percentage of Nike's revenue comes from women?",
-    "option_a": "20%",
-    "option_b": "35%",
-    "option_c": "50%",
-    "option_d": "65%",
+    "question": "What iconic swoosh logo design year revolutionized the brand's visual identity?",
+    "option_a": "1969",
+    "option_b": "1971",
+    "option_c": "1973",
+    "option_d": "1975",
     "correct_answer": "b"
   },
   {
-    "question": "In what year did Nike acquire Converse?",
+    "question": "In which decade did the company go public on the stock exchange?",
+    "option_a": "1960s",
+    "option_b": "1970s",
+    "option_c": "1980s",
+    "option_d": "1990s",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What was the primary business model before the company shifted to outsourced manufacturing?",
+    "option_a": "Direct retail stores only",
+    "option_b": "Importing and distributing products",
+    "option_c": "In-house manufacturing",
+    "option_d": "Licensing agreements",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What approximate percentage of revenue came from international markets as of recent fiscal years?",
+    "option_a": "Less than 20%",
+    "option_b": "20-30%",
+    "option_c": "30-45%",
+    "option_d": "Over 50%",
+    "correct_answer": "c"
+  },
+  {
+    "question": "In what year did the company acquire the Converse brand?",
     "option_a": "2001",
-    "option_b": "2002",
-    "option_c": "2003",
-    "option_d": "2004",
-    "correct_answer": "b"
+    "option_b": "2003",
+    "option_c": "2005",
+    "option_d": "2007",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What was the company's approximate total revenue in fiscal year 2023?",
+    "option_a": "30-35 billion dollars",
+    "option_b": "35-40 billion dollars",
+    "option_c": "45-50 billion dollars",
+    "option_d": "50-55 billion dollars",
+    "correct_answer": "c"
   }
 ]

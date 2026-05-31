@@ -1,10 +1,10 @@
 {
   "ticker": "DIS",
   "company_id": "dis",
-  "generated_at": "2026-05-30T23:25:17.525Z",
-  "candidates_raw": 6028,
-  "candidates_after_stage3": 200,
-  "phrases_approved": 50,
+  "generated_at": "2026-05-31T02:13:09.796Z",
+  "mode": "paragraphs",
+  "quarters_processed": 16,
+  "phrases_approved": 16,
   "trivia_approved": 6,
   "validation_issues": [
     "trivia contains possible person name — skipped",
@@ -17,5 +17,5 @@
     "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped"
   ],
-  "ready_for_migration": true
+  "ready_for_migration": false
 }

@@ -1,16 +1,19 @@
 {
   "ticker": "WMT",
   "company_id": "wmt",
-  "generated_at": "2026-05-30T23:24:55.763Z",
-  "candidates_raw": 9288,
-  "candidates_after_stage3": 200,
-  "phrases_approved": 50,
-  "trivia_approved": 11,
+  "generated_at": "2026-05-31T02:16:04.676Z",
+  "mode": "paragraphs",
+  "quarters_processed": 17,
+  "phrases_approved": 20,
+  "trivia_approved": 8,
   "validation_issues": [
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped"
   ],
-  "ready_for_migration": true
+  "ready_for_migration": false
 }

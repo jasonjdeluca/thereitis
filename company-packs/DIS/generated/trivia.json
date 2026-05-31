@@ -8,43 +8,43 @@
     "correct_answer": "a"
   },
   {
-    "question": "How many theme parks did the company operate globally as of 2023?",
-    "option_a": "8",
-    "option_b": "10",
-    "option_c": "12",
-    "option_d": "6",
+    "question": "In what year did the company acquire ABC Television?",
+    "option_a": "1995",
+    "option_b": "1997",
+    "option_c": "1999",
+    "option_d": "2001",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What was the primary business segment before major theme park expansion?",
+    "option_a": "Television production",
+    "option_b": "Animation and motion pictures",
+    "option_c": "Music publishing",
+    "option_d": "Theater operations",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What was the company's approximate annual revenue in 2022?",
+    "option_a": "55 billion USD",
+    "option_b": "65 billion USD",
+    "option_c": "75 billion USD",
+    "option_d": "85 billion USD",
     "correct_answer": "c"
   },
   {
-    "question": "What was the approximate annual revenue in 2022?",
-    "option_a": "$75 billion",
-    "option_b": "$82 billion",
-    "option_c": "$91 billion",
-    "option_d": "$68 billion",
+    "question": "In what year did the company complete its acquisition of the Fox film and television assets?",
+    "option_a": "2018",
+    "option_b": "2019",
+    "option_c": "2020",
+    "option_d": "2021",
     "correct_answer": "b"
   },
   {
-    "question": "In what decade did the company begin its television broadcasting venture?",
-    "option_a": "1940s",
-    "option_b": "1950s",
-    "option_c": "1960s",
-    "option_d": "1970s",
-    "correct_answer": "b"
-  },
-  {
-    "question": "What is the primary revenue driver for the Parks & Experiences segment?",
-    "option_a": "Merchandise only",
-    "option_b": "Theme park tickets and resort stays",
-    "option_c": "Film licensing",
-    "option_d": "Television rights",
-    "correct_answer": "b"
-  },
-  {
-    "question": "As of 2024, approximately how many Disney+ subscribers does the company have?",
-    "option_a": "150+ million",
-    "option_b": "100+ million",
-    "option_c": "200+ million",
-    "option_d": "75+ million",
-    "correct_answer": "a"
+    "question": "What strategic shift did the company announce regarding theatrical releases post-2020?",
+    "option_a": "Ending all theatrical releases",
+    "option_b": "Prioritizing simultaneous theatrical and streaming releases",
+    "option_c": "Reducing theatrical exclusivity windows",
+    "option_d": "Selling theatrical rights to competitors",
+    "correct_answer": "c"
   }
 ]

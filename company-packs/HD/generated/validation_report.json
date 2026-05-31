@@ -1,16 +1,27 @@
 {
   "ticker": "HD",
   "company_id": "hd",
-  "generated_at": "2026-05-30T23:24:33.319Z",
-  "candidates_raw": 7331,
-  "candidates_after_stage3": 200,
-  "phrases_approved": 50,
-  "trivia_approved": 11,
+  "generated_at": "2026-05-31T02:04:53.511Z",
+  "mode": "paragraphs",
+  "quarters_processed": 17,
+  "phrases_approved": 27,
+  "trivia_approved": 0,
   "validation_issues": [
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
+    "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped",
     "trivia contains possible person name — skipped"
   ],
-  "ready_for_migration": true
+  "ready_for_migration": false
 }
