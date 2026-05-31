@@ -1291,15 +1291,17 @@ export default function Admin() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // getUser() validates the token server-side and auto-refreshes if needed.
-    // getSession() only reads from localStorage cache and passes expired tokens.
     supabase.auth.getUser().then(({ data: { user } }) => {
+      console.log('[auth] getUser resolved — user:', !!user, new Date().toISOString());
       setAuthed(!!user);
       setChecking(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, _session) => { if (event === 'SIGNED_OUT') setAuthed(false); }
+      (event, session) => {
+        console.log('[auth] onAuthStateChange —', event, '— session:', !!session, new Date().toISOString());
+        if (event === 'SIGNED_OUT') setAuthed(false);
+      }
     );
     return () => subscription.unsubscribe();
   }, []);
@@ -1313,7 +1315,7 @@ export default function Admin() {
   }
 
   if (!authed) {
-    return <GateForm onAuth={() => setAuthed(true)} />;
+    return <GateForm onAuth={() => { console.log('[auth] onAuth called', new Date().toISOString()); setAuthed(true); }} />;
   }
 
   return <AdminPanel onSignOut={() => setAuthed(false)} />;
