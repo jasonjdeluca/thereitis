@@ -1291,11 +1291,12 @@ export default function Admin() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // getSession() reads from localStorage — no network call, no 429 risk.
-    // The actual write guard is refreshSession() inside approveRow, which
-    // catches expired tokens at the point they matter.
+    // getSession() reads from localStorage only — no network call, no 429 risk
+    // (background auto-refresh is disabled in lib/supabase.js). Treat an expired
+    // cached token as logged-out so a stale token doesn't briefly flash the panel.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setAuthed(!!session);
+      const valid = !!session && (session.expires_at ?? 0) * 1000 > Date.now();
+      setAuthed(valid);
       setChecking(false);
     });
 
