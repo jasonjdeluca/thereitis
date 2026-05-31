@@ -18,6 +18,77 @@ const REVIEW_QUEUE_DIR = path.join(DATA_DIR, 'review-queue');
 const MAX_PHRASE_CHARS = 25;
 const MIN_APPROVED_PHRASES = 25;
 
+// ─── Stage 4 (paragraph mode): identify CEO idioms from prepared remarks ─────
+
+async function stage4IdentifyPhrases(client, quarterEntries, ticker) {
+  const phraseCounts = new Map(); // phrase → Set of quarters
+
+  for (const entry of quarterEntries) {
+    const { quarter, paragraphs } = entry;
+    if (!paragraphs?.length) continue;
+
+    const text = paragraphs.join('\n\n');
+    const prompt = `From these ${ticker} earnings call prepared remarks (${quarter}), identify CEO-speak idioms.
+
+A CEO idiom is a 2-4 word phrase that:
+- Sounds like something an executive says to project confidence or frame strategy
+- Would cause a knowing groan from a bingo player: "there it is"
+- Is NOT a financial metric, geographic segment, product name, or person name
+
+Good examples: "unlocking value", "playing offense", "our flywheel", "double down", "lean into"
+
+TEXT:
+${text}
+
+Return ONLY a JSON array of lowercase 2-4 word phrases found in this text. JSON only, no explanation.`;
+
+    let attempt = 0;
+    while (true) {
+      try {
+        const response = await client.messages.create({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 512,
+          messages: [{ role: 'user', content: prompt }],
+        });
+
+        const raw = response.content[0].text.trim()
+          .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
+        let phrases = [];
+        try { phrases = JSON.parse(raw); } catch { phrases = []; }
+
+        for (const phrase of phrases) {
+          if (typeof phrase !== 'string') continue;
+          const p = phrase.trim().toLowerCase();
+          const wordCount = p.split(/\s+/).length;
+          if (!p || p.length > 25 || wordCount < 2 || wordCount > 4) continue;
+          if (!phraseCounts.has(p)) phraseCounts.set(p, new Set());
+          phraseCounts.get(p).add(quarter);
+        }
+        break;
+      } catch (err) {
+        if (err.status === 429 && attempt < 3) {
+          attempt++;
+          const wait = 65 * attempt;
+          log(`  rate limited — waiting ${wait}s (attempt ${attempt}/3)`);
+          await new Promise(r => setTimeout(r, wait * 1000));
+        } else {
+          throw err;
+        }
+      }
+    }
+  }
+
+  return Array.from(phraseCounts.entries())
+    .filter(([, quarters]) => quarters.size >= 2)
+    .map(([phrase, quarters]) => ({
+      phrase,
+      quarter_count: quarters.size,
+      quarters: Array.from(quarters).sort(),
+    }))
+    .sort((a, b) => b.quarter_count - a.quarter_count)
+    .slice(0, 200);
+}
+
 // ─── Stage 4: AI scoring and trivia ──────────────────────────────────────────
 
 async function stage4Score(client, candidates, ticker) {
@@ -106,8 +177,23 @@ correct_answer must be "a", "b", "c", or "d". JSON only, no markdown.`;
   catch { return []; }
 }
 
-async function stage4Enrich(client, candidates, ticker) {
-  log(`  Stage 4a — scoring ${candidates.length} candidates`);
+async function stage4Enrich(client, batch, ticker) {
+  let candidates;
+
+  if (batch.mode === 'paragraphs') {
+    // Layer 2: identify idioms from prepared-remarks paragraphs, then score
+    log(`  Stage 4a — identifying phrases from ${batch.quarter_entries.length} quarters of prepared remarks`);
+    candidates = await stage4IdentifyPhrases(client, batch.quarter_entries, ticker);
+    log(`  Identified ${candidates.length} candidate phrases (≥2 quarters)`);
+    if (candidates.length < 10) {
+      log(`  Warning: only ${candidates.length} candidates — results may be sparse`);
+    }
+  } else {
+    // Layer 1 (n-gram mode): score pre-extracted candidates
+    candidates = batch.candidates ?? [];
+    log(`  Stage 4a — scoring ${candidates.length} n-gram candidates`);
+  }
+
   const scores = await stage4Score(client, candidates, ticker);
 
   const scored = candidates
@@ -201,12 +287,15 @@ async function processBatch(client, db, batchPath) {
     return;
   }
 
-  const { ticker, company_id, candidates } = batch;
-  log(`--- ${ticker}: ${candidates.length} Stage 3 candidates ---`);
+  const { ticker, company_id } = batch;
+  const modeLabel = batch.mode === 'paragraphs'
+    ? `${batch.quarter_entries?.length ?? 0} quarters of prepared remarks`
+    : `${batch.candidates?.length ?? 0} n-gram candidates`;
+  log(`--- ${ticker}: ${modeLabel} (mode: ${batch.mode ?? 'ngrams'}) ---`);
 
   let aiOutput;
   try {
-    aiOutput = await stage4Enrich(client, candidates, ticker);
+    aiOutput = await stage4Enrich(client, batch, ticker);
     log(`  AI returned ${aiOutput.phrases?.length ?? 0} phrases, ${aiOutput.trivia?.length ?? 0} trivia`);
   } catch (e) {
     logError(`${ticker}: Stage 4 failed: ${e.message}`);
@@ -234,8 +323,9 @@ async function processBatch(client, db, batchPath) {
   writeFileSync(path.join(generatedDir, 'validation_report.json'), JSON.stringify({
     ticker, company_id,
     generated_at: new Date().toISOString(),
+    mode: batch.mode ?? 'ngrams',
+    quarters_processed: batch.mode === 'paragraphs' ? batch.quarter_entries?.length : undefined,
     candidates_raw_count: batch.candidates_raw_count,
-    candidates_after_stage3: candidates.length,
     phrases_approved: approved.length,
     trivia_approved: triviaApproved.length,
     validation_issues: issues,
