@@ -451,6 +451,14 @@ function PhraseReviewPanel() {
   async function approveRow(row) {
     setBusyIds((b) => ({ ...b, [row.id]: true }));
     setActionError("");
+    // Refresh the session before writing. getSession() reads from cache and may
+    // return an expired token; refreshSession() validates with the server.
+    const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+    if (refreshErr || !refreshData.session) {
+      setActionError("Session expired — sign out and sign back in");
+      setBusyIds((b) => ({ ...b, [row.id]: false }));
+      return false;
+    }
     // upsert with ignoreDuplicates: if the phrase already exists in phrases
     // (e.g. inserted by migration.sql), skip the insert and proceed to mark staging approved.
     const ins = await supabase.from("phrases").upsert(
