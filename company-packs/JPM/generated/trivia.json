@@ -1,0 +1,98 @@
+[
+  {
+    "question": "The company is primarily what type of business?",
+    "option_a": "a bank",
+    "option_b": "an airline",
+    "option_c": "a carmaker",
+    "option_d": "a grocer",
+    "correct_answer": "a"
+  },
+  {
+    "question": "It is often cited as the largest US bank by what measure?",
+    "option_a": "assets",
+    "option_b": "store count",
+    "option_c": "aircraft",
+    "option_d": "oil reserves",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the company's stock ticker?",
+    "option_a": "jp",
+    "option_b": "jpm",
+    "option_c": "jpc",
+    "option_d": "jmp",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is a component of which index?",
+    "option_a": "the dow 30",
+    "option_b": "the russell 2000",
+    "option_c": "a crypto index",
+    "option_d": "no major index",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which is one of the company's business segments?",
+    "option_a": "consumer and community banking",
+    "option_b": "jet manufacturing",
+    "option_c": "paint coatings",
+    "option_d": "soft drinks",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Investment-banking fees sit within which broad activity?",
+    "option_a": "the corporate and investment bank",
+    "option_b": "fast food",
+    "option_c": "mining",
+    "option_d": "airlines",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is headquartered in which city?",
+    "option_a": "new york city",
+    "option_b": "chicago",
+    "option_c": "denver",
+    "option_d": "miami",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Wealth management falls under which segment?",
+    "option_a": "asset and wealth management",
+    "option_b": "defense",
+    "option_c": "retail apparel",
+    "option_d": "streaming",
+    "correct_answer": "a"
+  },
+  {
+    "question": "A bank 'reserve build' sets aside money for what?",
+    "option_a": "potential loan losses",
+    "option_b": "new stores",
+    "option_c": "aircraft orders",
+    "option_d": "ad campaigns",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which is a core banking activity for the company?",
+    "option_a": "lending and deposits",
+    "option_b": "making films",
+    "option_c": "brewing soda",
+    "option_d": "mining coal",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company serves which broad customer base?",
+    "option_a": "consumers and corporations",
+    "option_b": "only farmers",
+    "option_c": "only airlines",
+    "option_d": "only sports teams",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Order of magnitude, how many people does the company employ?",
+    "option_a": "about 30 thousand",
+    "option_b": "about 300 thousand",
+    "option_c": "about 3 million",
+    "option_d": "about 30 million",
+    "correct_answer": "b"
+  }
+]

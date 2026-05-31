@@ -1,0 +1,11 @@
+{
+  "ticker": "BA",
+  "company_id": "ba",
+  "finalized_at": "2026-05-31T18:43:09.115Z",
+  "enriched_by": "claude-code-agent (subscription)",
+  "mode": "paragraphs",
+  "phrases_approved": 50,
+  "trivia_approved": 12,
+  "validation_issues": [],
+  "ready_for_migration": true
+}

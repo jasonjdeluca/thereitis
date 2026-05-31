@@ -1,0 +1,98 @@
+[
+  {
+    "question": "In what decade was the company founded?",
+    "option_a": "1900s",
+    "option_b": "1910s",
+    "option_c": "1920s",
+    "option_d": "1930s",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company's 787 jet is marketed under what name?",
+    "option_a": "dreamliner",
+    "option_b": "skyliner",
+    "option_c": "stratoliner",
+    "option_d": "jetliner",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which widebody jet is nicknamed the 'jumbo jet'?",
+    "option_a": "the 737",
+    "option_b": "the 747",
+    "option_c": "the 767",
+    "option_d": "the 777",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Besides commercial airplanes, what is its other major segment?",
+    "option_a": "defense and space",
+    "option_b": "consumer goods",
+    "option_c": "pharmaceuticals",
+    "option_d": "grocery retail",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the company's stock ticker symbol?",
+    "option_a": "bo",
+    "option_b": "ba",
+    "option_c": "bn",
+    "option_d": "bg",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is a component of which index?",
+    "option_a": "the dow 30",
+    "option_b": "the russell 2000",
+    "option_c": "a crypto index",
+    "option_d": "no major index",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The single-aisle 737 production target is measured in units per what?",
+    "option_a": "day",
+    "option_b": "week",
+    "option_c": "month",
+    "option_d": "year",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Which jet family is made by this company rather than a rival?",
+    "option_a": "the 320",
+    "option_b": "the 350",
+    "option_c": "the 777",
+    "option_d": "the 220",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Its headquarters sit in which part of the country?",
+    "option_a": "the west coast",
+    "option_b": "the east coast area",
+    "option_c": "the upper midwest",
+    "option_d": "the deep south",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The 777x is an updated version of which jet family?",
+    "option_a": "the 737",
+    "option_b": "the 747",
+    "option_c": "the 777",
+    "option_d": "the 787",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Order of magnitude, how many people does the company employ?",
+    "option_a": "about 17 thousand",
+    "option_b": "about 170 thousand",
+    "option_c": "about 1.7 million",
+    "option_d": "about 17 million",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is a major contractor for which sector?",
+    "option_a": "defense",
+    "option_b": "agriculture",
+    "option_c": "hospitality",
+    "option_d": "fashion",
+    "correct_answer": "a"
+  }
+]

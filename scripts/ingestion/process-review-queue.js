@@ -1,238 +1,58 @@
 #!/usr/bin/env node
-// process-review-queue.js — Phase 2 AI enrichment, run inside a Claude Code session.
-// Reads pending batches from data/review-queue/, calls Claude Haiku for scoring
-// and trivia generation, validates output, writes to company-packs/{TICKER}/generated/.
+// process-review-queue.js — Phase 2 enrichment queue tool (NO API — subscription model).
 //
-// Usage: node scripts/ingestion/process-review-queue.js [--ticker TICKER]
-// Requires: ANTHROPIC_API_KEY in .env (loaded automatically via common.js)
+// The deterministic Docker pipeline (fetcher → extractor → validator) writes a
+// pending work item to data/review-queue/{TICKER}.json for each company. The
+// JUDGMENT step (selecting the best CEO-idiom phrases and writing trivia) is NOT
+// done by an API call. It is done by a Claude Code agent working on this project,
+// using the Claude subscription — see docs/program/ENRICHMENT_QUEUE.md.
+//
+// This script has NO Anthropic API dependency. It only:
+//   --list                 show what is pending and what each item still needs
+//   --finalize <TICKER>    validate the agent-written generated/ output for a
+//                          company, emit migration.sql, mark the job ready, and
+//                          move the queue item to data/review-queue/processed/.
+//
+// Agent workflow per pending company:
+//   1. node scripts/ingestion/process-review-queue.js --list
+//   2. Read data/review-queue/{TICKER}.json (prepared-remarks paragraphs).
+//   3. Select 40–50 recurring CEO-idiom phrases + write 12–18 trivia questions
+//      per docs/program/ENRICHMENT_QUEUE.md.
+//   4. Write company-packs/{TICKER}/generated/phrases.json and trivia.json.
+//   5. node scripts/ingestion/process-review-queue.js --finalize {TICKER}
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, renameSync, existsSync } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import Anthropic from '@anthropic-ai/sdk';
 import Database from 'better-sqlite3';
 import { DATA_DIR, DB_PATH, REPO_ROOT, log, logError } from './lib/common.js';
 
 const PACKS_DIR = path.join(REPO_ROOT, 'company-packs');
 const REVIEW_QUEUE_DIR = path.join(DATA_DIR, 'review-queue');
+const PROCESSED_DIR = path.join(REVIEW_QUEUE_DIR, 'processed');
 const MAX_PHRASE_CHARS = 25;
 const MIN_APPROVED_PHRASES = 12;
 
-// ─── Stage 4 (paragraph mode): identify CEO idioms from prepared remarks ─────
+// ─── Stage 5: deterministic validation (unchanged rules) ──────────────────────
 
-async function stage4IdentifyPhrases(client, quarterEntries, ticker) {
-  const phraseCounts = new Map(); // phrase → Set of quarters
-
-  for (const entry of quarterEntries) {
-    const { quarter, paragraphs } = entry;
-    if (!paragraphs?.length) continue;
-
-    const text = paragraphs.join('\n\n');
-    const prompt = `From these ${ticker} earnings call prepared remarks (${quarter}), identify CEO-speak idioms.
-
-A CEO idiom is a 2-4 word phrase that:
-- Sounds like something an executive says to project confidence or frame strategy
-- Would cause a knowing groan from a bingo player: "there it is"
-- Is NOT a financial metric, geographic segment, product name, or person name
-
-Good examples: "unlocking value", "playing offense", "our flywheel", "double down", "lean into"
-
-TEXT:
-${text}
-
-Return ONLY a JSON array of lowercase 2-4 word phrases found in this text. JSON only, no explanation.`;
-
-    let attempt = 0;
-    while (true) {
-      try {
-        const response = await client.messages.create({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 512,
-          messages: [{ role: 'user', content: prompt }],
-        });
-
-        const raw = response.content[0].text.trim()
-          .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
-        let phrases = [];
-        try { phrases = JSON.parse(raw); } catch { phrases = []; }
-
-        for (const phrase of phrases) {
-          if (typeof phrase !== 'string') continue;
-          const p = phrase.trim().toLowerCase();
-          const wordCount = p.split(/\s+/).length;
-          if (!p || p.length > 25 || wordCount < 2 || wordCount > 4) continue;
-          if (!phraseCounts.has(p)) phraseCounts.set(p, new Set());
-          phraseCounts.get(p).add(quarter);
-        }
-        break;
-      } catch (err) {
-        if (err.status === 429 && attempt < 3) {
-          attempt++;
-          const wait = 65 * attempt;
-          log(`  rate limited — waiting ${wait}s (attempt ${attempt}/3)`);
-          await new Promise(r => setTimeout(r, wait * 1000));
-        } else {
-          throw err;
-        }
-      }
-    }
-  }
-
-  return Array.from(phraseCounts.entries())
-    .filter(([, quarters]) => quarters.size >= 2)
-    .map(([phrase, quarters]) => ({
-      phrase,
-      quarter_count: quarters.size,
-      quarters: Array.from(quarters).sort(),
-    }))
-    .sort((a, b) => b.quarter_count - a.quarter_count)
-    .slice(0, 200);
-}
-
-// ─── Stage 4: AI scoring and trivia ──────────────────────────────────────────
-
-async function stage4Score(client, candidates, ticker) {
-  const BATCH = 50;
-  const scores = new Map();
-
-  for (let i = 0; i < candidates.length; i += BATCH) {
-    const batch = candidates.slice(i, i + BATCH);
-    const numbered = batch
-      .map((c, j) => `${i + j}. "${c.phrase}" (${c.quarter_count} quarters)`)
-      .join('\n');
-
-    const prompt = `You are scoring phrase candidates for a ${ticker} earnings call BINGO game.
-
-Players mark phrases on their cards when they hear executives say them live. The best bingo phrase causes a knowing groan or laugh — "there it is." Score for SPEAKING STYLE, not subject matter.
-
-Score each phrase 0–10:
-- 8-10: Executive idiom, rhetorical framing, or CEO buzzword. Company-specific feel. ("double down", "playing offense", "unlocking value", "our flywheel")
-- 5-7: Recurring company language, somewhat distinctive, not pure boilerplate.
-- 2-4: Topic label (geographic, product, metric) or generic financial term. Any company could say it.
-- 0-1: Boilerplate, legal text, ceremony filler, vendor disclaimer, operator instructions.
-
-CANDIDATES:
-${numbered}
-
-Return ONLY a JSON array of {index, score} objects in order. No explanation. Example: [{"index":0,"score":7},{"index":1,"score":2}]`;
-
-    let attempt = 0;
-    while (true) {
-      try {
-        const response = await client.messages.create({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 1024,
-          messages: [{ role: 'user', content: prompt }],
-        });
-
-        const raw = response.content[0].text.trim()
-          .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
-        let ratings;
-        try { ratings = JSON.parse(raw); }
-        catch { ratings = []; }
-
-        for (const r of ratings) {
-          if (typeof r.index === 'number' && r.index < candidates.length) {
-            scores.set(candidates[r.index].phrase, r.score ?? 0);
-          }
-        }
-        break;
-      } catch (err) {
-        if (err.status === 429 && attempt < 3) {
-          attempt++;
-          const wait = 65 * attempt;
-          log(`  rate limited — waiting ${wait}s (attempt ${attempt}/3)`);
-          await new Promise(r => setTimeout(r, wait * 1000));
-        } else {
-          throw err;
-        }
-      }
-    }
-  }
-
-  return scores;
-}
-
-async function stage4Trivia(client, ticker) {
-  const prompt = `Generate 15 trivia questions about ${ticker} as a company — history, strategy, products, financials, milestones. Mix easy, medium, and hard difficulty.
-
-ABSOLUTE RULES — any violation disqualifies the whole response:
-- ZERO person names in any field. No CEO names, no founder names, no executive names, no designer names, no athlete names — nobody.
-- Questions must be about the COMPANY, not about individuals. Ask about years, revenues, store counts, product launches, acquisitions, market share.
-- Use only: "the company", "the brand", "management", "the leadership team". Never name a specific person.
-- BAD (rejected): "Which CEO guided the company through the 2008 downturn?" — names a role tied to a specific person
-- BAD (rejected): "What was Ted Decker's first year as president?" — obvious name
-- GOOD: "In what year did the company surpass $100 billion in annual revenue?"
-- GOOD: "Approximately how many US store locations does the company operate?"
-- Each question must have exactly 4 distinct answer options and one correct answer.
-- No answer option over 80 characters.
-
-Return ONLY a JSON array:
-[{"question":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","correct_answer":"a"},...]
-correct_answer must be "a", "b", "c", or "d". JSON only, no markdown.`;
-
-  const response = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 4096,
-    messages: [{ role: 'user', content: prompt }],
-  });
-
-  const raw = response.content[0].text.trim()
-    .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
-  try { return JSON.parse(raw); }
-  catch { return []; }
-}
-
-async function stage4Enrich(client, batch, ticker) {
-  let candidates;
-
-  if (batch.mode === 'paragraphs') {
-    // Layer 2: identify idioms from prepared-remarks paragraphs, then score
-    log(`  Stage 4a — identifying phrases from ${batch.quarter_entries.length} quarters of prepared remarks`);
-    candidates = await stage4IdentifyPhrases(client, batch.quarter_entries, ticker);
-    log(`  Identified ${candidates.length} candidate phrases (≥2 quarters)`);
-    if (candidates.length < 10) {
-      log(`  Warning: only ${candidates.length} candidates — results may be sparse`);
-    }
-  } else {
-    // Layer 1 (n-gram mode): score pre-extracted candidates
-    candidates = batch.candidates ?? [];
-    log(`  Stage 4a — scoring ${candidates.length} n-gram candidates`);
-  }
-
-  const scores = await stage4Score(client, candidates, ticker);
-
-  const scored = candidates
-    .filter(c => scores.has(c.phrase))
-    .map(c => ({ ...c, ai_score: scores.get(c.phrase) }))
-    .sort((a, b) => b.ai_score - a.ai_score || b.quarter_count - a.quarter_count);
-
-  const selected = scored.slice(0, 50).map(c => c.phrase);
-  log(`  Stage 4b — generating trivia`);
-  const trivia = await stage4Trivia(client, ticker);
-
-  return { phrases: selected, trivia };
-}
-
-// ─── Stage 5: validation and SQL generation ───────────────────────────────────
-
-function stage5Validate(aiOutput) {
+function validateOutput(output) {
   const issues = [];
   const approved = [];
+  const seen = new Set();
 
-  for (const phrase of aiOutput.phrases ?? []) {
+  for (const phrase of output.phrases ?? []) {
     if (typeof phrase !== 'string') { issues.push('non-string phrase skipped'); continue; }
     const p = phrase.trim();
     if (!p) { issues.push('blank phrase rejected'); continue; }
     if (p.length > MAX_PHRASE_CHARS) { issues.push(`too long (${p.length} chars): "${p}"`); continue; }
-    if (/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/.test(p)) {
-      issues.push(`possible person name rejected: "${p}"`); continue;
-    }
+    if (/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/.test(p)) { issues.push(`possible person name rejected: "${p}"`); continue; }
+    const key = p.toLowerCase();
+    if (seen.has(key)) { issues.push(`duplicate phrase skipped: "${p}"`); continue; }
+    seen.add(key);
     approved.push(p);
   }
 
   const triviaApproved = [];
-  for (const q of aiOutput.trivia ?? []) {
+  for (const q of output.trivia ?? []) {
     const required = ['question', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_answer'];
     const missing = required.filter(k => !q[k]);
     if (missing.length) { issues.push(`trivia missing fields: ${missing.join(', ')}`); continue; }
@@ -241,7 +61,10 @@ function stage5Validate(aiOutput) {
     }
     const allText = [q.question, q.option_a, q.option_b, q.option_c, q.option_d].join(' ');
     if (/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/.test(allText)) {
-      issues.push('trivia contains possible person name — skipped'); continue;
+      issues.push(`trivia rejected (possible person name / two-capitalized-words): "${q.question}"`); continue;
+    }
+    if ([q.option_a, q.option_b, q.option_c, q.option_d].some(o => String(o).length > 80)) {
+      issues.push(`trivia option over 80 chars: "${q.question}"`); continue;
     }
     triviaApproved.push(q);
   }
@@ -249,154 +72,141 @@ function stage5Validate(aiOutput) {
   return { approved, triviaApproved, issues };
 }
 
-function stage5Sql(companyId, ticker, approved, triviaApproved) {
-  const esc = s => s.replace(/'/g, "''");
-
+function buildSql(companyId, ticker, approved, triviaApproved) {
+  const esc = s => String(s).replace(/'/g, "''");
   const phraseRows = approved
     .map(p => `  ('${companyId}', '${esc(p)}', 'standard', 1, true, false)`)
     .join(',\n');
-
   const triviaRows = triviaApproved
     .map(q => `  ('${companyId}', '${esc(q.question)}', '${esc(q.option_a)}', '${esc(q.option_b)}', '${esc(q.option_c)}', '${esc(q.option_d)}', '${q.correct_answer}', 'earnings', 'medium', true)`)
     .join(',\n');
 
   return `-- ${ticker} phrase and trivia migration
--- Generated by scripts/ingestion/process-review-queue.js
+-- Finalized by scripts/ingestion/process-review-queue.js --finalize ${ticker}
+-- Phrases selected by a Claude Code agent (subscription), not an API call.
 -- ${new Date().toISOString()}
 --
 -- HUMAN REVIEW REQUIRED before execution.
--- Phrases are inserted with is_active = false.
--- Company must be manually activated once phrases are reviewed.
+-- Phrases are inserted with is_active = false; activate after review.
 
 INSERT INTO phrases (company_id, phrase, tier, points, ceo_mode, is_active) VALUES
 ${phraseRows}
 ON CONFLICT (company_id, phrase) DO NOTHING;
-
+${triviaRows ? `
 INSERT INTO trivia_questions (company_id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty, is_active) VALUES
 ${triviaRows}
 ON CONFLICT DO NOTHING;
-
--- Refresh phrase count (counts inactive phrases so admin can see the total)
+` : '-- (no trivia passed validation)\n'}
 UPDATE companies
   SET phrase_count = (SELECT COUNT(*) FROM phrases WHERE company_id = '${companyId}')
   WHERE id = '${companyId}';
 `;
 }
 
-// ─── Batch processing ─────────────────────────────────────────────────────────
+// ─── Modes ────────────────────────────────────────────────────────────────────
 
-async function processBatch(client, db, batchPath) {
-  let batch;
-  try { batch = JSON.parse(readFileSync(batchPath, 'utf8')); }
-  catch (e) { logError(`Cannot parse ${batchPath}: ${e.message}`); return; }
+function readQueueItem(file) {
+  try { return JSON.parse(readFileSync(file, 'utf8')); }
+  catch (e) { return { _error: e.message }; }
+}
 
-  if (batch.status !== 'pending') {
-    log(`Skipping ${path.basename(batchPath)} — status is "${batch.status}"`);
-    return;
+function itemSize(batch) {
+  if (Array.isArray(batch.quarter_entries)) return `${batch.quarter_entries.length} quarters of prepared remarks`;
+  if (Array.isArray(batch.candidates)) return `${batch.candidates.length} candidates`;
+  return 'unknown input';
+}
+
+function listQueue() {
+  if (!existsSync(REVIEW_QUEUE_DIR)) { log('No review-queue/ directory — nothing pending.'); return; }
+  const files = readdirSync(REVIEW_QUEUE_DIR).filter(f => f.endsWith('.json'));
+  if (files.length === 0) { log('Enrichment queue is empty — nothing to process.'); return; }
+
+  log(`Enrichment queue — ${files.length} pending compan${files.length === 1 ? 'y' : 'ies'}:`);
+  log('(process each per docs/program/ENRICHMENT_QUEUE.md using your Claude subscription — no API)\n');
+  for (const f of files.sort()) {
+    const ticker = path.basename(f, '.json');
+    const batch = readQueueItem(path.join(REVIEW_QUEUE_DIR, f));
+    if (batch._error) { log(`  ${ticker.padEnd(6)} ⚠️  unreadable (${batch._error})`); continue; }
+    const genDir = path.join(PACKS_DIR, ticker, 'generated');
+    const hasPhrases = existsSync(path.join(genDir, 'phrases.json'));
+    const hasTrivia = existsSync(path.join(genDir, 'trivia.json'));
+    let state;
+    if (hasPhrases && hasTrivia) state = '→ generated/ ready: run --finalize ' + ticker;
+    else if (hasPhrases || hasTrivia) state = `→ partial (phrases:${hasPhrases} trivia:${hasTrivia}) — finish then --finalize`;
+    else state = '→ NEEDS ENRICHMENT: read queue file, write phrases.json + trivia.json';
+    log(`  ${ticker.padEnd(6)} ${itemSize(batch).padEnd(34)} ${state}`);
+  }
+}
+
+function finalize(ticker) {
+  const queuePath = path.join(REVIEW_QUEUE_DIR, `${ticker}.json`);
+  if (!existsSync(queuePath)) { logError(`No queue item at ${path.relative(REPO_ROOT, queuePath)} — nothing to finalize for ${ticker}.`); process.exit(1); }
+  const batch = readQueueItem(queuePath);
+  if (batch._error) { logError(`Cannot read queue item: ${batch._error}`); process.exit(1); }
+  const companyId = batch.company_id || ticker.toLowerCase();
+
+  const genDir = path.join(PACKS_DIR, ticker, 'generated');
+  const phrasesPath = path.join(genDir, 'phrases.json');
+  const triviaPath = path.join(genDir, 'trivia.json');
+  if (!existsSync(phrasesPath) || !existsSync(triviaPath)) {
+    logError(`Missing agent output. Write both before finalizing:`);
+    logError(`  ${path.relative(REPO_ROOT, phrasesPath)}  (JSON array of phrase strings)`);
+    logError(`  ${path.relative(REPO_ROOT, triviaPath)}   (JSON array of trivia objects)`);
+    logError(`See docs/program/ENRICHMENT_QUEUE.md for the format and selection rubric.`);
+    process.exit(1);
   }
 
-  const { ticker, company_id } = batch;
-  const modeLabel = batch.mode === 'paragraphs'
-    ? `${batch.quarter_entries?.length ?? 0} quarters of prepared remarks`
-    : `${batch.candidates?.length ?? 0} n-gram candidates`;
-  log(`--- ${ticker}: ${modeLabel} (mode: ${batch.mode ?? 'ngrams'}) ---`);
+  let phrases, trivia;
+  try { phrases = JSON.parse(readFileSync(phrasesPath, 'utf8')); }
+  catch (e) { logError(`phrases.json parse error: ${e.message}`); process.exit(1); }
+  try { trivia = JSON.parse(readFileSync(triviaPath, 'utf8')); }
+  catch (e) { logError(`trivia.json parse error: ${e.message}`); process.exit(1); }
 
-  let aiOutput;
-  try {
-    aiOutput = await stage4Enrich(client, batch, ticker);
-    log(`  AI returned ${aiOutput.phrases?.length ?? 0} phrases, ${aiOutput.trivia?.length ?? 0} trivia`);
-  } catch (e) {
-    logError(`${ticker}: Stage 4 failed: ${e.message}`);
-    db.prepare(`UPDATE phase2_jobs SET status='validation_failed', error_message=?, updated_at=datetime('now') WHERE company_id=?`)
-      .run(`Stage 4 failed: ${e.message}`, company_id);
-    return;
-  }
-
-  log(`  Stage 5 — validating`);
-  const { approved, triviaApproved, issues } = stage5Validate(aiOutput);
-  log(`  ${approved.length} phrases approved, ${triviaApproved.length} trivia, ${issues.length} issue(s)`);
+  const { approved, triviaApproved, issues } = validateOutput({ phrases, trivia });
+  log(`${ticker}: ${approved.length} phrases approved, ${triviaApproved.length} trivia, ${issues.length} issue(s)`);
+  for (const i of issues.slice(0, 12)) log(`   - ${i}`);
+  if (issues.length > 12) log(`   …and ${issues.length - 12} more`);
 
   if (approved.length < MIN_APPROVED_PHRASES) {
-    logError(`${ticker}: only ${approved.length} phrases passed validation (need ≥${MIN_APPROVED_PHRASES})`);
-    db.prepare(`UPDATE phase2_jobs SET status='validation_failed', error_message=?, updated_at=datetime('now') WHERE company_id=?`)
-      .run(`only ${approved.length} phrases passed (need ≥${MIN_APPROVED_PHRASES})`, company_id);
-    return;
+    logError(`Only ${approved.length} phrases passed validation (need ≥${MIN_APPROVED_PHRASES}). Not finalized — add more phrases and re-run.`);
+    process.exit(1);
   }
 
-  const generatedDir = path.join(PACKS_DIR, ticker, 'generated');
-  mkdirSync(generatedDir, { recursive: true });
-
-  writeFileSync(path.join(generatedDir, 'phrases.json'), JSON.stringify(approved, null, 2));
-  writeFileSync(path.join(generatedDir, 'trivia.json'), JSON.stringify(triviaApproved, null, 2));
-  writeFileSync(path.join(generatedDir, 'validation_report.json'), JSON.stringify({
-    ticker, company_id,
-    generated_at: new Date().toISOString(),
-    mode: batch.mode ?? 'ngrams',
-    quarters_processed: batch.mode === 'paragraphs' ? batch.quarter_entries?.length : undefined,
-    candidates_raw_count: batch.candidates_raw_count,
+  writeFileSync(path.join(genDir, 'validation_report.json'), JSON.stringify({
+    ticker, company_id: companyId,
+    finalized_at: new Date().toISOString(),
+    enriched_by: 'claude-code-agent (subscription)',
+    mode: batch.mode ?? 'paragraphs',
     phrases_approved: approved.length,
     trivia_approved: triviaApproved.length,
     validation_issues: issues,
-    ready_for_migration: approved.length >= 50,
+    ready_for_migration: approved.length >= 50 && triviaApproved.length >= 12,
   }, null, 2));
-  writeFileSync(path.join(generatedDir, 'migration.sql'), stage5Sql(company_id, ticker, approved, triviaApproved));
+  writeFileSync(path.join(genDir, 'migration.sql'), buildSql(companyId, ticker, approved, triviaApproved));
 
-  db.prepare(`UPDATE phase2_jobs SET status='ready_for_review', updated_at=datetime('now') WHERE company_id=?`).run(company_id);
+  const db = new Database(DB_PATH);
+  db.pragma('journal_mode = WAL');
+  db.prepare(`UPDATE phase2_jobs SET status='ready_for_review', updated_at=datetime('now') WHERE company_id=?`).run(companyId);
+  db.close();
 
-  unlinkSync(batchPath);
-  log(`${ticker}: done — ${approved.length} phrases, ${triviaApproved.length} trivia written to company-packs/${ticker}/generated/`);
+  mkdirSync(PROCESSED_DIR, { recursive: true });
+  renameSync(queuePath, path.join(PROCESSED_DIR, `${ticker}.json`));
+
+  log(`${ticker}: finalized → company-packs/${ticker}/generated/migration.sql`);
+  log(`  ${approved.length} phrases, ${triviaApproved.length} trivia. Queue item moved to processed/. Status: ready_for_review.`);
+  if (approved.length < 50 || triviaApproved.length < 12) {
+    log(`  NOTE: below the 50-phrase / 12-trivia activation target — usable, but add more before activation if possible.`);
+  }
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const out = {};
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--ticker') out.ticker = args[++i]?.toUpperCase();
-  }
-  return out;
+const args = process.argv.slice(2);
+const finalizeIdx = args.indexOf('--finalize');
+if (finalizeIdx !== -1) {
+  const ticker = args[finalizeIdx + 1]?.toUpperCase();
+  if (!ticker) { logError('Usage: --finalize <TICKER>'); process.exit(1); }
+  finalize(ticker);
+} else {
+  listQueue();
 }
-
-async function main() {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    logError('ANTHROPIC_API_KEY is required — set it in .env');
-    process.exit(1);
-  }
-
-  const { ticker: tickerFilter } = parseArgs();
-
-  if (!existsSync(REVIEW_QUEUE_DIR)) {
-    log('review-queue/ directory does not exist — no batches to process');
-    process.exit(0);
-  }
-
-  const batchFiles = readdirSync(REVIEW_QUEUE_DIR)
-    .filter(f => f.endsWith('.json'))
-    .filter(f => !tickerFilter || f.startsWith(tickerFilter))
-    .map(f => path.join(REVIEW_QUEUE_DIR, f));
-
-  if (batchFiles.length === 0) {
-    log(`No pending batches found in review-queue/${tickerFilter ? ` for ${tickerFilter}` : ''}`);
-    process.exit(0);
-  }
-
-  log(`Found ${batchFiles.length} pending batch(es)${tickerFilter ? ` for ${tickerFilter}` : ''}`);
-
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const db = new Database(DB_PATH);
-  db.pragma('journal_mode = WAL');
-
-  for (const batchPath of batchFiles) {
-    try {
-      await processBatch(client, db, batchPath);
-    } catch (e) {
-      logError(`Unhandled error processing ${path.basename(batchPath)}: ${e.message}`);
-    }
-  }
-
-  db.close();
-  log('All batches processed.');
-}
-
-main().catch(e => { logError('Fatal:', e.message); process.exit(1); });

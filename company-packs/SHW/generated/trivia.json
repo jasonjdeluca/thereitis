@@ -1,0 +1,98 @@
+[
+  {
+    "question": "In what decade was the company founded?",
+    "option_a": "1840s",
+    "option_b": "1860s",
+    "option_c": "1890s",
+    "option_d": "1910s",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company primarily makes what products?",
+    "option_a": "paints and coatings",
+    "option_b": "kitchen appliances",
+    "option_c": "tires",
+    "option_d": "smartphones",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company's classic logo shows paint covering what?",
+    "option_a": "the earth",
+    "option_b": "a single house",
+    "option_c": "a sports car",
+    "option_d": "an artist's canvas",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the company's stock ticker?",
+    "option_a": "sw",
+    "option_b": "shw",
+    "option_c": "swn",
+    "option_d": "shn",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is a component of which index?",
+    "option_a": "the dow 30",
+    "option_b": "the russell 2000",
+    "option_c": "a crypto index",
+    "option_d": "no major index",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which is one of the company's reporting segments?",
+    "option_a": "paint stores group",
+    "option_b": "media networks",
+    "option_c": "cloud services",
+    "option_d": "airlines",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Professional paint is sold largely through what channel?",
+    "option_a": "its own stores",
+    "option_b": "vending machines",
+    "option_c": "gas stations",
+    "option_d": "airlines",
+    "correct_answer": "a"
+  },
+  {
+    "question": "In 2017 the company acquired which coatings maker?",
+    "option_a": "valspar",
+    "option_b": "benjamin only",
+    "option_c": "dulux",
+    "option_d": "behr",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is headquartered in which state?",
+    "option_a": "ohio",
+    "option_b": "texas",
+    "option_c": "oregon",
+    "option_d": "georgia",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The term 'residential repaint' refers to demand from what?",
+    "option_a": "home repainting",
+    "option_b": "new aircraft",
+    "option_c": "data centers",
+    "option_d": "oil rigs",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which segment serves manufacturers and industrial uses?",
+    "option_a": "performance coatings",
+    "option_b": "streaming media",
+    "option_c": "retail banking",
+    "option_d": "air travel",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company's products are mainly used for what?",
+    "option_a": "architectural and industrial coating",
+    "option_b": "mobile gaming",
+    "option_c": "air travel",
+    "option_d": "food delivery",
+    "correct_answer": "a"
+  }
+]

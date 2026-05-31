@@ -1,0 +1,98 @@
+[
+  {
+    "question": "In what decade was the company formed by a merger?",
+    "option_a": "1900s",
+    "option_b": "1920s",
+    "option_c": "1940s",
+    "option_d": "1960s",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is best known for making what?",
+    "option_a": "construction and mining equipment",
+    "option_b": "passenger cars",
+    "option_c": "smartphones",
+    "option_d": "aircraft",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What color are the company's machines famously painted?",
+    "option_a": "yellow",
+    "option_b": "red",
+    "option_c": "green",
+    "option_d": "blue",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the company's stock ticker?",
+    "option_a": "ct",
+    "option_b": "cat",
+    "option_c": "ctp",
+    "option_d": "catr",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is a component of which index?",
+    "option_a": "the dow 30",
+    "option_b": "the russell 2000",
+    "option_c": "a crypto index",
+    "option_d": "no major index",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which is one of the company's reporting segments?",
+    "option_a": "construction industries",
+    "option_b": "media networks",
+    "option_c": "cloud services",
+    "option_d": "footwear",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company sells engines and turbines under which energy brand?",
+    "option_a": "solar turbines",
+    "option_b": "wind dynamics",
+    "option_c": "hydroflow",
+    "option_d": "voltedge",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Independent dealers are a key part of the company's what?",
+    "option_a": "distribution network",
+    "option_b": "ad agency",
+    "option_c": "airline",
+    "option_d": "retail bank",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is headquartered in which state?",
+    "option_a": "illinois",
+    "option_b": "ohio",
+    "option_c": "nevada",
+    "option_d": "maine",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Digging and hauling machinery falls under which segment theme?",
+    "option_a": "resource industries",
+    "option_b": "consumer health",
+    "option_c": "streaming",
+    "option_d": "insurance",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company's products are commonly used in which sectors?",
+    "option_a": "construction and mining",
+    "option_b": "social media",
+    "option_c": "air travel",
+    "option_d": "pharma",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Order of magnitude, how many people does the company employ?",
+    "option_a": "about 11 thousand",
+    "option_b": "about 110 thousand",
+    "option_c": "about 1.1 million",
+    "option_d": "about 11 million",
+    "correct_answer": "b"
+  }
+]
