@@ -16,7 +16,8 @@ function pick(arr, n) {
 function derivePools(phrases) {
   return {
     hot: phrases.filter((p) => p.tier === "hot").map((p) => p.phrase),
-    warm: phrases.filter((p) => p.tier === "warm").map((p) => p.phrase),
+    // 'standard' is the default tier for pipeline-ingested phrases — treat as warm
+    warm: phrases.filter((p) => p.tier === "warm" || p.tier === "standard").map((p) => p.phrase),
     cold: phrases.filter((p) => p.tier === "cold").map((p) => p.phrase),
     ceo: phrases.filter((p) => p.ceo_mode).map((p) => p.phrase),
   };
@@ -76,31 +77,45 @@ export function generateCard(phrases) {
     isFilibuster: false,
   };
 
-  // Place Trinity
-  const placements = trinityPlacements();
-  const placement = placements[Math.floor(Math.random() * placements.length)];
-  const trinityShuffled = shuffle(TRINITY);
-  placement.forEach(([r, c], i) => {
-    grid[r][c] = {
-      phrase: trinityShuffled[i],
-      tier: "hot",
-      isFree: false,
-      isTrinity: true,
-      isFilibuster: trinityShuffled[i] === FILIBUSTER,
-    };
-  });
+  // Trinity is Hilton-specific — only place it when all three phrases exist in
+  // this company's pool. Other companies skip it and fill those cells normally.
+  const allPhraseTexts = new Set([...hot, ...warm, ...cold]);
+  const trinityAvailable = TRINITY.every((t) => allPhraseTexts.has(t));
 
-  // Remaining 21 cells: hot pool excluding Trinity, plus warm, plus 1-2 cold
+  if (trinityAvailable) {
+    const placements = trinityPlacements();
+    const placement = placements[Math.floor(Math.random() * placements.length)];
+    const trinityShuffled = shuffle(TRINITY);
+    placement.forEach(([r, c], i) => {
+      grid[r][c] = {
+        phrase: trinityShuffled[i],
+        tier: "hot",
+        isFree: false,
+        isTrinity: true,
+        isFilibuster: trinityShuffled[i] === FILIBUSTER,
+      };
+    });
+  }
+
+  // Remaining empty cells (21 when Trinity placed, 24 otherwise)
   const hotPool = hot.filter((p) => !TRINITY.includes(p));
-  const coldCount = Math.random() < 0.5 ? 1 : 2;
-  const hotCount = 13;
-  const warmCount = 21 - coldCount - hotCount; // 7 or 6
+  const coldCount = cold.length > 0 ? (Math.random() < 0.5 ? 1 : 2) : 0;
+  const hotCount = Math.min(hotPool.length, 13);
+  const needed = grid.flat().filter((c) => c === null).length;
+  const warmCount = Math.max(0, needed - coldCount - hotCount);
 
   const fillers = shuffle([
     ...pick(hotPool, hotCount),
     ...pick(warm, warmCount),
     ...pick(cold, coldCount),
   ]);
+
+  // Pad with repeats if phrase pool is smaller than card needs
+  const fullPool = shuffle([...hotPool, ...warm, ...cold]);
+  let repeatIdx = 0;
+  while (fillers.length < needed && fullPool.length > 0) {
+    fillers.push(fullPool[repeatIdx++ % fullPool.length]);
+  }
 
   let idx = 0;
   for (let r = 0; r < 5; r++) {
@@ -139,27 +154,36 @@ export function generateCeoCard(phrases) {
     isFilibuster: false,
   };
 
-  const placements = trinityPlacements();
-  const placement = placements[Math.floor(Math.random() * placements.length)];
-  const trinityShuffled = shuffle(TRINITY);
-  placement.forEach(([r, c], i) => {
-    grid[r][c] = {
-      phrase: trinityShuffled[i],
-      tier: "hot",
-      isFree: false,
-      isTrinity: true,
-      isFilibuster: trinityShuffled[i] === FILIBUSTER,
-    };
-  });
+  const allPhraseTexts = new Set([...hot, ...warm, ...cold]);
+  const trinityAvailable = TRINITY.every((t) => allPhraseTexts.has(t));
 
+  if (trinityAvailable) {
+    const placements = trinityPlacements();
+    const placement = placements[Math.floor(Math.random() * placements.length)];
+    const trinityShuffled = shuffle(TRINITY);
+    placement.forEach(([r, c], i) => {
+      grid[r][c] = {
+        phrase: trinityShuffled[i],
+        tier: "hot",
+        isFree: false,
+        isTrinity: true,
+        isFilibuster: trinityShuffled[i] === FILIBUSTER,
+      };
+    });
+  }
+
+  const needed = grid.flat().filter((c) => c === null).length;
   const ceoFillers = shuffle(ceo.filter((p) => !TRINITY.includes(p)));
-
   const used = new Set([...TRINITY, ...ceoFillers]);
-  const supplement = shuffle(
-    [...hot, ...warm, ...cold].filter((p) => !used.has(p)),
-  );
+  const supplement = shuffle([...hot, ...warm, ...cold].filter((p) => !used.has(p)));
+  const fillers = [...ceoFillers, ...supplement].slice(0, needed);
 
-  const fillers = [...ceoFillers, ...supplement].slice(0, 21);
+  // Pad with repeats if pool is too small
+  const fullPool = shuffle([...ceoFillers, ...supplement]);
+  let repeatIdx = 0;
+  while (fillers.length < needed && fullPool.length > 0) {
+    fillers.push(fullPool[repeatIdx++ % fullPool.length]);
+  }
 
   let idx = 0;
   for (let r = 0; r < 5; r++) {

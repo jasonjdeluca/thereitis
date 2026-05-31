@@ -324,15 +324,20 @@ export default function TriviaQuiz({ companyId = "hilton", onBack }) {
                   <span className="w-6 h-6 rounded-full border border-current flex items-center justify-center text-xs font-bold shrink-0">
                     {labels[i]}
                   </span>
-                  <span className="text-sm">{option}</span>
+                  <span className="text-sm">
+                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                  </span>
                 </button>
               );
             })}
           </div>
 
-          {revealed && q.fun_fact && (
+          {revealed && (
             <div className="rounded-xl bg-gold/10 border border-gold/30 px-4 py-3 text-sm text-cream/80">
-              {q.fun_fact}
+              {q.fun_fact ||
+                (selectedAnswer !== correctText(q) || timedOut
+                  ? `Answer: ${correctText(q).charAt(0).toUpperCase() + correctText(q).slice(1)}`
+                  : "Nailed it.")}
             </div>
           )}
 

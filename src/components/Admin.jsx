@@ -1387,8 +1387,8 @@ function AdminPanel({ onSignOut }) {
     async function load() {
       const { data } = await supabase.from("companies").select("*");
       if (data) {
-        const sorted = COMPANY_ORDER.map((id) => data.find((c) => c.id === id)).filter(
-          Boolean,
+        const sorted = [...data].sort(
+          (a, b) => Number(b.is_active) - Number(a.is_active) || a.name.localeCompare(b.name),
         );
         setCompanies(sorted);
       }
