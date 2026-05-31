@@ -451,12 +451,17 @@ function PhraseReviewPanel() {
   async function approveRow(row) {
     setBusyIds((b) => ({ ...b, [row.id]: true }));
     setActionError("");
-    const ins = await supabase.from("phrases").insert({
-      company_id: row.company_id,
-      phrase: row.phrase,
-      tier: APPROVE_DEFAULT_TIER,
-      points: APPROVE_DEFAULT_POINTS,
-    });
+    // upsert with ignoreDuplicates: if the phrase already exists in phrases
+    // (e.g. inserted by migration.sql), skip the insert and proceed to mark staging approved.
+    const ins = await supabase.from("phrases").upsert(
+      {
+        company_id: row.company_id,
+        phrase: row.phrase,
+        tier: APPROVE_DEFAULT_TIER,
+        points: APPROVE_DEFAULT_POINTS,
+      },
+      { onConflict: "company_id,phrase", ignoreDuplicates: true }
+    );
     if (ins.error) {
       setActionError(`Approve failed: ${ins.error.message}`);
       setBusyIds((b) => ({ ...b, [row.id]: false }));
@@ -1278,10 +1283,17 @@ export default function Admin() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setAuthed(!!session);
+    // getUser() validates the token server-side and auto-refreshes if needed.
+    // getSession() only reads from localStorage cache and passes expired tokens.
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setAuthed(!!user);
       setChecking(false);
     });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => { setAuthed(!!session?.user); }
+    );
+    return () => subscription.unsubscribe();
   }, []);
 
   if (checking) {

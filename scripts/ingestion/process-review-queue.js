@@ -269,10 +269,12 @@ function stage5Sql(companyId, ticker, approved, triviaApproved) {
 -- Company must be manually activated once phrases are reviewed.
 
 INSERT INTO phrases (company_id, phrase, tier, points, ceo_mode, is_active) VALUES
-${phraseRows};
+${phraseRows}
+ON CONFLICT (company_id, phrase) DO NOTHING;
 
 INSERT INTO trivia_questions (company_id, question, option_a, option_b, option_c, option_d, correct_answer, category, difficulty, is_active) VALUES
-${triviaRows};
+${triviaRows}
+ON CONFLICT DO NOTHING;
 
 -- Refresh phrase count (counts inactive phrases so admin can see the total)
 UPDATE companies

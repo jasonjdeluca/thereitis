@@ -1,0 +1,90 @@
+[
+  {
+    "question": "In what year was the company founded?",
+    "option_a": "1852",
+    "option_b": "1881",
+    "option_c": "1911",
+    "option_d": "1945",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Approximately how many stores did the company operate globally as of 2023?",
+    "option_a": "500",
+    "option_b": "1,200",
+    "option_c": "2,400",
+    "option_d": "3,800",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What was the company's approximate annual revenue in fiscal year 2022?",
+    "option_a": "$18 billion",
+    "option_b": "$32 billion",
+    "option_c": "$48 billion",
+    "option_d": "$65 billion",
+    "correct_answer": "c"
+  },
+  {
+    "question": "In what year did the company transition from public to private ownership?",
+    "option_a": "2005",
+    "option_b": "2007",
+    "option_c": "2014",
+    "option_d": "2018",
+    "correct_answer": "b"
+  },
+  {
+    "question": "How many major brand banners does the company operate under its portfolio?",
+    "option_a": "3",
+    "option_b": "5",
+    "option_c": "7",
+    "option_d": "10",
+    "correct_answer": "c"
+  },
+  {
+    "question": "In approximately what year did the company first launch e-commerce operations?",
+    "option_a": "1998",
+    "option_b": "2002",
+    "option_c": "2008",
+    "option_d": "2012",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which of these acquisitions did the company NOT make in the 2010s?",
+    "option_a": "A luxury leather goods brand",
+    "option_b": "An athletic footwear company",
+    "option_c": "A mid-range home furnishings retailer",
+    "option_d": "A regional discount apparel chain",
+    "correct_answer": "d"
+  },
+  {
+    "question": "In what year did the company exceed $1 billion in annual revenue?",
+    "option_a": "1985",
+    "option_b": "1995",
+    "option_c": "2002",
+    "option_d": "2008",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What strategic shift did the company announce regarding its store portfolio in 2019?",
+    "option_a": "Expansion of all-format locations",
+    "option_b": "Closure of underperforming locations",
+    "option_c": "Doubling of store count within 5 years",
+    "option_d": "Exit from all international markets",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Which corporate initiative has the company emphasized most heavily since 2020?",
+    "option_a": "Digital transformation and omnichannel integration",
+    "option_b": "Expansion into luxury markets only",
+    "option_c": "Return to physical-only retail model",
+    "option_d": "Consolidation into single brand entity",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Approximately what margin improvement did the company target through efficiency initiatives?",
+    "option_a": "100 basis points over 3 years",
+    "option_b": "250 basis points over 3 years",
+    "option_c": "400 basis points over 3 years",
+    "option_d": "600 basis points over 3 years",
+    "correct_answer": "b"
+  }
+]

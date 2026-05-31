@@ -1,10 +1,10 @@
 {
-  "ticker": "HD",
-  "company_id": "hd",
-  "generated_at": "2026-05-31T12:07:55.838Z",
+  "ticker": "TRV",
+  "company_id": "trv",
+  "generated_at": "2026-05-31T12:20:16.096Z",
   "mode": "paragraphs",
-  "quarters_processed": 17,
-  "phrases_approved": 37,
+  "quarters_processed": 10,
+  "phrases_approved": 20,
   "trivia_approved": 11,
   "validation_issues": [
     "trivia contains possible person name — skipped",

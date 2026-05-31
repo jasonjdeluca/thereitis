@@ -6,6 +6,7 @@
 services:
   fetcher:
     build: ./fetcher
+    user: "1001:1001"
     volumes:
       - ../company-packs:/app/company-packs
       - ../data:/app/data
@@ -17,12 +18,14 @@ services:
 
   extractor:
     build: ./extractor
+    user: "1001:1001"
     volumes:
       - ../company-packs:/app/company-packs
       - ../data:/app/data
 
   validator:
     build: ./validator
+    user: "1001:1001"
     volumes:
       - ../company-packs:/app/company-packs
       - ../data:/app/data

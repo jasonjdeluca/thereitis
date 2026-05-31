@@ -1,0 +1,66 @@
+[
+  {
+    "question": "In what year was the company founded?",
+    "option_a": "1962",
+    "option_b": "1950",
+    "option_c": "1968",
+    "option_d": "1955",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Approximately how many stores does the company currently operate globally?",
+    "option_a": "200",
+    "option_b": "500",
+    "option_c": "750",
+    "option_d": "1,200",
+    "correct_answer": "c"
+  },
+  {
+    "question": "In which year did the company's annual revenue first exceed $10 billion?",
+    "option_a": "2005",
+    "option_b": "2012",
+    "option_c": "2008",
+    "option_d": "2015",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What percentage of the company's revenue typically comes from international markets?",
+    "option_a": "15%",
+    "option_b": "30%",
+    "option_c": "50%",
+    "option_d": "65%",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What was the company's approximate annual revenue in 2022?",
+    "option_a": "$8.5 billion",
+    "option_b": "$12.2 billion",
+    "option_c": "$15.6 billion",
+    "option_d": "$18.9 billion",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What is the company's primary direct-to-consumer distribution strategy?",
+    "option_a": "Department store partnerships only",
+    "option_b": "Company-operated retail stores and online",
+    "option_c": "Wholesale to sporting goods retailers",
+    "option_d": "Outlet malls exclusively",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In 2021, the company announced a major strategic investment in which area?",
+    "option_a": "Manufacturing automation",
+    "option_b": "Sustainable and responsible business practices",
+    "option_c": "Luxury brand acquisitions",
+    "option_d": "Real estate development",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Approximately what percentage of the company's products use sustainable materials?",
+    "option_a": "25%",
+    "option_b": "40%",
+    "option_c": "60%",
+    "option_d": "80%",
+    "correct_answer": "c"
+  }
+]
