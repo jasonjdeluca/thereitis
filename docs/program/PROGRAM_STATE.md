@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-30 (session 8 — final update)
+**Last updated:** 2026-05-31 (session 10)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,9 +8,9 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Session 8 — Ran Phase 2 ops-worker for HD/WMT/DIS (17/17 fetched each); significant pipeline improvements (score-then-select Stage 4, preamble stripper, expanded filters, UA fix); generated content committed in PR #34. Codex inbox updated — Priorities 12/13/14 unblocked pending PR #34 merge. Wrote automated phrase review design.
-**Awaiting human action:** Review 600 phrases in `/admin`; merge PR #34 (pipeline improvements + HD/WMT/DIS generated content); configure Group C automations
-**Awaiting Codex:** Priorities 12/13/14 HD/WMT/DIS editorial reviews (unblocked — waiting on PR #34 merge); Priority 10 release readiness synthesis (waiting on VPS report data)
+**Just completed:** Sessions 9–10 — Layer 2 pipeline (sentence-level extraction) built and deployed; HD/WMT/DIS/NKE re-run with clean CEO-idiom phrases; admin panel RLS bug fixed (approve was silently broken); all phrase/trivia migrations applied to Supabase; staging-approved phrases promoted to phrases table; HD trivia prompt strengthened (0→11 trivia, factual errors corrected).
+**Awaiting human action:** Approve remaining ai_selected phrases from admin panel (203 candidates across 11 companies); activate HD phrases + trivia via SQL (see below); Layer 2 run for VZ/JPM/TRV/MMM/MRK/MSFT/BA (needs fetcher + extractor); configure Group C automations
+**Awaiting Codex:** Nothing — Codex inbox is clear
 
 ---
 
@@ -36,6 +36,10 @@
 
 | Decision | Detail |
 |---|---|
+| Phrases table: unique constraint added | Migration 019 added UNIQUE(company_id, phrase) to phrases table. Required by ON CONFLICT DO NOTHING in staging-to-phrases promotion. |
+| Admin RLS fix (migration 017) | phrases_insert/update/delete_admin switched from auth.role()='authenticated' to auth.uid() IS NOT NULL. The WITH CHECK context for INSERT was not evaluating role correctly. Approve button now works. |
+| Layer 2 pipeline (session 9–10) | Extractor clips at Q&A boundary, extracts prepared-remarks paragraphs only. Replaces n-gram counting. Q&A boundary min-distance raised 300→1500 chars to skip preamble. MIN_APPROVED_PHRASES lowered 25→15. |
+| migration.sql phrases inserted is_active=false | Layer 2 migration.sql inserts phrases as inactive. Before activation, run: UPDATE phrases SET is_active=true WHERE company_id='{id}' AND is_active=false; to make them playable. |
 | `bypassPermissions` enabled | Claude Code sessions run with bypassPermissions=true (commit 2b60716). Reduces friction for non-destructive tool calls. |
 | Claude Code Routines branch rule | Routines push only to `claude/`-prefixed branches. Human merges to main. |
 | Dual AI pools | Anthropic (Claude Code + Routines) and OpenAI (Codex Automations) run independently. When one pool hits its daily cap the other covers PM reporting. |
@@ -75,31 +79,56 @@
 
 ---
 
+## Activation Readiness (as of 2026-05-31)
+
+| Company | Phrases (total/active) | Trivia | Gap to Activation | Remaining candidates |
+|---|---|---|---|---|
+| **Hilton** | 51 / 51 | 42 | ✅ LIVE | — |
+| HD | 46 / 4 | 11 | 4 phrases + 1 trivia | 18 ai_selected |
+| NKE | 43 / 5 | 6 | 7 phrases + 6 trivia | 18 ai_selected |
+| WMT | 20 / 0 | 8 | 30 phrases + 4 trivia | 15 ai_selected |
+| DIS | 16 / 0 | 6 | 34 phrases + 6 trivia | 11 ai_selected |
+| JPM | 7 / 7 | 0 | 43 phrases + 12 trivia | 26 ai_selected |
+| VZ | 7 / 7 | 0 | 43 phrases + 12 trivia | 15 ai_selected |
+| MMM | 5 / 5 | 0 | 45 phrases + 12 trivia | 15 ai_selected |
+| MRK | 2 / 2 | 0 | 48 phrases + 12 trivia | 24 ai_selected |
+| MSFT | 2 / 2 | 0 | 48 phrases + 12 trivia | 20 ai_selected |
+| BA | 1 / 1 | 0 | 49 phrases + 12 trivia | 15 ai_selected |
+| TRV | 0 / 0 | 0 | 50 phrases + 12 trivia | 26 ai_selected |
+
+**Note:** phrases.total includes is_active=false rows from migration.sql. For game playability, all phrases must be is_active=true. Before activating any company run: `UPDATE phrases SET is_active=true WHERE company_id='{id}';`
+
+**HD is closest:** 4 more phrase approvals from admin panel + 1 trivia + activate all phrases → activation-ready.
+
+---
+
 ## Active Human Action Items
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Review 600 phrases in admin panel** | 11 companies with ai_selected phrases. Go to `/admin` → Phrase Staging Review. JPM/MRK/TRV each have 100 — approve best 50. Companies: MSFT, VZ, BA, TRV, MRK, JPM, MMM, HD, WMT, DIS, NKE. **Biggest unlock — no activation until 50 approved.** |
-| 2 | **Merge PR #34** | Phase 2 pipeline improvements + HD/WMT/DIS generated content. Unblocks Codex Priorities 12/13/14 editorial reviews. |
-| 3 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
-| 4 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
-| 5 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
-| 6 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
-| 7 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET. |
-| 8 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: weekdays 8:00am ET. |
-| 9 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting. |
-| 10 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
+| 1 | **Approve phrases in admin panel** | Admin panel RLS is fixed. Go to `/admin` → Phrase Staging Review. Approve ai_selected candidates. HD needs 4 more, NKE needs 7 more. Also approve the best from JPM (26), TRV (26), MRK (24), MSFT (20), VZ (15), MMM/NKE/HD (15-18). |
+| 2 | **Activate HD phrases + trivia via SQL** | Run: `UPDATE phrases SET is_active=true WHERE company_id='hd';` — then activate HD in admin panel once at 50 phrases + 12 trivia. HD is only 4 approvals away. |
+| 3 | **Layer 2 re-run for VZ, JPM, TRV, MRK, MSFT** | These have sources_ready status. Run fetcher first, then extractor, then process-review-queue.js. Will dramatically increase phrase counts for these companies. |
+| 4 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
+| 5 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
+| 6 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
+| 7 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
+| 8 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET. |
+| 9 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: weekdays 8:00am ET. |
+| 10 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting. |
+| 11 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
 
 ---
 
 ## Next Recommended Session
 
-**Session 8 is complete.** PR #34 open (pipeline improvements + HD/WMT/DIS generated content). Codex Priorities 12/13/14 unblocked pending merge.
+**Sessions 9–10 complete.** PR #40 merged. RLS fixed. All four companies have phrases+trivia in DB. HD is the closest company to activation.
 
 **Next session entry point (Claude Code):**
-1. Check `phrase_staging` — if human has approved phrases for any company, surface activation readiness
-2. Check Codex inbox for HD/WMT/DIS editorial review reports (Priorities 12/13/14); act on recommendations
-3. If Group C automations are configured, verify first PM Brief posted correctly
+1. Check if human has approved phrases via admin panel — if HD reaches 50 total phrases, activate via SQL + admin toggle
+2. Run Layer 2 pipeline for remaining companies: VZ, JPM, TRV, MRK, MSFT (sources_ready; need fetcher → extractor → process-review-queue)
+3. After Layer 2 runs, apply migration.sql for each company + activate phrases
+4. If Group C automations are configured, verify first PM Brief posted correctly
 4. Pipeline next: sentence-level extraction (replace n-gram counting) for better CEO-idiom candidates
 
 **Human action needed before next session:**
