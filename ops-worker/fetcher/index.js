@@ -70,10 +70,16 @@ function seedJobs(db) {
     VALUES (?, ?, 'sources_ready', ?)
     ON CONFLICT(company_id) DO NOTHING
   `);
+  // Re-sync accepted_url/source_type from the current manifest on every seed.
+  // (Previously DO NOTHING, which stranded companies on stale pre-repair URLs —
+  // e.g. the queue still held StockAnalysis links after a manifest was fixed to
+  // q4cdn.) fetch_status is intentionally NOT reset here, so already-fetched
+  // quarters stay fetched; the poller resets status when it wants a re-fetch.
   const upsertQ = db.prepare(`
     INSERT INTO phase2_quarters (company_id, fiscal_quarter, accepted_url, source_type)
     VALUES (?, ?, ?, ?)
-    ON CONFLICT(company_id, fiscal_quarter) DO NOTHING
+    ON CONFLICT(company_id, fiscal_quarter)
+    DO UPDATE SET accepted_url = excluded.accepted_url, source_type = excluded.source_type
   `);
 
   let seeded = 0;
