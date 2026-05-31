@@ -1,14 +1,14 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-31 (session 12)
-**Updated by:** Claude Code (Sonnet 4.6)
+**Last updated:** 2026-05-31 (session 13)
+**Updated by:** Claude Code (Opus 4.8)
 
 ---
 
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Session 12 — Admin RLS fix hardened and pushed to Vercel (belt-and-suspenders: getUser() on load + onAuthStateChange + refreshSession() before every approve write); HD migration.sql applied (57 total phrases, 11 trivia in DB, is_active=false — admin toggle still needed); V (Visa) Layer 2 run: 13 phrases + 12 trivia generated, migration.sql applied, MIN_APPROVED_PHRASES lowered 15→12. ⚠️ V trivia is wrong-company content (describes a department store chain, not Visa) — must be purged before V can be activated.
+**Just completed:** Session 13 — Diagnosed and fixed the admin 429 login loop at its real root cause: a token-refresh storm, not RLS. The session-12 "hardening" (refreshSession() before every write) was itself a primary cause. Replaced the localStorage-read gate + per-write manual refresh with the canonical single-path Supabase pattern (autoRefreshToken:true + getSession()-once + onAuthStateChange; no manual refresh). On branch `claude/fix-admin-auth-429`, PR opened. Build clean. ⚠️ After merge+deploy, the burned refresh token must be cleared once in the browser (Clear site data) then a fresh sign-in. Prior session-12 items still open: HD admin toggle; V wrong-company trivia purge.
 **Awaiting human action:** Toggle HD active in admin panel; approve phrases in admin panel; review and purge V trivia; configure Group C automations
 **Awaiting Codex:** Nothing — Codex inbox is clear
 
@@ -77,7 +77,8 @@
 | Migration 016 applied | Resolved | `016_phrase_staging_ai_select_policy.sql` applied via MCP 2026-05-30 (session 5). RLS UPDATE policy live. `ai-select.js` writes confirmed working: MSFT 50 ai_selected / 4,740 ai_rejected; VZ 50 ai_selected / 5,070 ai_rejected. |
 | NKE trivia gap | Low | Stage 4 generated only 4 NKE trivia questions; minimum for activation is 12. Codex Priority 7 editorial review will flag this. Stage 4 trivia prompt needs strengthening. |
 | Admin RLS true root cause (session 11) | Resolved | Prior "fix" changed phrases INSERT policy to auth.uid() IS NOT NULL but still reported broken. Root cause: Admin.jsx used getSession() which reads cached localStorage token without server validation — expired tokens passed the gate but failed on writes. Fix: getUser() (server-validated) + onAuthStateChange subscription + upsert with ignoreDuplicates in approveRow. phrase_staging UPDATE/DELETE policies also patched (migration 017). |
-| Admin RLS hardened (session 12) | Resolved | Belt-and-suspenders: getUser() on load + onAuthStateChange listener + refreshSession() immediately before every approve write. An expired token can no longer slip through to a write. Pushed to Vercel. |
+| Admin RLS hardened (session 12) | Superseded | Belt-and-suspenders attempt: getUser() on load + onAuthStateChange + refreshSession() before every approve write. This was the WRONG fix — the per-write refreshSession(), combined with onAuthStateChange's internal session load, created multiple concurrent refresh paths on the same expired token and caused the /auth/v1/token 429 storm. Unwound across commits 715ce58→671bbfc. See "Admin auth 429 root cause (session 13)" below. |
+| Admin auth 429 root cause (session 13) | Resolved | The 429 login loop was a token-refresh storm, not an RLS issue. Three refresh paths hit the same expired refresh token: (1) the localStorage-read gate's onAuthStateChange subscription, whose initial-session emit internally calls __loadSession→_callRefreshToken; (2) refreshSession() in approveRow before every write; (3) earlier autoRefresh/getUser/getSession load attempts. The "read localStorage directly, never refresh" hack could never work because subscribing to onAuthStateChange triggers a refresh regardless. Fix: canonical single-path pattern — one client with autoRefreshToken:true (single-flight lock owns refresh), getSession() once at mount + onAuthStateChange as sole auth-state source, zero manual refreshSession() calls. Net −29 lines. After deploy, the burned refresh token must be cleared once in the browser (Clear site data) and a fresh sign-in performed. |
 | HD activated (session 12) | Resolved | HD migration.sql applied — 57 total phrases, 11 trivia in DB. Phrases inserted as is_active=false. Human must run `UPDATE phrases SET is_active=true WHERE company_id='hd';` and toggle active in admin. |
 | V trivia wrong-company content (session 12) | ⚠️ Open | Layer 2 generated 12 trivia questions for V (Visa) that clearly describe a department store chain (Chapter 11 bankruptcy, nameplates/brands, store count). All 12 must be purged before V can be activated. Root cause: Haiku hallucinated company identity. Trivia prompt needs to focus on earnings call language patterns, not historical facts. |
 | MIN_APPROVED_PHRASES lowered 15→12 (session 12) | Resolved | Matches trivia activation minimum and accommodates companies with partial official PDF coverage (e.g., V at 10/17 quarters). |

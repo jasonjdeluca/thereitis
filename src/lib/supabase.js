@@ -1,17 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
 
+// Single shared client for the whole app. Auth uses the library's built-in
+// token management: ONE client, autoRefreshToken with its internal single-flight
+// lock, and no manual refresh calls anywhere else. Earlier code disabled
+// autoRefresh and called refreshSession() before every admin write, which —
+// combined with onAuthStateChange's internal session load — fired several
+// concurrent refreshes on the same (often expired) token and tripped the
+// /auth/v1/token 429 rate limit, which auth-js turns into a SIGNED_OUT login
+// loop. Letting the library own refresh, with exactly one load path, prevents
+// the storm: the single-flight lock collapses concurrent refreshes into one.
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY,
   {
     auth: {
-      // Do NOT auto-refresh tokens in the background. On client init Supabase
-      // refreshes any stored-but-expired token; when that refresh endpoint
-      // rate-limits (HTTP 429) the library fires SIGNED_OUT and bounces the
-      // admin to the login screen on every page load. We refresh explicitly
-      // right before each admin write instead (see approveRow in Admin.jsx).
-      autoRefreshToken: false,
       persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
     },
   },
 );
