@@ -1299,7 +1299,7 @@ export default function Admin() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => { setAuthed(!!session?.user); }
+      (event, _session) => { if (event === 'SIGNED_OUT') setAuthed(false); }
     );
     return () => subscription.unsubscribe();
   }, []);
