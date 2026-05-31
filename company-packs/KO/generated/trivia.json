@@ -1,0 +1,98 @@
+[
+  {
+    "question": "In what decade was the beverage first created?",
+    "option_a": "1860s",
+    "option_b": "1880s",
+    "option_c": "1900s",
+    "option_d": "1920s",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The drink was originally sold at what kind of location?",
+    "option_a": "a pharmacy",
+    "option_b": "a bakery",
+    "option_c": "a hardware store",
+    "option_d": "a gas station",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the company's stock ticker?",
+    "option_a": "co",
+    "option_b": "ko",
+    "option_c": "cc",
+    "option_d": "ck",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Which lemon-lime soft drink does the company own?",
+    "option_a": "sprite",
+    "option_b": "sierra",
+    "option_c": "citra",
+    "option_d": "twist",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which orange soda brand belongs to the company?",
+    "option_a": "fanta",
+    "option_b": "crush",
+    "option_c": "tango",
+    "option_d": "jolt",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which bottled water brand does the company own?",
+    "option_a": "dasani",
+    "option_b": "aquafina",
+    "option_c": "perrier",
+    "option_d": "evian",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company mainly sells what to its bottling partners?",
+    "option_a": "concentrate",
+    "option_b": "glass bottles",
+    "option_c": "delivery trucks",
+    "option_d": "retail shelving",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is a component of which index?",
+    "option_a": "the dow 30",
+    "option_b": "the russell 2000",
+    "option_c": "a crypto index",
+    "option_d": "no major index",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is headquartered in which city?",
+    "option_a": "atlanta",
+    "option_b": "chicago",
+    "option_c": "denver",
+    "option_d": "boston",
+    "correct_answer": "a"
+  },
+  {
+    "question": "How does the company describe its beverage strategy?",
+    "option_a": "a total beverage company",
+    "option_b": "an energy-only company",
+    "option_c": "a dairy-first company",
+    "option_d": "an alcohol-led company",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which sports-drink brand does the company control?",
+    "option_a": "powerade",
+    "option_b": "gatorade",
+    "option_c": "bodyfuel",
+    "option_d": "lucozade",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Order of magnitude, in how many countries are its products sold?",
+    "option_a": "about 20",
+    "option_b": "about 200",
+    "option_c": "about 2,000",
+    "option_d": "about 20,000",
+    "correct_answer": "b"
+  }
+]

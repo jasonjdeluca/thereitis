@@ -15,6 +15,18 @@ Then read in this order before touching any code:
 3. `docs/program/AGENT_TASK_BACKLOG.md` — current task status across all groups
 4. Relevant source files for the specific ticket being worked
 
+**Then check the enrichment queue** (the phrase/trivia work is done by YOU on the
+Claude subscription — never the Anthropic API):
+
+```bash
+node scripts/ingestion/process-review-queue.js --list
+```
+
+If any company is pending, process it per `docs/program/ENRICHMENT_QUEUE.md`
+(read the queue file → select 40–50 CEO-idiom phrases + write 12–18 trivia →
+`--finalize {TICKER}`) before unrelated work, or surface the pending list to the
+human. Do **not** run any Anthropic-API enrichment; that path was removed.
+
 ---
 
 ## Project Purpose
@@ -37,7 +49,7 @@ Working directory: `~/thereitis`
 | Backend/DB | Supabase | @supabase/supabase-js ^2.106.1 |
 | Card capture | html2canvas | 1.4.1 |
 | Deployment | Vercel | auto-deploy from main |
-| Ingest script (dev only) | @anthropic-ai/sdk | ^0.98.0 (devDependency) |
+| Ingest enrichment | Claude Code agent (subscription) | no API — see `docs/program/ENRICHMENT_QUEUE.md` |
 
 PostCSS and autoprefixer are wired for Tailwind. ESLint with react-hooks and react-refresh plugins.
 

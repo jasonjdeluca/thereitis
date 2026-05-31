@@ -1,0 +1,11 @@
+{
+  "ticker": "JPM",
+  "company_id": "jpm",
+  "finalized_at": "2026-05-31T18:34:22.878Z",
+  "enriched_by": "claude-code-agent (subscription)",
+  "mode": "paragraphs",
+  "phrases_approved": 27,
+  "trivia_approved": 12,
+  "validation_issues": [],
+  "ready_for_migration": false
+}

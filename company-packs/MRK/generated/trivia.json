@@ -1,0 +1,98 @@
+[
+  {
+    "question": "The company primarily operates in which industry?",
+    "option_a": "pharmaceuticals",
+    "option_b": "airlines",
+    "option_c": "paint",
+    "option_d": "mining",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the company's stock ticker?",
+    "option_a": "mk",
+    "option_b": "mrk",
+    "option_c": "mck",
+    "option_d": "mer",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is a component of which index?",
+    "option_a": "the dow 30",
+    "option_b": "the russell 2000",
+    "option_c": "a crypto index",
+    "option_d": "no major index",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which blockbuster cancer immunotherapy does the company make?",
+    "option_a": "keytruda",
+    "option_b": "humira",
+    "option_c": "eliquis",
+    "option_d": "ozempic",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which vaccine for a common virus is one of its products?",
+    "option_a": "gardasil",
+    "option_b": "shingrix",
+    "option_c": "prevnar",
+    "option_d": "fluzone",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Besides human pharma, the company has a large business in what?",
+    "option_a": "animal health",
+    "option_b": "air travel",
+    "option_c": "home paint",
+    "option_d": "social media",
+    "correct_answer": "a"
+  },
+  {
+    "question": "In many markets the company is branded under which name?",
+    "option_a": "msd",
+    "option_b": "gsk",
+    "option_c": "bms",
+    "option_d": "lly",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company's products are mainly what?",
+    "option_a": "prescription medicines and vaccines",
+    "option_b": "snack foods",
+    "option_c": "tractors",
+    "option_d": "house paint",
+    "correct_answer": "a"
+  },
+  {
+    "question": "'Renal cell carcinoma' treated by its drugs is a type of what?",
+    "option_a": "cancer",
+    "option_b": "allergy",
+    "option_c": "fracture",
+    "option_d": "head cold",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is headquartered in which state?",
+    "option_a": "new jersey",
+    "option_b": "texas",
+    "option_c": "oregon",
+    "option_d": "nevada",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which therapeutic area is a major focus for the company?",
+    "option_a": "oncology",
+    "option_b": "smartphones",
+    "option_c": "aviation",
+    "option_d": "retail",
+    "correct_answer": "a"
+  },
+  {
+    "question": "'Pulmonary arterial' hypertension chiefly affects which system?",
+    "option_a": "the lungs and heart",
+    "option_b": "the skin",
+    "option_c": "the teeth",
+    "option_d": "the hair",
+    "correct_answer": "a"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "question": "In what decade was the company founded?",
+    "option_a": "1880s",
+    "option_b": "1900s",
+    "option_c": "1920s",
+    "option_d": "1940s",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company began in which original line of business?",
+    "option_a": "mining",
+    "option_b": "banking",
+    "option_c": "textiles",
+    "option_d": "oil refining",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which iconic adhesive-note product does the company make?",
+    "option_a": "sticky tabs",
+    "option_b": "post-it",
+    "option_c": "memo dots",
+    "option_d": "quick notes",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Which transparent tape brand belongs to the company?",
+    "option_a": "scotch",
+    "option_b": "tartan",
+    "option_c": "clear-line",
+    "option_d": "glassine",
+    "correct_answer": "a"
+  },
+  {
+    "question": "What is the company's stock ticker?",
+    "option_a": "mmm",
+    "option_b": "tmm",
+    "option_c": "mmc",
+    "option_d": "mmg",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The ticker is made of how many identical letters?",
+    "option_a": "two",
+    "option_b": "three",
+    "option_c": "four",
+    "option_d": "one",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company is a component of which index?",
+    "option_a": "the dow 30",
+    "option_b": "the russell 2000",
+    "option_c": "a crypto index",
+    "option_d": "no major index",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which is one of the company's reporting segments?",
+    "option_a": "safety and industrial",
+    "option_b": "media networks",
+    "option_c": "cloud services",
+    "option_d": "apparel",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Which health-care brand belongs to the company?",
+    "option_a": "nexcare",
+    "option_b": "band-it",
+    "option_c": "curefast",
+    "option_d": "medingo",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is headquartered in which state?",
+    "option_a": "minnesota",
+    "option_b": "california",
+    "option_c": "texas",
+    "option_d": "florida",
+    "correct_answer": "a"
+  },
+  {
+    "question": "The company is broadly known for products in which area?",
+    "option_a": "industrial and consumer goods",
+    "option_b": "social media",
+    "option_c": "air travel",
+    "option_d": "fast food",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Order of magnitude, how many people does the company employ?",
+    "option_a": "about 9 thousand",
+    "option_b": "about 90 thousand",
+    "option_c": "about 900 thousand",
+    "option_d": "about 9 million",
+    "correct_answer": "b"
+  }
+]
