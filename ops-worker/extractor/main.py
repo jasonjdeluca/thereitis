@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """
-extractor — Phase 2 Stage 2.
-Reads fetched PDFs from company-packs/{ticker}/transcripts/, extracts 2-4 word
-phrases via n-gram scoring, writes candidate_phrases.json per company.
+extractor — Phase 2 Stage 2 (Layer 2: sentence-level extraction).
+Reads fetched PDFs from company-packs/{ticker}/transcripts/, extracts the
+prepared-remarks section of each transcript, and writes a paragraph batch to
+data/review-queue/{ticker}.json for Claude Code AI processing.
+
+Replaces n-gram counting with paragraph extraction so that legal disclaimers,
+Q&A boilerplate, and FactSet attribution text are excluded at the source.
+
 Env: DATA_DIR (default /app/data), PACKS_DIR (default /app/company-packs),
      TICKER (optional, process one company only)
 """
@@ -11,7 +16,6 @@ import json
 import os
 import re
 import sqlite3
-from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -20,66 +24,11 @@ import pdfplumber
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/app/data"))
 PACKS_DIR = Path(os.environ.get("PACKS_DIR", "/app/company-packs"))
 DB_PATH = DATA_DIR / "ingestion-queue.db"
+REVIEW_QUEUE_DIR = DATA_DIR / "review-queue"
 TICKER_FILTER = os.environ.get("TICKER", "").upper() or None
 
-MAX_CHARS = 25
-NGRAM_SIZES = (2, 3, 4)
-MIN_QUARTER_FREQ = 2
-
-STOPWORDS = {
-    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for",
-    "of", "with", "by", "from", "as", "is", "was", "are", "were", "be",
-    "been", "being", "have", "has", "had", "do", "does", "did", "will",
-    "would", "could", "should", "may", "might", "shall", "can", "that",
-    "this", "these", "those", "it", "its", "we", "our", "us", "they",
-    "their", "them", "you", "your", "not", "no", "so", "if", "then",
-    "than", "when", "what", "which", "who", "how", "all", "also", "more",
-    "very", "just", "now", "up", "out", "into", "over", "after", "about",
-    "within", "both", "each", "per", "yet", "still", "get", "got", "go",
-    "going", "come", "came", "see", "said", "say", "know", "think",
-    "look", "really", "actually", "certainly", "absolutely",
-}
-
-# Words that suggest executive speaking-style phrases (boost score).
-ACTION_WORDS = {
-    # Executive-strategy verbs that signal CEO-speak (not financial metric labels)
-    "accelerate", "accelerating", "unlock", "unlocking",
-    "execute", "executing", "win", "winning", "lead", "leading",
-    "lean", "leaning", "capture", "capturing", "strengthen", "strengthening",
-    "prioritize", "prioritizing", "transform", "transforming",
-    "play", "playing", "navigate", "navigating", "capitalize", "capitalizing",
-    "innovate", "innovating", "outperform", "outperforming",
-    "empower", "empowering", "disrupt", "disrupting",
-}
-
-# Words that flag pure domain-vocabulary phrases (penalty — not speaking style).
-DOMAIN_VOCAB = {
-    # Geographic segments
-    "china", "america", "europe", "asia", "pacific", "latin", "india",
-    "japan", "canada", "australia", "emea", "apac", "americas",
-    # Clinical / medical
-    "cancer", "disease", "therapy", "clinical", "patient", "drug",
-    "treatment", "trial", "diagnosis", "tumor", "oncology", "antibody",
-    # Pure financial nouns (when the whole phrase is just metrics)
-    "ebitda", "eps", "dividend", "yield", "bps",
-    # Legal boilerplate words — penalise heavily
-    "materially", "cautionary", "harbor", "litigation", "hereby",
-    "incorporated", "disclaimer", "prospectus", "registrant",
-    "approximately", "beginning", "ending", "trailing",
-}
-
-
-def idiom_signal(words: list[str]) -> float:
-    """Score 0.7–1.5: boosts executive-idiom phrases, penalises pure domain vocab."""
-    phrase_set = set(words)
-    if phrase_set & ACTION_WORDS:
-        return 1.4
-    if phrase_set & DOMAIN_VOCAB:
-        return 0.7
-    # Phrases ending in -ing or containing adverbs/adjectives trend toward idioms.
-    if any(w.endswith(("ing", "ly", "ward")) for w in words):
-        return 1.2
-    return 1.0
+MIN_PARAGRAPH_WORDS = 30
+MIN_PREPARED_REMARKS_WORDS = 200
 
 
 def ts() -> str:
@@ -97,16 +46,24 @@ def open_db() -> sqlite3.Connection:
     return conn
 
 
+def extract_text(transcript_path: Path) -> str:
+    if transcript_path.suffix.lower() == ".txt":
+        return transcript_path.read_text(encoding="utf-8", errors="replace")
+    parts = []
+    with pdfplumber.open(transcript_path) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text()
+            if text:
+                parts.append(text)
+    return "\n".join(parts)
+
+
 def strip_preamble(text: str) -> str:
     """Remove operator boilerplate, legal disclaimer, and participant roster.
 
-    Earnings call transcripts open with ~500-2000 words of noise before
-    any executive actually speaks. We skip to the first substantive remark
-    by searching for common prepared-remarks markers. If no marker is found,
-    we drop the first 2000 characters as a conservative fallback.
+    Searches for common prepared-remarks markers. If no marker is found,
+    drops the first 2000 characters as a conservative fallback.
     """
-    # Markers that typically appear just before the first executive speaks.
-    # Listed in rough order of reliability.
     markers = [
         "prepared remarks",
         "prepared statement",
@@ -122,55 +79,63 @@ def strip_preamble(text: str) -> str:
     best = len(text)
     for m in markers:
         idx = lower.find(m)
-        if 200 < idx < best:  # ignore matches in the very first 200 chars
+        if 200 < idx < best:
             best = idx
 
     if best < len(text):
         return text[best:]
-    # Fallback: drop first 2000 characters
     return text[min(2000, len(text) // 4):]
 
 
-def extract_text(transcript_path: Path) -> str:
-    if transcript_path.suffix.lower() == '.txt':
-        return transcript_path.read_text(encoding='utf-8', errors='replace')
-    parts = []
-    with pdfplumber.open(transcript_path) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text()
-            if text:
-                parts.append(text)
-    return "\n".join(parts)
+def find_qa_boundary(text: str) -> int:
+    """Return character index where Q&A begins, or len(text) if not found.
+
+    Legal disclaimers and FactSet attribution appear in the Q&A section or
+    after it. Clipping here eliminates the primary contamination source.
+    """
+    patterns = [
+        r"\bquestions?\s+and\s+answers?\b",
+        r"\bq\s*&\s*a\s+session\b",
+        r"\bq\s*&\s*a\b",
+        r"(?:^|\n)\s*operator[:\s]",
+        r"\bopen\s+(?:(?:the\s+)?(?:floor|call|line)\s+)?(?:for|to)\s+questions?\b",
+        r"\bnow\s+(?:open|take)\s+(?:your\s+)?questions?\b",
+        r"\bturn\s+(?:it\s+|the\s+call\s+)?(?:back\s+)?over\s+to\s+the\s+operator\b",
+        r"\bwe(?:'ll|'d| will| would)\s+now\s+(?:open|begin|start|take)\b",
+    ]
+    lower = text.lower()
+    earliest = len(text)
+    for pattern in patterns:
+        m = re.search(pattern, lower)
+        if m and m.start() > 300:
+            earliest = min(earliest, m.start())
+    return earliest
 
 
-def tokenize(sentence: str) -> list[str]:
-    return re.findall(r"[a-z][a-z'\-]*[a-z]|[a-z]{2,}", sentence.lower())
+def extract_prepared_remarks(text: str) -> str:
+    """Return only the prepared-remarks section of a transcript."""
+    text = strip_preamble(text)
+    boundary = find_qa_boundary(text)
+    return text[:boundary].strip()
 
 
-def is_valid_phrase(words: list[str]) -> bool:
-    phrase = " ".join(words)
-    if len(phrase) > MAX_CHARS:
-        return False
-    if all(w in STOPWORDS for w in words):
-        return False
-    if words[0] in STOPWORDS or words[-1] in STOPWORDS:
-        return False
-    if any(len(w) == 1 for w in words):
-        return False
-    return True
+def split_paragraphs(text: str) -> list[str]:
+    """Split prepared-remarks text into meaningful paragraph chunks.
 
-
-def extract_ngrams(text: str) -> set[str]:
-    phrases: set[str] = set()
-    sentences = re.split(r"(?<=[.!?])\s+|\n{2,}", text)
-    for sent in sentences:
-        words = tokenize(sent)
-        for size in NGRAM_SIZES:
-            for i in range(len(words) - size + 1):
-                window = words[i: i + size]
-                if is_valid_phrase(window):
-                    phrases.add(" ".join(window))
-    return phrases
+    Splits on blank lines or newlines followed by an uppercase letter
+    (common in PDF-extracted transcripts). Filters out very short fragments.
+    """
+    raw = re.split(r"\n\s*\n|\n(?=[A-Z])", text)
+    paragraphs = []
+    for p in raw:
+        p = p.strip()
+        # Skip short or mostly-whitespace chunks
+        if len(p.split()) < MIN_PARAGRAPH_WORDS:
+            continue
+        # Collapse internal whitespace
+        p = re.sub(r"\s+", " ", p)
+        paragraphs.append(p)
+    return paragraphs
 
 
 def process_company(conn: sqlite3.Connection, company_id: str, ticker: str) -> None:
@@ -184,12 +149,12 @@ def process_company(conn: sqlite3.Connection, company_id: str, ticker: str) -> N
         log(f"{ticker}: no quarters ready for extraction")
         return
 
-    log(f"{ticker}: extracting {len(quarters)} quarter(s)")
+    log(f"{ticker}: extracting prepared remarks from {len(quarters)} quarter(s)")
 
-    phrase_quarters: dict[str, set] = defaultdict(set)
     extracted_dir = PACKS_DIR / ticker / "extracted"
     extracted_dir.mkdir(parents=True, exist_ok=True)
 
+    quarter_entries = []
     ok = 0
     fail = 0
 
@@ -207,25 +172,40 @@ def process_company(conn: sqlite3.Connection, company_id: str, ticker: str) -> N
             continue
 
         try:
-            text = extract_text(transcript_path)
-            if not text.strip():
+            raw_text = extract_text(transcript_path)
+            if not raw_text.strip():
                 raise ValueError("Extracted text is empty")
-            text = strip_preamble(text)
 
+            prepared = extract_prepared_remarks(raw_text)
+            word_count = len(prepared.split())
+
+            if word_count < MIN_PREPARED_REMARKS_WORDS:
+                raise ValueError(
+                    f"Prepared remarks too short ({word_count} words) — may be a Q&A-only transcript"
+                )
+
+            paragraphs = split_paragraphs(prepared)
+            if not paragraphs:
+                raise ValueError("No paragraphs extracted from prepared remarks")
+
+            # Save extracted text for inspection
             txt_path = extracted_dir / f"{fq.replace(' ', '-')}.txt"
-            txt_path.write_text(text, encoding="utf-8")
+            txt_path.write_text(prepared, encoding="utf-8")
 
-            phrases = extract_ngrams(text)
-            for p in phrases:
-                phrase_quarters[p].add(fq)
+            quarter_entries.append({
+                "quarter": fq,
+                "word_count": word_count,
+                "paragraph_count": len(paragraphs),
+                "paragraphs": paragraphs,
+            })
 
             conn.execute(
                 "UPDATE phase2_quarters SET extract_status='extracted', candidates_path=?, phrase_count=?, updated_at=datetime('now') WHERE company_id=? AND fiscal_quarter=?",
-                (str(txt_path), len(phrases), company_id, fq),
+                (str(txt_path), len(paragraphs), company_id, fq),
             )
             conn.commit()
             ok += 1
-            log(f"  [{fq}] {len(phrases)} raw phrases")
+            log(f"  [{fq}] {len(paragraphs)} paragraphs, {word_count} words")
 
         except Exception as e:
             conn.execute(
@@ -236,30 +216,44 @@ def process_company(conn: sqlite3.Connection, company_id: str, ticker: str) -> N
             fail += 1
             log(f"  [{fq}] ✗ {e}")
 
-    # Score candidates; require MIN_QUARTER_FREQ distinct quarters.
-    # idiom_signal boosts CEO-speak phrases and penalises pure domain vocab.
-    candidates = [
-        {
-            "phrase": p,
-            "score": round(len(qs) * idiom_signal(p.split()), 3),
-            "quarter_count": len(qs),
-            "quarters": sorted(qs),
-        }
-        for p, qs in phrase_quarters.items()
-        if len(qs) >= MIN_QUARTER_FREQ
-    ]
-    candidates.sort(key=lambda c: (-c["score"], c["phrase"]))
+    if not quarter_entries:
+        new_status = "extract_failed"
+        conn.execute(
+            "UPDATE phase2_jobs SET status=?, quarters_extracted=0, updated_at=datetime('now') WHERE company_id=?",
+            (new_status, company_id),
+        )
+        conn.commit()
+        log(f"{ticker}: all quarters failed extraction → {new_status}")
+        return
 
-    out_path = PACKS_DIR / ticker / "candidate_phrases.json"
-    out_path.write_text(json.dumps(candidates, indent=2), encoding="utf-8")
+    # Write batch file to review-queue for Claude Code AI processing
+    REVIEW_QUEUE_DIR.mkdir(parents=True, exist_ok=True)
+    batch_path = REVIEW_QUEUE_DIR / f"{ticker}.json"
+    batch_path.write_text(
+        json.dumps(
+            {
+                "ticker": ticker,
+                "company_id": company_id,
+                "queued_at": ts(),
+                "status": "pending",
+                "mode": "paragraphs",
+                "quarters_ok": ok,
+                "quarters_failed": fail,
+                "quarter_entries": quarter_entries,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
-    new_status = "extracted" if ok > 0 else "extract_failed"
     conn.execute(
-        "UPDATE phase2_jobs SET status=?, quarters_extracted=?, updated_at=datetime('now') WHERE company_id=?",
-        (new_status, ok, company_id),
+        "UPDATE phase2_jobs SET status='awaiting_ai_review', quarters_extracted=?, updated_at=datetime('now') WHERE company_id=?",
+        (ok, company_id),
     )
     conn.commit()
-    log(f"{ticker}: {ok} extracted, {fail} failed, {len(candidates)} candidates (≥{MIN_QUARTER_FREQ} qtrs) → {new_status}")
+    log(
+        f"{ticker}: {ok} quarters extracted, {fail} failed → review-queue/{ticker}.json (awaiting Claude Code session)"
+    )
 
 
 def main() -> None:
