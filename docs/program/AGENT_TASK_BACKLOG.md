@@ -97,6 +97,7 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Add admin warning banner for companies that are active but stale or below threshold
 - [x] Add sample card preview: clicking a company shows a randomly assembled 5×5 bingo card using that company's phrases
 - [x] Add recent sessions list: last 10 sessions with company name, player count, whether bingo was reached
+- [x] Add activation override: "Override →" link below "Cannot Activate" allows force-activation despite phrase/trivia gap (session 16)
 
 ---
 
@@ -323,9 +324,8 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Cross-Cutting Tasks
 *Surfaced by Codex handover intake 2026-05-29*
 
-- [ ] Add all 30 blue-chip companies to the `companies` table — output migration SQL for human execution
-  - Output as `supabase/migrations/{next-number}_add_bluechip_companies.sql`
-  - Owner: Claude Code (SQL output), Human (execution)
+- [x] Add all 30 blue-chip companies to the `companies` table — output migration SQL for human execution
+  - All 30 blue-chip + 11 hotel companies (41 total) confirmed in `companies` table as of 2026-05-31 (session 16)
 - [x] Decide canonical location for `latest_ingested_quarter` metadata per company
   - Decision: Supabase `companies` table (migration 015 adds column). `company.json` per pack may optionally mirror for offline use but is not the authoritative source.
   - Migration 015 output at `supabase/migrations/015_latest_ingested_quarter.sql` — human execution required after PR #23 merge.
@@ -345,4 +345,4 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
-*Last updated: 2026-05-30 (session 7). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
+*Last updated: 2026-05-31 (session 16). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*

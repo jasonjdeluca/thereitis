@@ -1,16 +1,16 @@
 # There It Is — Program State
 
-**Last updated:** 2026-05-31 (session 13)
-**Updated by:** Claude Code (Opus 4.8)
+**Last updated:** 2026-05-31 (session 16)
+**Updated by:** Claude Code (Sonnet 4.6)
 
 ---
 
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Session 13 — Diagnosed and fixed the admin 429 login loop at its real root cause: a token-refresh storm, not RLS. The session-12 "hardening" (refreshSession() before every write) was itself a primary cause. Replaced the localStorage-read gate + per-write manual refresh with the canonical single-path Supabase pattern (autoRefreshToken:true + getSession()-once + onAuthStateChange; no manual refresh). On branch `claude/fix-admin-auth-429`, PR opened. Build clean. ⚠️ After merge+deploy, the burned refresh token must be cleared once in the browser (Clear site data) then a fresh sign-in. Prior session-12 items still open: HD admin toggle; V wrong-company trivia purge.
-**Awaiting human action:** Toggle HD active in admin panel; approve phrases in admin panel; review and purge V trivia; configure Group C automations
-**Awaiting Codex:** Nothing — Codex inbox is clear
+**Just completed:** Sessions 14–16 — Subscription enrichment model (PR #42), admin-driven Docker control plane (PR #43), BA/KO/MMM migrations applied + phrases activated, activation override button added to admin panel. The agentic ingestion loop is now end-to-end: admin panel triggers pipeline → Docker fetch/extract/validate → enrichment queue → Claude Code session enriches → migration SQL applied.
+**Awaiting human action:** Toggle HD/BA/KO/MMM active in admin panel; apply CAT/JPM/MRK/SHW migration SQL; flip is_active for phrase-staging companies; configure Group C automations
+**Awaiting Codex:** WMT and DIS editorial phrase reviews (unblocked once WMT/DIS phrases are activated)
 
 ---
 
@@ -21,14 +21,14 @@
 | A | Live Game Stability | ✅ Complete | Silent fallback removed, zero-phrase companies fixed, trivia generalized, readiness gate added |
 | B | Deterministic Truth Layer | ✅ Complete | All 4 scripts built and deployed; VPS cron running at 6:00am and 9:00pm ET |
 | C | Automation Infrastructure | 🔄 In Progress | All 5 prompt files written and quality-edited (merged — PR #32). Platform configuration pending — manual setup in Claude Code Routines and Codex Automations. |
-| D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate, ingestion status column, next call date, sample card preview, recent sessions list |
-| E | Transcript Research | ✅ Complete | All 30 companies researched. Priorities 1–6 done. KO/BA/MMM/HD/WMT/NKE/DIS fully official (17/17 each). VZ 17/17 official confirmed. AAPL/NVDA/AMZN/CSCO/HON/MCD confirmed no written transcript PDFs — structural limitation. JNJ: human_review_required. MSFT: HTML-only, StockAnalysis fallback. All manifests in `company-packs/` (17 on main via PR #18; 13 in codex/staging pending promotion). |
-| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 run for 11 companies (2026-05-30): MSFT, VZ, BA, TRV, MRK, JPM, MMM, HD, WMT, DIS, NKE — all have 50 ai_selected phrases awaiting human approval (JPM/MRK/TRV have 100 each after repair run). Phase 2 ops-worker built and tested (NKE). **Blocker: human phrase review needed before any company can be activated.** |
-| G | Content QA | 🔄 In Progress | Scripts and rubric complete. NKE generated files committed (PR #29). Codex Priority 8 editorial review assigned — should run next Codex session. |
-| H | Evergreen Maintenance | ✅ Complete | `transcript-freshness.js` merged. Migration 015 live (executed 2026-05-30). Runbook and Codex exception prompt merged. Post-call HTTP watch deferred to Phase 3. |
+| D | Admin Console | ✅ Complete | Readiness table, status badges, activation gate + override button, ingestion status column, next call date, sample card preview, recent sessions list, Ingestion Pipeline panel (PR #43) |
+| E | Transcript Research | ✅ Complete | All 30 blue-chip + hotel companies in DB. All source manifests in `company-packs/`. 41 companies total. |
+| F | Ingestion Pipeline | 🔄 In Progress | Phase 1 complete for 11 companies. Phase 2 Docker ops-worker built. Admin control plane live (PR #43) — poller cron running. Enrichment queue empty; 4 companies (CAT/JPM/MRK/SHW) have generated migrations pending human application. **Blocker: human phrase review + migration application needed before more companies activate.** |
+| G | Content QA | 🔄 In Progress | Scripts and rubric complete. NKE, HD, WMT, DIS, BA, KO, MMM generated files committed. Codex editorial reviews for WMT and DIS deferred pending phrase activation. |
+| H | Evergreen Maintenance | ✅ Complete | `transcript-freshness.js` merged. Migration 015 live. Runbook and Codex exception prompt merged. Post-call HTTP watch deferred to Phase 3. |
 | I | Public UX and SEO | ✅ Complete | Companies section, interactive sample card, FAQ merged (PR #21). SEO already complete. |
-| J | QA and Launch Hardening | ✅ Complete | Playwright tests, release-readiness.js, RELEASE_CHECKLIST.md all merged. VPS needs `npx playwright install-deps`. Current posture: **Yellow** (0 blockers, 13 warnings). Codex Priority 7 release readiness synthesis in progress. |
-| K | Analytics and Launch | 🔄 In Progress | `docs/program/LAUNCH_KIT.md` promoted from Codex staging (merged PR #26). Human review required before publishing any copy. Analytics event tracking, snapshot script, and feedback form still not started. |
+| J | QA and Launch Hardening | ✅ Complete | Playwright tests, release-readiness.js, RELEASE_CHECKLIST.md all merged. VPS needs `npx playwright install-deps`. Current posture: **Yellow** (0 blockers, 13 warnings). |
+| K | Analytics and Launch | 🔄 In Progress | `docs/program/LAUNCH_KIT.md` promoted from Codex staging. Human review required before publishing. Analytics event tracking, snapshot script, and feedback form not started. |
 
 ---
 
@@ -37,80 +37,52 @@
 | Decision | Detail |
 |---|---|
 | Phrases table: unique constraint added | Migration 019 added UNIQUE(company_id, phrase) to phrases table. Required by ON CONFLICT DO NOTHING in staging-to-phrases promotion. |
-| Admin RLS fix (migration 017) | phrases_insert/update/delete_admin switched from auth.role()='authenticated' to auth.uid() IS NOT NULL. The WITH CHECK context for INSERT was not evaluating role correctly. Approve button now works. |
-| Layer 2 pipeline (session 9–10) | Extractor clips at Q&A boundary, extracts prepared-remarks paragraphs only. Replaces n-gram counting. Q&A boundary min-distance raised 300→1500 chars to skip preamble. MIN_APPROVED_PHRASES lowered 25→15. |
-| migration.sql phrases inserted is_active=false | Layer 2 migration.sql inserts phrases as inactive. Before activation, run: UPDATE phrases SET is_active=true WHERE company_id='{id}' AND is_active=false; to make them playable. |
-| `bypassPermissions` enabled | Claude Code sessions run with bypassPermissions=true (commit 2b60716). Reduces friction for non-destructive tool calls. |
+| Admin RLS fix (migration 017) | phrases_insert/update/delete_admin switched from auth.role()='authenticated' to auth.uid() IS NOT NULL. |
+| Layer 2 pipeline (session 9–10) | Extractor clips at Q&A boundary, extracts prepared-remarks paragraphs only. Q&A boundary min-distance raised 300→1500 chars. MIN_APPROVED_PHRASES lowered 25→15. |
+| migration.sql phrases inserted is_active=false | All migration.sql files insert phrases as inactive. Before activation, run: `UPDATE phrases SET is_active=true WHERE company_id='{id}' AND is_active=false;` |
+| `bypassPermissions` enabled | Claude Code sessions run with bypassPermissions=true (commit 2b60716). |
 | Claude Code Routines branch rule | Routines push only to `claude/`-prefixed branches. Human merges to main. |
-| Dual AI pools | Anthropic (Claude Code + Routines) and OpenAI (Codex Automations) run independently. When one pool hits its daily cap the other covers PM reporting. |
-| 5-stage pipeline; only Stage 4 uses AI | Deterministic stages reduce input to ~200 candidates before the AI call — 45x token reduction vs. feeding raw transcripts. Stage 4 uses Claude Haiku or GPT-4o Mini (plain API call inside Docker, not a Claude Code session). |
-| Group E assigned to Codex | Transcript research is browsing and synthesis, not codebase engineering. No repo context needed; OpenAI pool used. |
-| Separate Docker containers | Fetcher (Node.js), extractor (Python), validator (Node.js). Python is better suited to PDF/NLP; Node for HTTP and SQL. Phase 2 work not yet started. |
-| Company ID normalization | `companies` table has no `ticker` column. Canonical IDs are lowercase tickers for most companies; hotel companies use word-slug IDs (`MAR→marriott`, `H→hyatt`, `WH→wyndham`, `CHH→choice`, `KO→ko`). `TICKER_TO_COMPANY_ID` map in `scripts/ingestion/lib/common.js` is authoritative. |
-| `phrase_staging` migration | 013_phrase_staging.sql created and applied via MCP 2026-05-30. Table did not exist before this session. |
-| MSFT full pipeline validated | 15/17 quarters fetched, 7,086 raw candidates, 4,790 unique phrases staged to `phrase_staging` as `pending`. |
-| Opus for architecture, Sonnet for execution | Use `claude-opus-4-8` when designing new systems or making architectural decisions. Use `claude-sonnet-4-6` for well-defined implementation tickets and inspection work. |
+| Dual AI pools | Anthropic (Claude Code + Routines) and OpenAI (Codex Automations) run independently. |
+| 5-stage pipeline; only Stage 4 uses AI | 45x token reduction vs. feeding raw transcripts. |
+| Company ID normalization | No `ticker` column on `companies`. `TICKER_TO_COMPANY_ID` map in `scripts/ingestion/lib/common.js` is authoritative. |
+| `phrase_staging` migration | 013_phrase_staging.sql created and applied 2026-05-30. |
+| Opus for architecture, Sonnet for execution | Use `claude-opus-4-8` for architectural decisions. Use `claude-sonnet-4-6` for implementation. |
 | Model ID strings | Opus 4.8: `claude-opus-4-8` · Sonnet 4.6: `claude-sonnet-4-6` · Haiku 4.5: `claude-haiku-4-5-20251001` |
 | Production SQL requires human approval | All Supabase migrations must be output as SQL files and executed manually by the human. Never auto-run. |
-| codex/staging ↔ codex/inbox pipeline | Shared staging branch protocol live on main. Codex deposits work to `codex/staging/`; Claude Code writes task assignments and responses to `codex/inbox/`. `PROTOCOL.md` is the source of truth. |
-| Phase 2 fetcher: Q4CDN only | `ir.homedepot.com` and StockAnalysis both block automated fetching (403/400). Phase 2 Docker fetcher can only reliably download from Q4CDN vendor-hosted PDFs. Confirmed working: NKE (`s1.q4cdn.com`), confirmed in spot checks: V, TRV, MRK. This is why Codex Priority 3 (official source repair) directly unblocks the pipeline. |
-| ANTHROPIC_API_KEY in thereitis/.env | Key is now in `~/thereitis/.env` for docker compose validator service. Never commit `.env`. |
-| MSFT official HTML confirmed inaccessible | Codex Priority 4 validation: 15 MSFT official IR HTML pages return 403 to Node GET. These are transcript web pages, not PDFs. MSFT stays on StockAnalysis fallback for Phase 2; Phase 1 ingest (4,790 phrases staged) is unaffected since the extractor works against pre-downloaded text. |
-| VZ fully official — prime Phase 2 candidate | Codex Priority 4 validated all 17 VZ official PDFs (verizon.com/about/file/* token URLs): 17/17 pass with correct Content-Type and PDF signature. TRV (s26.q4cdn.com) also 10/10 pass. VZ and TRV are the next lowest-risk companies to run through the Phase 2 pipeline. |
-| KO official PDF returns 403 | Codex Priority 2 spot check: KO Q1 2026 official transcript PDF on investors.coca-colacompany.com returns 403 application/xml even with browser-like headers. Ingestion access issue — KO may require a different fetch approach or manual download. |
-| Phase 1 pipeline + ai-select flow confirmed | Resolved | Session 5: 7 companies processed. Session 6: URL repairs + 4 new builders. Final fetch rates: BA 17/17, MMM 17/17, VZ 17/17, MSFT 15/17, HD 17/17, WMT 17/17, DIS 17/17, NKE 17/17, TRV 11/17, JPM 13/17, MRK 9/17. StockAnalysis 400 failures accepted. |
-| Codex inbox note sent (session 5) | Info | `codex/inbox/session-5-handoff-2026-05-30.md` on `codex/staging` branch. Priority 8: NKE editorial review (unblocked). Priority 9: Group C prompt review. Priority 10: release readiness synthesis (waiting on VPS report data). Priority 11: advance notice of BA/TRV/MRK/JPM/MMM editorial reviews. |
-| Codex Priority 8+9 complete (session 6) | Info | NKE: not activation-ready (16/50 phrases pass after editorial review; 3/12 trivia pass). migration.sql must remain human_decision_needed. Group C: 5 prompt files need targeted edits — see `codex/staging/reports/group-c-prompt-review-2026-05-30.md`. |
-| Group C prompt edits applied (session 7) | Resolved | PR #32 applies all 16 Codex Priority 9 findings as targeted line-level changes to all 5 prompt files. No wholesale rewrites. Awaiting human merge. |
-| Codex inbox note sent (session 7) | Info | `codex/inbox/editorial-reviews-hd-wmt-dis-2026-05-30.md` on `codex/staging`. Assigns Priorities 12 (HD), 13 (WMT), 14 (DIS) editorial reviews. All three currently blocked — Phase 2 ops-worker must generate phrases.json/trivia.json before Codex can review. WMT and DIS flagged as high-priority launch companies. |
-| No human phrase approvals (session 7 check) | Info | All 11 companies remain at ai_selected in phrase_staging. 600 phrases await human review in admin panel. No company is activation-ready yet. |
-| Phase 2 pipeline improved (session 8) | Info | Score-then-select Stage 4 (Haiku scores 0-10, code selects top 50) eliminates hallucination. Preamble stripper, expanded FILLER_BLOCKLIST, STAGE3_REJECT_PATTERNS (30 regex patterns). Fetcher UA fixed (Chrome string, fixes HD 403). |
-| HD/WMT/DIS generated content (session 8) | Info | PR #34 open. HD 50 phrases/11 trivia, WMT 50/11, DIS 50/6 (DIS trivia below activation minimum — same issue as NKE). Codex inbox updated — editorial reviews unblocked pending PR #34 merge. |
-| Automated review design completed (session 8) | Info | Score-then-select is Layer 1. Layer 2 (sentence-level extraction not n-gram) is the next pipeline upgrade. Layer 3 (two-tier admin UX: Haiku ≥8 auto-flag for bulk approve, 5-7 manual review, ≤4 auto-reject) can be built once scoring signal is reliable. |
-| URL pattern strategy: use manifests, not patterns | Decision | buildMrk/buildJpm/buildTrv now use hardcoded URL maps sourced from source_manifest.json. StockAnalysis 400 errors are expected and accepted for quarters with no official PDF. All new builders (HD/WMT/DIS/NKE) use the same manifest-sourced approach. |
-| Fetcher User-Agent changed to browser-like string | Resolved | "ThereItIsBot" UA triggered 403 on ir.homedepot.com. Updated to Chrome/Mac UA. Affects all companies — re-run is safe since each fetch writes to data/raw/ and does not re-download already-fetched rows. |
-| ai-select 429 backoff (65s, 3 retries) | Resolved | Haiku 50k token/min rate limit hit on WMT (3997 phrases, 27 batches). Retry logic added to selectBatch loop. WMT completed on second attempt after 65s wait. |
-| JPM/MRK/TRV have 100 ai_selected phrases | Info | Two runs of ai-select (session 5 + session 6 repair run) each selected 50. Both sets are visible in the admin Phrase Staging Review panel. Human should approve the best 50 from each. |
-| VZ queue-builder was using HTML webcast URLs | Resolved | Fixed in PR #26: updated to use direct PDF download URLs from source_manifest.json. VZ re-run successful (5,120 phrases staged). |
-| PDF character-spaced headers produce garbage n-grams | Resolved | Fixed in PR #26: validator now rejects any phrase where a token is a single non-'a' letter (`single_char_token` rejection reason). VZ re-run confirmed clean top phrases. |
-| Priority 6 promotions complete (BA/KO/MMM/CAT/SHW) | Resolved | BA (17/17 q4cdn), KO (17/17 official IR), MMM (17/17 CloudFront), CAT (9/17 q4cdn + 8/17 StockAnalysis), SHW (8/17 q4cdn + 9/17 StockAnalysis). source_manifest.json promoted and queue-builder wired for all 5. IBM (4/17) and CRM (1/17) deferred — too few official rows to be useful. |
-| Migration 016 applied | Resolved | `016_phrase_staging_ai_select_policy.sql` applied via MCP 2026-05-30 (session 5). RLS UPDATE policy live. `ai-select.js` writes confirmed working: MSFT 50 ai_selected / 4,740 ai_rejected; VZ 50 ai_selected / 5,070 ai_rejected. |
-| NKE trivia gap | Low | Stage 4 generated only 4 NKE trivia questions; minimum for activation is 12. Codex Priority 7 editorial review will flag this. Stage 4 trivia prompt needs strengthening. |
-| Admin RLS true root cause (session 11) | Resolved | Prior "fix" changed phrases INSERT policy to auth.uid() IS NOT NULL but still reported broken. Root cause: Admin.jsx used getSession() which reads cached localStorage token without server validation — expired tokens passed the gate but failed on writes. Fix: getUser() (server-validated) + onAuthStateChange subscription + upsert with ignoreDuplicates in approveRow. phrase_staging UPDATE/DELETE policies also patched (migration 017). |
-| Admin RLS hardened (session 12) | Superseded | Belt-and-suspenders attempt: getUser() on load + onAuthStateChange + refreshSession() before every approve write. This was the WRONG fix — the per-write refreshSession(), combined with onAuthStateChange's internal session load, created multiple concurrent refresh paths on the same expired token and caused the /auth/v1/token 429 storm. Unwound across commits 715ce58→671bbfc. See "Admin auth 429 root cause (session 13)" below. |
-| Admin auth 429 root cause (session 13) | Resolved | The 429 login loop was a token-refresh storm, not an RLS issue. Three refresh paths hit the same expired refresh token: (1) the localStorage-read gate's onAuthStateChange subscription, whose initial-session emit internally calls __loadSession→_callRefreshToken; (2) refreshSession() in approveRow before every write; (3) earlier autoRefresh/getUser/getSession load attempts. The "read localStorage directly, never refresh" hack could never work because subscribing to onAuthStateChange triggers a refresh regardless. Fix: canonical single-path pattern — one client with autoRefreshToken:true (single-flight lock owns refresh), getSession() once at mount + onAuthStateChange as sole auth-state source, zero manual refreshSession() calls. Net −29 lines. After deploy, the burned refresh token must be cleared once in the browser (Clear site data) and a fresh sign-in performed. |
-| HD activated (session 12) | Resolved | HD migration.sql applied — 57 total phrases, 11 trivia in DB. Phrases inserted as is_active=false. Human must run `UPDATE phrases SET is_active=true WHERE company_id='hd';` and toggle active in admin. |
-| V trivia wrong-company content (session 12) | ⚠️ Open | Layer 2 generated 12 trivia questions for V (Visa) that clearly describe a department store chain (Chapter 11 bankruptcy, nameplates/brands, store count). All 12 must be purged before V can be activated. Root cause: Haiku hallucinated company identity. Trivia prompt needs to focus on earnings call language patterns, not historical facts. |
-| MIN_APPROVED_PHRASES lowered 15→12 (session 12) | Resolved | Matches trivia activation minimum and accommodates companies with partial official PDF coverage (e.g., V at 10/17 quarters). |
-| StockAnalysis fully blocked in Phase 2 Docker (session 12 confirmed) | Confirmed | GS, AXP, CVX, PG, UNH, AMGN, MSFT, CSCO, HON, MCD, AAPL, NVDA, AMZN return 100% 400 from Phase 2 Docker fetcher. The unlock for these companies is finding official q4cdn or IR-domain PDF sources. Codex research assignment is the next step. |
-| StockAnalysis Phase 2 fully blocked | Confirmed | MSFT/GS/AXP all return HTTP 400 from Phase 2 Docker fetcher (0/17 each). StockAnalysis now blocks the Chrome UA used by Docker. Phase 1 could get MSFT 15/17 via a different UA or timing. Companies with no official PDFs (MSFT, GS, AXP, JPM partial, MRK partial) cannot expand via Phase 2 Layer 2 without official source repair. |
-| Docker review-queue permissions fixed | Resolved | Docker containers ran as root, writing review-queue files owned by root (causing unlinkSync EACCES). Fixed by adding user: 1001:1001 to all services in docker-compose.yml. |
-| ON CONFLICT DO NOTHING in migration.sql | Resolved | process-review-queue.js generator now adds ON CONFLICT (company_id, phrase) DO NOTHING and ON CONFLICT DO NOTHING to phrase and trivia INSERTs. Prevents duplicate-phrase failures when migration.sql overlaps with previously applied rows. |
-| Phase 2 Layer 2 results (session 11) | Info | VZ: 17/17 fetched (official verizon.com PDFs), 26 phrases, 8 trivia. TRV: 10/17 fetched (q4cdn), 20 phrases, 11 trivia. JPM: 8/17 fetched, 3 phrases (below 15 threshold — batch retained). MRK: 8/17 fetched, 9 phrases (below 15 threshold). HD refreshed: 37 phrases, 11 trivia. Migration files in company-packs/{VZ,TRV,HD}/generated/migration.sql. |
+| codex/staging ↔ codex/inbox pipeline | Shared staging branch protocol live on main. Codex deposits work to `codex/staging/`; Claude Code writes task assignments and responses to `codex/inbox/`. |
+| Phase 2 fetcher: Q4CDN only | StockAnalysis returns 400. Phase 2 Docker fetcher can only reliably download from Q4CDN vendor-hosted PDFs. |
+| ANTHROPIC_API_KEY in thereitis/.env | Key is in `~/thereitis/.env` for docker compose validator service. Never commit `.env`. |
+| Subscription enrichment model (session 14) | AI enrichment step (phrase selection + trivia writing) is now done by the Claude Code agent using the subscription — never the Anthropic API. No per-token cost. `ENRICHMENT_QUEUE.md` is the protocol. |
+| Admin ingestion control plane (session 15) | Admin panel can trigger Docker fetch→extract→validate runs. Poller (`scripts/ingestion/poller.js`) runs on VPS (cron every 3 min + nightly --enqueue). Migration 018 live. |
+| Activation override button (session 16) | Admin panel now shows "Override →" link below "Cannot Activate" for companies below criteria. Allows human to force-activate despite phrase/trivia gap. |
+| All 41 companies in DB | All 30 blue-chip + 11 hotel companies confirmed in `companies` table. Cross-cutting migration task complete. |
+| BA/KO/MMM migrations applied (session 16) | 51/50/55 phrases (all is_active=true) + 12 trivia each. Awaiting admin toggle. |
 
 ---
 
-## Activation Readiness (as of 2026-05-31 session 12)
+## Activation Readiness (as of 2026-05-31 session 16)
 
-| Company | Phrases (total/active) | Trivia | Gap to Activation | Notes |
+| Company | Active / Total Phrases | Trivia | Gap to Activation | Notes |
 |---|---|---|---|---|
 | **Hilton** | 51 / 51 | 42 | ✅ LIVE | — |
-| **HD** | 57 / 57 | 11 | ✅ Ready — toggle active in admin | Migration applied session 12. Admin toggle still needed. |
-| NKE | 43 / 5 | 6 | 7 phrases + 6 trivia | No new migration this session |
-| VZ | 32 / 7 | 0 | 18 phrases + 12 trivia | Migration applied session 11. Phrases inactive. Trivia still at 0. |
-| TRV | 20 / 0 | 11 | 30 phrases + 1 trivia | Migration applied session 11. Phrases inactive. |
-| V | 13 / 0 | 0 | 37 phrases + 12 trivia | ⚠️ Migration applied but trivia is wrong-company content — purge before activation |
-| WMT | 20 / 0 | 8 | 30 phrases + 4 trivia | No new migration |
-| JPM | 7 / 7 | 0 | 43 phrases + 12 trivia | StockAnalysis blocked in Phase 2 Docker |
-| MMM | 5 / 5 | 0 | 45 phrases + 12 trivia | ❌ |
-| DIS | 16 / 0 | 6 | 34 phrases + 6 trivia | No new migration |
-| MRK | 2 / 2 | 0 | 48 phrases + 12 trivia | 9 phrases below threshold in Layer 2 |
-| MSFT | 2 / 2 | 0 | 48 phrases + 12 trivia | StockAnalysis 100% blocked in Phase 2 Docker |
-| BA | 1 / 1 | 0 | 49 phrases + 12 trivia | ❌ |
+| **HD** | 58 / 58 | 11 | ✅ Ready — toggle active in admin | 11 trivia (use Override — 1 below min) |
+| **MMM** | 55 / 55 | 12 | ✅ Ready — toggle active in admin | Migration applied session 16 |
+| **BA** | 51 / 51 | 12 | ✅ Ready — toggle active in admin | Migration applied session 16 |
+| **KO** | 50 / 50 | 12 | ✅ Ready — toggle active in admin | Migration applied session 16 |
+| VZ | 14 / 39 | 0 | Flip 25 inactive phrases + 12 trivia | Run `UPDATE phrases SET is_active=true WHERE company_id='vz' AND is_active=false;` then build trivia |
+| NKE | 8 / 46 | 6 | Flip 38 inactive phrases + 6 trivia | Run is_active flip; 6 more trivia needed |
+| WMT | 6 / 26 | 8 | Flip 20 inactive phrases + 4 trivia | Run is_active flip; Codex editorial review pending |
+| DIS | 1 / 17 | 6 | Flip 16 inactive phrases + 6 trivia | Run is_active flip; Codex editorial review pending |
+| TRV | 0 / 20 | 11 | Flip 20 inactive phrases + 1 trivia | Run is_active flip; 1 more trivia needed |
+| V | 0 / 13 | 0 | ⚠️ 37 phrases + 12 trivia | Wrong-company trivia purged — need re-enrichment |
+| CAT | 0 / 0 | 0 | Apply migration + 18 more phrases | migration.sql in company-packs/CAT/generated/ (32 phrases, 12 trivia) |
+| JPM | 7 / 7 | 0 | Apply migration + more phrases | migration.sql in company-packs/JPM/generated/ (27 phrases, 12 trivia) |
+| SHW | 0 / 0 | 0 | Apply migration + 30 more phrases | migration.sql in company-packs/SHW/generated/ (20 phrases, 12 trivia) |
+| MRK | 2 / 2 | 0 | Apply migration + more phrases | migration.sql in company-packs/MRK/generated/ (19 phrases, 12 trivia) |
+| MSFT | 6 / 6 | 0 | 44 phrases + 12 trivia | StockAnalysis 100% blocked in Phase 2 Docker |
 
-**Note:** phrases.total includes is_active=false rows. Before activating, run: `UPDATE phrases SET is_active=true WHERE company_id='{id}';`
-
-**HD is ready:** Run `UPDATE phrases SET is_active=true WHERE company_id='hd';` (already at 57 total) → toggle active in admin panel. **V trivia must be purged** before V can be activated — all 12 trivia rows describe a department store chain, not Visa.
+**Note:** For VZ/NKE/WMT/DIS/TRV — phrases are in DB as is_active=false. Run the UPDATE before activating.
+`UPDATE phrases SET is_active=true WHERE company_id='{id}' AND is_active=false;`
 
 ---
 
@@ -118,38 +90,38 @@
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Activate HD in admin panel** | Migration applied (57 phrases, 11 trivia in DB). Run `UPDATE phrases SET is_active=true WHERE company_id='hd';` then toggle active. HD becomes the second live company. |
-| 2 | **Purge V trivia from Supabase** | All 12 V trivia rows describe a department store chain, not Visa. Run `DELETE FROM trivia_questions WHERE company_id='v';` before attempting V activation. Then re-run Layer 2 with a strengthened trivia prompt. |
-| 3 | **Approve phrases in admin panel** | RLS fix is live on Vercel. Go to `/admin` → Phrase Staging Review. Approve ai_selected candidates for NKE (18), JPM (26), TRV (26), MRK (24), MSFT (20), VZ (15), MMM (15), BA (15). |
-| 4 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
-| 5 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
-| 6 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
-| 7 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
-| 8 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET. |
-| 9 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: weekdays 8:00am ET. |
-| 10 | **Review human_review_required sources** | RHP, CLDT, AHT, JNJ flagged in source manifests. Must verify before ingesting. |
-| 11 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
+| 1 | **Toggle BA, KO, MMM active in admin panel** | All three have ≥50 active phrases and 12 trivia — activation-ready. |
+| 2 | **Toggle HD active in admin panel (use Override)** | 58 active phrases, 11 trivia (1 below min — use Override button). |
+| 3 | **Flip inactive phrases for VZ/NKE/WMT/DIS/TRV** | `UPDATE phrases SET is_active=true WHERE company_id='{id}' AND is_active=false;` for each. |
+| 4 | **Apply CAT/JPM/MRK/SHW migration SQL** | Files at `company-packs/{TICKER}/generated/migration.sql`. These are below 50-phrase threshold — more enrichment needed after. |
+| 5 | **Purge V trivia from Supabase** | `DELETE FROM trivia_questions WHERE company_id='v';` then re-run Layer 2 with corrected trivia prompt. |
+| 6 | **Add SUPABASE_SERVICE_ROLE_KEY to VPS .env** | ✅ Done (session 16). Poller verified live. |
+| 7 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
+| 8 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
+| 9 | **Configure Codex Automation: Weekly content quality summary** | Prompt at `docs/program/prompts/codex-content-quality.md`. Trigger: Friday 8:00am ET. |
+| 10 | **Configure Codex Automation: Nightly ingestion queue triage** | Prompt at `docs/program/prompts/codex-ingestion-triage.md`. Trigger: 9:30pm ET. |
+| 11 | **Configure Codex Automation: Overflow PM brief** | Prompt at `docs/program/prompts/codex-pm-brief-overflow.md`. Trigger: weekdays 8:00am ET. |
+| 12 | **`npx playwright install-deps` on VPS** | One-time command. Unblocks Playwright tests in VPS cron. |
+| 13 | **Review LAUNCH_KIT.md** | Replace `"Beta access is opening soon"` and `"[beta link]"` placeholders before publishing. |
 
 ---
 
 ## Next Recommended Session
 
-**Session 12 complete.** HD migration applied, V pipeline run (trivia wrong-company — flagged). Admin RLS hardened and live on Vercel.
-
-**Next session entry point (Claude Code):**
-1. Verify HD active status — if human toggled active, confirm Hilton + HD both visible on `/play` company selector
-2. Purge V trivia (`DELETE FROM trivia_questions WHERE company_id='v';`) and re-run Layer 2 for V with a strengthened trivia prompt (no factual questions about historical events — focus on earnings call language patterns only)
-3. For VZ/TRV/NKE: supplement Layer 2 phrases with Phase 1 ai_selected approvals from admin panel to close phrase gaps
-4. Ask Codex to hunt official PDF sources (q4cdn or IR-domain) for GS, AXP, UNH, AMGN, CVX, PG — these are the next unlock for more companies (everything else is StockAnalysis-blocked)
-5. If Group C automations are configured, verify first PM Brief posted correctly
+**Entry point (Claude Code):**
+1. Check enrichment queue (`node scripts/ingestion/process-review-queue.js --list`) — if any pending, process them
+2. Re-enrich V: purge wrong-company trivia, run Phase 2 pipeline for V, enrich from review queue with corrected trivia prompt (no historical/factual — CEO language patterns only)
+3. Enrich CAT/JPM/MRK/SHW further — need to reach 50 phrases before activation. Either run pipeline again (if official PDFs available) or extend enrichment from existing review-queue data
+4. Assign Codex WMT/DIS editorial reviews (currently blocked on phrase activation — human must flip is_active first)
+5. Hunt official q4cdn/IR-domain PDF sources for GS, AXP, UNH, AMGN, CVX, PG — assign to Codex as next research batch
 
 **Human action needed before next session:**
-- Activate HD in admin panel (#1 above — HD is ready now)
-- Purge V trivia (#2 above — before any further V work)
-- Approve phrases in admin panel (#3 above)
-- Configure at least one Claude Code Routine or Codex Automation (#5–#9)
+- Toggle BA/KO/MMM active in admin panel (#1–#3)
+- Toggle HD active (Override — #2)
+- Flip is_active phrases for VZ/NKE/WMT/DIS/TRV (#3)
+- Apply CAT/JPM/MRK/SHW migration SQL (#4)
 
-**Model:** `claude-sonnet-4-6` for all pipeline and repair work. Switch to `claude-opus-4-8` only for architectural decisions.
+**Model:** `claude-sonnet-4-6` for pipeline and repair work. Switch to `claude-opus-4-8` only for architectural decisions.
 
 ---
 
@@ -157,19 +129,14 @@
 
 | Item | Severity | Detail |
 |---|---|---|
-| Company ID normalization | Medium | No `ticker` column on `companies`. Hotel companies use word-slug IDs. The `TICKER_TO_COMPANY_ID` map in `lib/common.js` must be kept in sync as new companies are added to the DB. |
-| `phrases.tier` and `phrases.points` NOT NULL | Low | These columns have no default. The admin approve action in `Admin.jsx` inserts hardcoded defaults. Any other insert path that omits these will fail. |
-| IHG manual sourcing | Low | IHG is set aside from the ingestion pipeline. Non-standard reporting format means it can only be added manually. No ETA. |
-| Low-confidence transcript sources | Low | RHP (Q1/Q4 2022, Q1 2023), CLDT (historical), AHT (Q1 2026 missing), JNJ (several quarters). These are flagged `human_review_required=true` in the source manifest and must be verified before the company is activated. |
-| Choice Hotels ticker typo normalized | Resolved | Was researched under `CCH` (typo), normalized to `CHH` (correct). Manifests updated. No action needed. |
-| IR server bot-blocking | Partially resolved | StockAnalysis returns 400. `ir.homedepot.com` HTML catalog pages return 403, but **direct PDF file URLs on ir.homedepot.com pass** (Priority 5 confirmed 17/17 HD PDFs at HTTP 200). The constraint is catalog/navigation pages, not direct PDF links. Phase 2 fetcher can process HD and any company with direct PDF URLs in their source manifest. Companies with only StockAnalysis fallback URLs (AAPL, NVDA, AMZN, CSCO, IBM, CRM, KO, CAT, BA, HON, MMM, SHW, MCD) still need official PDF source repair before Phase 2 can fetch them. |
-| V trivia wrong-company content | High | All 12 V trivia rows in Supabase describe a department store chain, not Visa. Must purge (`DELETE FROM trivia_questions WHERE company_id='v';`) before V activation. Indicates Haiku can confuse company identity when prompted for historical/factual trivia. Trivia prompt should focus on earnings call language patterns rather than corporate history facts. |
-| Phase 2 trivia pass rate | Low | Stage 4 Claude Haiku still includes person names in ~75% of trivia despite explicit prompt instruction. Stage 5 correctly rejects them. Prompt strengthened; retry loop not yet built. NKE test: 4/15 trivia passed. Acceptable for now; fix before batch production runs. |
-| Group C platform configuration pending | Medium | All 5 automation prompt files exist but none of the Claude Code Routines or Codex Automations are live. The agentic PM loop does not run until these are configured. |
-| `feat/group-d-admin-console` branch not merged | Low | Local branch exists. Confirm it is fully merged to main; if not, review and merge. |
-| HD/WMT/NKE/DIS source manifests repaired | Resolved | PR #18 merged. All 68 quarters use official IR-domain sources. |
-| Phase 2 Docker ops-worker built and tested | Resolved | NKE end-to-end test passed. PR #20 ready. Awaiting human merge. |
-| Groups G, H, I, J built; PRs open | Info | All four PRs (#21–#24) are open and review-ready. No migration required except PR #23 (migration 015). |
-| KO official PDF access blocked | Low | investors.coca-colacompany.com returns 403 even with browser-like headers. KO ingestion will need manual download or a browser-emulation strategy. Not a blocker for other companies. |
-| MSFT official HTML pages inaccessible | Resolved | Confirmed 403 to Node GET (HTML transcript pages, not PDFs). MSFT Phase 1 pipeline already validated on StockAnalysis fallback; Phase 2 will continue that approach. |
-| Codex Priority 5 outstanding | Low | Link validation for PR #18 companies (AAPL, NVDA, AMZN, CSCO, HD, IBM, CRM, KO, WMT, NKE, DIS, CAT, BA, HON, MMM, SHW, MCD) is assigned and in Codex inbox. No blocker for merges. |
+| V trivia wrong-company content | High | All V trivia was purged (was describing a department store chain). V needs full re-enrichment with a corrected trivia prompt focused on CEO language patterns, not corporate history facts. |
+| CAT/JPM/MRK/SHW below 50-phrase threshold | Medium | Generated migrations exist but companies are below activation minimum. More pipeline runs or alternative data sources needed. |
+| Phase 2 Docker blocked on StockAnalysis | Medium | MSFT, GS, AXP, UNH, AMGN, CVX, PG, CRM, IBM, HON, MCD, AAPL, NVDA, AMZN, CSCO all have no official q4cdn PDFs. Phase 2 cannot fetch them. Official source research via Codex is the unlock. |
+| Group C platform configuration pending | Medium | All 5 automation prompt files exist but Claude Code Routines and Codex Automations are not live. Agentic PM loop does not run until configured. |
+| VZ/NKE/WMT/DIS/TRV phrases inactive | Medium | Phrases in DB but is_active=false. Human must run UPDATE before these companies can be activated. |
+| HD/MMM/BA/KO not toggled active | Medium | All four are activation-ready in the DB. Admin toggle is the only remaining step. |
+| Phase 2 trivia pass rate | Low | Stage 4 Haiku still includes person names in ~75% of trivia despite prompt instructions. Stage 5 rejects them. Prompt strengthened; acceptable for now. |
+| Company ID normalization | Low | No `ticker` column on `companies`. Hotel companies use word-slug IDs. `TICKER_TO_COMPANY_ID` map in `lib/common.js` must stay in sync. |
+| `phrases.tier` and `phrases.points` NOT NULL | Low | No default. Admin approve and migration.sql use hardcoded defaults. Other insert paths will fail if omitting these. |
+| KO official PDF access blocked | Low | investors.coca-colacompany.com returns 403 even with browser headers. KO Phase 2 re-fetch will need manual download or browser-emulation. Not a blocker. |
+| Post-call HTTP transcript watch deferred | Low | Date-arithmetic detection implemented. Automated HTTP check deferred to Phase 3 (requires per-company IR base URL not yet stored). |

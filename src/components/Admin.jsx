@@ -164,6 +164,14 @@ function ActivationToggle({ companyId, isActive, phraseCount, triviaCount, onTog
         <span className="text-[9px] text-cream/30 leading-tight">
           Need {parts.join(", ")}
         </span>
+        <button
+          onClick={toggle}
+          disabled={loading}
+          className="text-[9px] text-amber-500/50 hover:text-amber-400 transition underline decoration-dotted underline-offset-2 disabled:opacity-40"
+          title="Override readiness gate and activate anyway"
+        >
+          {loading ? "…" : "Override →"}
+        </button>
       </div>
     );
   }
