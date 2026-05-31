@@ -210,15 +210,28 @@ function CompanyReadinessTable() {
       triviaCounts[t.company_id] = (triviaCounts[t.company_id] || 0) + 1;
     });
 
-    const sorted = COMPANY_ORDER.map((id) => companies.find((c) => c.id === id))
-      .filter(Boolean)
-      .map((c) => ({
-        ...c,
-        phraseCount: phraseCounts[c.id] || 0,
-        triviaCount: triviaCounts[c.id] || 0,
-      }));
+    // Show EVERY company in the DB (not just the hardcoded COMPANY_ORDER), so
+    // ingested companies appear automatically. Active first, then by phrase
+    // count, then name — with the original COMPANY_ORDER as a tiebreaker so the
+    // hotel set keeps its familiar order.
+    const rank = (id) => {
+      const i = COMPANY_ORDER.indexOf(id);
+      return i === -1 ? COMPANY_ORDER.length : i;
+    };
+    const withCounts = companies.map((c) => ({
+      ...c,
+      phraseCount: phraseCounts[c.id] || 0,
+      triviaCount: triviaCounts[c.id] || 0,
+    }));
+    withCounts.sort(
+      (a, b) =>
+        Number(b.is_active) - Number(a.is_active) ||
+        b.phraseCount - a.phraseCount ||
+        rank(a.id) - rank(b.id) ||
+        a.name.localeCompare(b.name),
+    );
 
-    setRows(sorted);
+    setRows(withCounts);
     setLoading(false);
   }
 
@@ -700,16 +713,168 @@ function PhraseReviewPanel() {
   );
 }
 
-function IngestionStatusPanel() {
+function runStatusBadge(status) {
+  const map = {
+    requested: "bg-gold/15 text-gold border-gold/30",
+    running: "bg-blue-500/15 text-blue-300 border-blue-500/30",
+    done: "bg-green-500/15 text-green-400 border-green-500/30",
+    error: "bg-red-900/30 text-red-300 border-red-500/30",
+  };
   return (
-    <section className="rounded-2xl bg-navy-2/80 border border-cream/10 border-l-4 border-l-gold p-5">
-      <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em] mb-3">
-        Ingestion Pipeline
-      </h2>
-      <p className="text-cream/50 text-sm leading-relaxed">
-        Pipeline not yet configured. This panel will show ingestion queue
-        status once Group F is complete.
-      </p>
+    <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase border ${map[status] || "bg-cream/10 text-cream/50 border-cream/20"}`}>
+      {status}
+    </span>
+  );
+}
+
+// Drives the deterministic Docker pipeline (fetch → extract → validate) via the
+// ingestion_runs / ingestion_status control tables (migration 018). A VPS poller
+// executes requests and republishes status. AI enrichment is NOT triggered here —
+// it stays a Claude Code subscription task (docs/program/ENRICHMENT_QUEUE.md).
+function IngestionStatusPanel() {
+  const [status, setStatus] = useState(null);
+  const [runs, setRuns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [tablesMissing, setTablesMissing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  async function load() {
+    const [sRes, rRes] = await Promise.all([
+      supabase.from("ingestion_status").select("*").eq("id", 1).maybeSingle(),
+      supabase
+        .from("ingestion_runs")
+        .select("*")
+        .order("requested_at", { ascending: false })
+        .limit(5),
+    ]);
+    if (sRes.error || rRes.error) {
+      setTablesMissing(true);
+      setLoading(false);
+      return;
+    }
+    setStatus(sRes.data);
+    setRuns(rRes.data || []);
+    setTablesMissing(false);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    load();
+    const id = setInterval(load, 6000);
+    return () => clearInterval(id);
+  }, []);
+
+  async function requestRun() {
+    setBusy(true);
+    setErr("");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("ingestion_runs")
+      .insert({ scope: "ready", requested_by: user?.email || "admin", status: "requested" });
+    setBusy(false);
+    if (error) setErr(error.message);
+    else load();
+  }
+
+  if (loading) {
+    return (
+      <section className="rounded-2xl bg-navy-2/80 border border-cream/10 p-5">
+        <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em] mb-3">
+          Ingestion Pipeline
+        </h2>
+        <div className="text-cream/40 text-sm">Loading…</div>
+      </section>
+    );
+  }
+
+  if (tablesMissing) {
+    return (
+      <section className="rounded-2xl bg-navy-2/80 border border-cream/10 border-l-4 border-l-gold p-5">
+        <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em] mb-3">
+          Ingestion Pipeline
+        </h2>
+        <p className="text-cream/50 text-sm leading-relaxed">
+          Control tables not found. Run{" "}
+          <code className="text-gold text-[11px]">supabase/migrations/018_ingestion_control.sql</code>{" "}
+          and make sure the VPS poller is on cron.
+        </p>
+      </section>
+    );
+  }
+
+  const ready = status?.ready_to_fetch || [];
+  const pending = status?.pending_enrichment || [];
+  const inProgress = runs.some((r) => r.status === "requested" || r.status === "running");
+
+  return (
+    <section className="rounded-2xl bg-navy-2/80 border border-cream/10 overflow-hidden">
+      <div className="px-5 py-4 border-b border-cream/10 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-sm font-bold text-cream uppercase tracking-[0.2em]">
+          Ingestion Pipeline
+        </h2>
+        <button
+          onClick={requestRun}
+          disabled={busy || inProgress || ready.length === 0}
+          className="rounded-lg bg-gold/10 border border-gold/30 text-gold px-3 py-1.5 text-xs font-semibold hover:bg-gold/20 transition disabled:opacity-40"
+          title={ready.length === 0 ? "Nothing is ready to fetch" : "Fetch → extract → validate the ready companies"}
+        >
+          {inProgress ? "Running…" : busy ? "Requesting…" : `Run pipeline${ready.length ? ` (${ready.length})` : ""}`}
+        </button>
+      </div>
+
+      <div className="p-5 space-y-4 text-sm">
+        {err && <div className="text-red-400 text-xs">{err}</div>}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-cream/40">Ready to fetch</div>
+            <div className="text-cream mt-1">
+              {ready.length
+                ? ready.map((r) => `${r.ticker} (${r.fetchable_quarters})`).join(", ")
+                : "—"}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-cream/40">Waiting for enrichment</div>
+            <div className="text-gold mt-1">
+              {pending.length
+                ? `${pending.join(", ")} — needs a Claude session`
+                : "none"}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-cream/40 mb-1">Recent runs</div>
+          {runs.length === 0 ? (
+            <div className="text-cream/40 text-xs">No runs yet.</div>
+          ) : (
+            <ul className="space-y-1.5">
+              {runs.map((r) => (
+                <li key={r.id} className="text-xs text-cream/70 flex flex-wrap items-center gap-2">
+                  {runStatusBadge(r.status)}
+                  <span>{new Date(r.requested_at).toLocaleString()}</span>
+                  {Array.isArray(r.summary) && r.summary.length > 0 && (
+                    <span className="text-cream/50">
+                      — {r.summary.map((s) => `${s.ticker} ${s.fetched}/${s.total}`).join(", ")}
+                    </span>
+                  )}
+                  {r.error && <span className="text-red-400">— {r.error}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {status?.updated_at && (
+          <div className="text-[10px] text-cream/30">
+            status updated {new Date(status.updated_at).toLocaleString()}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
