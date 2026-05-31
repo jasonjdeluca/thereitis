@@ -156,8 +156,14 @@ Return ONLY a JSON array of {index, score} objects in order. No explanation. Exa
 async function stage4Trivia(client, ticker) {
   const prompt = `Generate 15 trivia questions about ${ticker} as a company — history, strategy, products, financials, milestones. Mix easy, medium, and hard difficulty.
 
-HARD RULES:
-- No person names anywhere — not in questions, not in any answer option. Use role titles only (e.g. "the CEO", "the CFO", "the founder").
+ABSOLUTE RULES — any violation disqualifies the whole response:
+- ZERO person names in any field. No CEO names, no founder names, no executive names, no designer names, no athlete names — nobody.
+- Questions must be about the COMPANY, not about individuals. Ask about years, revenues, store counts, product launches, acquisitions, market share.
+- Use only: "the company", "the brand", "management", "the leadership team". Never name a specific person.
+- BAD (rejected): "Which CEO guided the company through the 2008 downturn?" — names a role tied to a specific person
+- BAD (rejected): "What was Ted Decker's first year as president?" — obvious name
+- GOOD: "In what year did the company surpass $100 billion in annual revenue?"
+- GOOD: "Approximately how many US store locations does the company operate?"
 - Each question must have exactly 4 distinct answer options and one correct answer.
 - No answer option over 80 characters.
 

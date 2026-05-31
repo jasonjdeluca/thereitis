@@ -1,1 +1,90 @@
-[]
+[
+  {
+    "question": "In what year was the company founded?",
+    "option_a": "1978",
+    "option_b": "1945",
+    "option_c": "1956",
+    "option_d": "1968",
+    "correct_answer": "a"
+  },
+  {
+    "question": "Approximately how many stores does the company operate globally as of 2024?",
+    "option_a": "1,200 stores",
+    "option_b": "2,300 stores",
+    "option_c": "850 stores",
+    "option_d": "3,500 stores",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In which decade did the company first go public?",
+    "option_a": "1970s",
+    "option_b": "1960s",
+    "option_c": "1980s",
+    "option_d": "1990s",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What was the company's approximate annual revenue in 2023?",
+    "option_a": "$95 billion",
+    "option_b": "$65 billion",
+    "option_c": "$150 billion",
+    "option_d": "$120 billion",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Which of these is NOT a major product category sold by the company?",
+    "option_a": "Lawn and garden supplies",
+    "option_b": "Automotive parts",
+    "option_c": "Building materials",
+    "option_d": "Tools and hardware",
+    "correct_answer": "b"
+  },
+  {
+    "question": "In what year did the company launch its first e-commerce website?",
+    "option_a": "1998",
+    "option_b": "2000",
+    "option_c": "1995",
+    "option_d": "2002",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Approximately what percentage of the company's revenue comes from the US market?",
+    "option_a": "85-95%",
+    "option_b": "50-60%",
+    "option_c": "70-80%",
+    "option_d": "40-50%",
+    "correct_answer": "a"
+  },
+  {
+    "question": "During the COVID-19 pandemic in 2020, the company's stock price approximately:",
+    "option_a": "Declined 40%",
+    "option_b": "Rose 25%",
+    "option_c": "Remained flat",
+    "option_d": "Rose 75%+",
+    "correct_answer": "d"
+  },
+  {
+    "question": "In which year did the company's market capitalization first exceed $300 billion?",
+    "option_a": "2019",
+    "option_b": "2017",
+    "option_c": "2021",
+    "option_d": "2015",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What strategic initiative has the company emphasized for small business growth?",
+    "option_a": "Licensing model expansion",
+    "option_b": "Contractor and pro customer focus",
+    "option_c": "International franchising",
+    "option_d": "Manufacturing partnerships",
+    "correct_answer": "b"
+  },
+  {
+    "question": "The company's dividend history shows it has increased dividends for how many consecutive years?",
+    "option_a": "10+ consecutive years",
+    "option_b": "20+ consecutive years",
+    "option_c": "5+ consecutive years",
+    "option_d": "Never paid dividends",
+    "correct_answer": "b"
+  }
+]
