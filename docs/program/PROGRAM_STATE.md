@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-06-01 (session 18)
+**Last updated:** 2026-06-01 (session 18 continued)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,8 +8,8 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Session 18 — Applied Codex P15 trivia rewrite SQL (13 companies; 2 MMM patches applied before execution). VZ now has 12 trivia rows. NKE now has 12 trivia rows. TRV fully replaced with insurance-relevant content. All 13 companies now have 100% fun_fact coverage. ai-select.js prompt revised to block generic idioms (Issue #44). HD/WMT/DIS editorial review reports promoted from codex/staging branch to main.
-**Awaiting human action:** Activate NKE, VZ, TRV via Override in admin panel; close GitHub issue #44
+**Just completed:** Session 18 — (1) Trivia rewrite P15 applied, ai-select prompt revised, staging branch reports promoted. (2) Pipeline investigation: root cause of REQUESTED stuck = ~/thereitis/logs/ directory missing → cron silently failed. Fixed. JNJ pipeline completed (4/17 quarters fetched, extracted, now in review-queue). AMGN blocked — 16/17 StockAnalysis + 1 dead investors.amgen.com URL; reset to sources_ready. (3) Four game bugs fixed in PR #45: blank screen after bingo (TIER?.dot), lowercase tiles, repeated fun_fact (75 COALESCE rows cleared), missing company badges (6 new + case-insensitive matching).
+**Awaiting human action:** Merge PR #45; activate NKE/VZ/TRV via Override in admin panel
 **Awaiting Codex:** Nothing currently assigned
 
 ---
@@ -94,17 +94,18 @@
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Activate NKE via Override** | 12 trivia rows now live. 46 phrases — use Override in admin panel |
-| 2 | **Activate VZ via Override** | 12 trivia rows now live. 39 phrases — use Override in admin panel |
-| 3 | **Activate TRV via Override** | 11 trivia rows (insurance-relevant). 20 phrases — use Override in admin panel |
-| 4 | **Close GitHub issue #44** | ai-select prompt revision applied in session 18 |
-| 5 | **Flip V phrases active** | `UPDATE phrases SET is_active=true WHERE company_id='v' AND is_active=false;` then full trivia rebuild |
-| 6 | **Run pipeline for more companies** | Click "Run Pipeline" in admin Ingestion panel — fetches/extracts/validates companies with official PDFs |
-| 7 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
-| 8 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
-| 9 | **Configure Codex Automations (3)** | content-quality, ingestion-triage, pm-brief-overflow — prompts in `docs/program/prompts/` |
-| 10 | **`npx playwright install-deps` on VPS** | One-time. Unblocks Playwright tests in VPS cron. |
-| 11 | **Review LAUNCH_KIT.md** | Replace placeholder text before publishing any copy. |
+| 1 | **Merge PR #45** | Game polish: blank screen fix, tile casing, fun_fact, company badges |
+| 2 | **Activate NKE via Override** | 12 trivia rows live. 46 phrases — use Override in admin panel |
+| 3 | **Activate VZ via Override** | 12 trivia rows live. 39 phrases — use Override in admin panel |
+| 4 | **Activate TRV via Override** | 11 trivia rows (insurance-relevant). 20 phrases — use Override in admin panel |
+| 5 | **Run enrichment for JNJ** | `node scripts/ingestion/process-review-queue.js` — JNJ is in review-queue with 4 quarters extracted |
+| 6 | **Flip V phrases active** | `UPDATE phrases SET is_active=true WHERE company_id='v' AND is_active=false;` then full trivia rebuild |
+| 7 | **Run pipeline for more companies** | Click "Run Pipeline" in admin Ingestion panel — more phrase runs needed for CAT/JPM/SHW/MRK/DIS/WMT |
+| 8 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
+| 9 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
+| 10 | **Configure Codex Automations (3)** | content-quality, ingestion-triage, pm-brief-overflow — prompts in `docs/program/prompts/` |
+| 11 | **`npx playwright install-deps` on VPS** | One-time. Unblocks Playwright tests in VPS cron. |
+| 12 | **Review LAUNCH_KIT.md** | Replace placeholder text before publishing any copy. |
 
 ---
 
@@ -125,11 +126,10 @@
 
 | Item | Severity | Detail |
 |---|---|---|
-| Trivia wrong-answer quality | High | New company trivia has absurd distractors and missing fun_facts. Codex P15 in progress. |
-| TRV wrong-company trivia | High | All 11 TRV rows describe a retail company. P15 replaces them entirely. |
-| Phase 2 Docker blocked on StockAnalysis | Medium | MSFT, GS, AXP, UNH, AMGN, CVX, PG, CRM, IBM, HON, MCD, AAPL, NVDA, AMZN, CSCO need official q4cdn sources before Phase 2 can fetch. |
+| Phrase counts still thin | High | CAT/JPM/SHW/MRK/DIS/WMT all need 20–30+ more active phrases before activation. More pipeline runs + enrichment sessions needed. |
+| Phase 2 Docker blocked on StockAnalysis | Medium | MSFT, GS, AXP, UNH, AMGN, CVX, PG, CRM, IBM, HON, MCD, AAPL, NVDA, AMZN, CSCO need official q4cdn sources. AMGN: dead investors.amgen.com URL also needs repair. |
 | Group C platform config pending | Medium | All 5 automation prompts exist but Routines and Automations are not live. PM loop does not run. |
 | V phrases still inactive | Medium | 13 phrases in DB as is_active=false. Run UPDATE before activating. |
-| Phase 2 trivia person-name pass rate | Low | Stage 4 Haiku includes person names in ~75% of trivia; Stage 5 rejects correctly. Prompt strengthened. |
+| Ingestion poller cron log dir | Low | Fixed in session 18 — ~/thereitis/logs/ now exists. Cron should run cleanly going forward. |
 | Post-call HTTP transcript watch | Low | Date-arithmetic detection implemented; automated HTTP check deferred to Phase 3. |
 | KO official PDF blocked | Low | investors.coca-colacompany.com returns 403. Phase 2 re-fetch needs manual download or browser-emulation. |
