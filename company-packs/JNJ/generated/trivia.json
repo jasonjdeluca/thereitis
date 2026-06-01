@@ -1,0 +1,114 @@
+[
+  {
+    "question": "What was the name of the company's consumer health spinoff that launched as a standalone public company in 2023?",
+    "option_a": "kenvue",
+    "option_b": "healthex",
+    "option_c": "meditrel",
+    "option_d": "carivia",
+    "correct_answer": "a"
+  },
+  {
+    "question": "How many consecutive years of annual dividend increases did the company celebrate in Q1 2023?",
+    "option_a": "25",
+    "option_b": "40",
+    "option_c": "61",
+    "option_d": "75",
+    "correct_answer": "c"
+  },
+  {
+    "question": "After acquiring Abiomed, how many MedTech platforms did the company report had over $1 billion in annual sales?",
+    "option_a": "8",
+    "option_b": "12",
+    "option_c": "16",
+    "option_d": "20",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What was the present value of the company's proposed talc litigation settlement announced in 2023?",
+    "option_a": "$3.1 billion",
+    "option_b": "$6.9 billion",
+    "option_c": "$8.9 billion",
+    "option_d": "$12.4 billion",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What type of therapy is CARVYKTI, the company's oncology treatment approved for multiple myeloma?",
+    "option_a": "mRNA vaccine",
+    "option_b": "CAR-T cell therapy",
+    "option_c": "antibody-drug conjugate",
+    "option_d": "small molecule inhibitor",
+    "correct_answer": "b"
+  },
+  {
+    "question": "After separating its consumer health business, the remaining company comprises which two business segments?",
+    "option_a": "pharma and consumer",
+    "option_b": "medtech and consumer",
+    "option_c": "pharma and medtech",
+    "option_d": "diagnostics and devices",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What was the name of the company's investigational robotic surgery platform highlighted in its 2023 earnings calls?",
+    "option_a": "Velaris",
+    "option_b": "OTTAVA",
+    "option_c": "ProSurge",
+    "option_d": "Apex",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Approximately what percentage of sales did the company invest in research and development in Q1 2023?",
+    "option_a": "8.2%",
+    "option_b": "10.7%",
+    "option_c": "14.4%",
+    "option_d": "18.1%",
+    "correct_answer": "c"
+  },
+  {
+    "question": "In which country did the company report patient utilization of Abiomed technologies grew over 30%?",
+    "option_a": "china",
+    "option_b": "germany",
+    "option_c": "japan",
+    "option_d": "brazil",
+    "correct_answer": "c"
+  },
+  {
+    "question": "What term describes a company that has raised its annual dividend for 50 or more consecutive years?",
+    "option_a": "dividend champion",
+    "option_b": "dividend king",
+    "option_c": "dividend aristocrat",
+    "option_d": "dividend elite",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What disease was the CARTITUDE-4 phase III clinical study designed to treat?",
+    "option_a": "lung cancer",
+    "option_b": "multiple myeloma",
+    "option_c": "rheumatoid arthritis",
+    "option_d": "colorectal cancer",
+    "correct_answer": "b"
+  },
+  {
+    "question": "Over how many years did the company propose to spread its talc litigation settlement payments?",
+    "option_a": "10 years",
+    "option_b": "25 years",
+    "option_c": "40 years",
+    "option_d": "50 years",
+    "correct_answer": "b"
+  },
+  {
+    "question": "What was the company's approximate target for pharmaceutical segment sales by 2025, discussed in early 2023?",
+    "option_a": "$40 billion",
+    "option_b": "$47 billion",
+    "option_c": "$54 billion",
+    "option_d": "$61 billion",
+    "correct_answer": "c"
+  },
+  {
+    "question": "Which electrophysiology clinical study did the company report had met both primary safety and efficacy endpoints?",
+    "option_a": "SmartfiRE",
+    "option_b": "FlexPulse",
+    "option_c": "inspiRE",
+    "option_d": "ProPath",
+    "correct_answer": "c"
+  }
+]

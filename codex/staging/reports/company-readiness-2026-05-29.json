@@ -1,0 +1,139 @@
+{
+  "generated_at": "2026-05-29T16:30:56.816Z",
+  "summary": {
+    "total_companies": 7,
+    "active_companies": 1,
+    "critical_count": 0,
+    "warning_count": 7
+  },
+  "companies": [
+    {
+      "id": "marriott",
+      "name": "Marriott",
+      "is_active": false,
+      "phrase_count": 0,
+      "trivia_count": 0,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_next_call_date",
+          "detail": "Missing next_earnings_date"
+        },
+        {
+          "severity": "warning",
+          "type": "missing_call_identifier",
+          "detail": "Missing call_identifier"
+        }
+      ]
+    },
+    {
+      "id": "hyatt",
+      "name": "Hyatt",
+      "is_active": false,
+      "phrase_count": 0,
+      "trivia_count": 0,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_next_call_date",
+          "detail": "Missing next_earnings_date"
+        },
+        {
+          "severity": "warning",
+          "type": "missing_call_identifier",
+          "detail": "Missing call_identifier"
+        }
+      ]
+    },
+    {
+      "id": "ihg",
+      "name": "IHG Hotels",
+      "is_active": false,
+      "phrase_count": 0,
+      "trivia_count": 0,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_next_call_date",
+          "detail": "Missing next_earnings_date"
+        },
+        {
+          "severity": "warning",
+          "type": "missing_call_identifier",
+          "detail": "Missing call_identifier"
+        }
+      ]
+    },
+    {
+      "id": "wyndham",
+      "name": "Wyndham Hotels",
+      "is_active": false,
+      "phrase_count": 0,
+      "trivia_count": 0,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_next_call_date",
+          "detail": "Missing next_earnings_date"
+        },
+        {
+          "severity": "warning",
+          "type": "missing_call_identifier",
+          "detail": "Missing call_identifier"
+        }
+      ]
+    },
+    {
+      "id": "choice",
+      "name": "Choice Hotels",
+      "is_active": false,
+      "phrase_count": 0,
+      "trivia_count": 0,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_next_call_date",
+          "detail": "Missing next_earnings_date"
+        },
+        {
+          "severity": "warning",
+          "type": "missing_call_identifier",
+          "detail": "Missing call_identifier"
+        }
+      ]
+    },
+    {
+      "id": "ko",
+      "name": "Coca-Cola",
+      "is_active": false,
+      "phrase_count": 0,
+      "trivia_count": 0,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_next_call_date",
+          "detail": "Missing next_earnings_date"
+        },
+        {
+          "severity": "warning",
+          "type": "missing_call_identifier",
+          "detail": "Missing call_identifier"
+        }
+      ]
+    },
+    {
+      "id": "hilton",
+      "name": "Hilton",
+      "is_active": true,
+      "phrase_count": 51,
+      "trivia_count": 42,
+      "issues": [
+        {
+          "severity": "warning",
+          "type": "missing_next_call_date",
+          "detail": "Missing next_earnings_date"
+        }
+      ]
+    }
+  ]
+}

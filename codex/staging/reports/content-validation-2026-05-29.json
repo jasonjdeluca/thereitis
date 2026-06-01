@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-05-29T16:30:57.210Z",
+  "summary": {
+    "total_phrases": 51,
+    "flagged_count": 1,
+    "trivia_flagged_count": 0
+  },
+  "flags": [
+    {
+      "type": "possible_person_name",
+      "company_id": "hilton",
+      "content": "I'd Take The Over",
+      "detail": "Possible person name: \"I'd Take\"",
+      "severity": "review"
+    }
+  ]
+}

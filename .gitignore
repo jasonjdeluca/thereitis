@@ -17,6 +17,9 @@ dist-ssr
 
 # Runtime report artifacts
 reports/
+# Codex staging reports are intentionally committed (handoff artifacts, not runtime)
+!codex/staging/reports/
+!codex/staging/reports/**
 
 # Ingestion pipeline runtime artifacts (SQLite queue + raw transcripts)
 # Keep the directory tracked via .gitkeep, ignore everything else.

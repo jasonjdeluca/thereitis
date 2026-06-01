@@ -1,0 +1,136 @@
+{
+  "generated_at": "2026-05-29T16:30:57.327Z",
+  "reports_read_at": {
+    "company_readiness": "2026-05-29T16:30:56.816Z",
+    "content_validation": "2026-05-29T16:30:57.210Z",
+    "migration_check": "2026-05-29T16:30:57.276Z"
+  },
+  "critical_issues": [],
+  "warnings": [
+    {
+      "source": "company-readiness",
+      "company_id": "marriott",
+      "company_name": "Marriott",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "marriott",
+      "company_name": "Marriott",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "hyatt",
+      "company_name": "Hyatt",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "hyatt",
+      "company_name": "Hyatt",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "ihg",
+      "company_name": "IHG Hotels",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "ihg",
+      "company_name": "IHG Hotels",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "wyndham",
+      "company_name": "Wyndham Hotels",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "wyndham",
+      "company_name": "Wyndham Hotels",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "choice",
+      "company_name": "Choice Hotels",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "choice",
+      "company_name": "Choice Hotels",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "ko",
+      "company_name": "Coca-Cola",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "ko",
+      "company_name": "Coca-Cola",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company_id": "hilton",
+      "company_name": "Hilton",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    }
+  ],
+  "healthy_companies": [],
+  "companies_below_50_phrases": [
+    {
+      "id": "marriott",
+      "name": "Marriott",
+      "phrase_count": 0
+    },
+    {
+      "id": "hyatt",
+      "name": "Hyatt",
+      "phrase_count": 0
+    },
+    {
+      "id": "ihg",
+      "name": "IHG Hotels",
+      "phrase_count": 0
+    },
+    {
+      "id": "wyndham",
+      "name": "Wyndham Hotels",
+      "phrase_count": 0
+    },
+    {
+      "id": "choice",
+      "name": "Choice Hotels",
+      "phrase_count": 0
+    },
+    {
+      "id": "ko",
+      "name": "Coca-Cola",
+      "phrase_count": 0
+    }
+  ],
+  "recommended_focus": "Ingest phrases for \"Marriott\" (currently 0 phrases) to reach the 50-phrase minimum required for activation."
+}

@@ -1,0 +1,11 @@
+{
+  "ticker": "JNJ",
+  "company_id": "jnj",
+  "finalized_at": "2026-06-01T21:27:44.479Z",
+  "enriched_by": "claude-code-agent (subscription)",
+  "mode": "paragraphs",
+  "phrases_approved": 45,
+  "trivia_approved": 14,
+  "validation_issues": [],
+  "ready_for_migration": false
+}

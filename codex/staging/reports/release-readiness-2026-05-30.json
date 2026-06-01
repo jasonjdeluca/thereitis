@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-05-30T13:47:26.242Z",
+  "posture": "yellow",
+  "ready_to_launch": false,
+  "summary": {
+    "blockers": 0,
+    "warnings": 13,
+    "active_companies_ready": 1,
+    "smoke_tests_passed": true
+  },
+  "blockers": [],
+  "warnings": [
+    {
+      "source": "company-readiness",
+      "company": "Marriott",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Marriott",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Hyatt",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Hyatt",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company": "IHG Hotels",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company": "IHG Hotels",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Wyndham Hotels",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Wyndham Hotels",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Choice Hotels",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Choice Hotels",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Coca-Cola",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Coca-Cola",
+      "type": "missing_call_identifier",
+      "detail": "Missing call_identifier"
+    },
+    {
+      "source": "company-readiness",
+      "company": "Hilton",
+      "type": "missing_next_call_date",
+      "detail": "Missing next_earnings_date"
+    }
+  ],
+  "info": [
+    {
+      "source": "launch-gate",
+      "type": "active_companies",
+      "detail": "1 active company(ies) with ≥50 phrases: Hilton"
+    }
+  ],
+  "reports_used": {
+    "company_readiness": {
+      "age_hours": 21,
+      "stale": false
+    },
+    "content_validation": {
+      "age_hours": 21,
+      "stale": false
+    },
+    "migration_check": {
+      "age_hours": 21,
+      "stale": false
+    },
+    "transcript_freshness": null,
+    "playwright_results": {
+      "smoke_tests_failed": 0
+    }
+  }
+}
