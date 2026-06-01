@@ -14,6 +14,10 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Generalize `TriviaSection` component so it is not hardcoded to a single company
 - [x] Add active company readiness gate — prevent game session creation for companies below minimum readiness threshold
 - [x] Update README.md to reflect current project state and tech stack
+- [x] Fix bingo card blank screen for new companies — card.js derivePools mapped 'standard' tier to warm; Trinity placement skipped when phrases not in company pool; dynamic pool sizing + repeat-pad for small pools (session 17)
+- [x] Fix company selector hardcoded to 7 companies — CompanySelect.jsx now queries is_active=true from DB (session 17)
+- [x] Fix trivia option casing — TriviaQuiz.jsx sentence-cases all options at render (session 17)
+- [x] Add fun_fact fallback — shows "Answer: X" or "Nailed it." when fun_fact is null (session 17)
 
 ---
 
@@ -98,6 +102,7 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Add sample card preview: clicking a company shows a randomly assembled 5×5 bingo card using that company's phrases
 - [x] Add recent sessions list: last 10 sessions with company name, player count, whether bingo was reached
 - [x] Add activation override: "Override →" link below "Cannot Activate" allows force-activation despite phrase/trivia gap (session 16)
+- [x] Fix Company Details section hardcoded to 7 companies — AdminPanel now loads all 41 companies sorted active-first (session 17)
 
 ---
 
@@ -224,6 +229,11 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Write `docs/program/prompts/codex-content-editorial-review.md`
   - Prompt for Codex editorial review triggered once per company when Stage 4 generation is complete
   - Owner: Claude Code
+- [~] Trivia rewrite — 13 companies (Priority 15)
+  - Wrong distractors, TRV wrong-company content, missing fun_facts, answer-A bias
+  - Task brief: `codex/inbox/trivia-rewrite-2026-06-01.md`
+  - Output: `codex/staging/reports/trivia-rewrite-2026-06-01.sql`
+  - Owner: Codex (rewrite), Claude Code (review + apply SQL)
 
 ---
 
@@ -345,4 +355,4 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
-*Last updated: 2026-05-31 (session 16). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
+*Last updated: 2026-06-01 (session 17). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
