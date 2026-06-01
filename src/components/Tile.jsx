@@ -58,7 +58,7 @@ export default function Tile({ cell, onTap, onLine, isPrediction, predictionHit,
           <span className="text-[11px] font-bold tracking-wider mt-0.5">FREE</span>
         </span>
       ) : (
-        <span className={`${sizeClass(phrase)} font-medium px-0.5`}>{phrase}</span>
+        <span className={`${sizeClass(phrase)} font-medium px-0.5`}>{phrase.charAt(0).toUpperCase() + phrase.slice(1)}</span>
       )}
       {marked && !isFree && (
         <span

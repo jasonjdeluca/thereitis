@@ -218,7 +218,7 @@ export default function PostGame({
                   className="inline-flex items-center gap-1 rounded-full bg-gold/15 border border-gold/40 px-2.5 py-1 text-[11px] text-cream"
                 >
                   <span className="opacity-70" aria-hidden>
-                    {TIER[cell.tier].dot}
+                    {TIER[cell.tier]?.dot}
                   </span>
                   <span>{cell.phrase}</span>
                 </span>
