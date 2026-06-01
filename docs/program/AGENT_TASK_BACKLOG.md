@@ -229,11 +229,19 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 - [x] Write `docs/program/prompts/codex-content-editorial-review.md`
   - Prompt for Codex editorial review triggered once per company when Stage 4 generation is complete
   - Owner: Claude Code
-- [~] Trivia rewrite — 13 companies (Priority 15)
+- [x] Trivia rewrite — 13 companies (Priority 15)
   - Wrong distractors, TRV wrong-company content, missing fun_facts, answer-A bias
   - Task brief: `codex/inbox/trivia-rewrite-2026-06-01.md`
   - Output: `codex/staging/reports/trivia-rewrite-2026-06-01.sql`
-  - Owner: Codex (rewrite), Claude Code (review + apply SQL)
+  - Owner: Codex (rewrite), Claude Code (review + apply SQL) — complete 2026-06-01
+  - Two MMM patches applied before execution (tegaderm→elastoplast, index correct_answer a not d)
+- [x] ai-select.js prompt revision — block generic idioms (session 18)
+  - KEEP examples replaced with company-specific ones; explicit blocklist of 15 generic idioms added
+  - Double-test strengthened: "any Fortune 500 card?" and "two unrelated companies?"
+  - GitHub issue #44 drafted by Codex, applied by Claude Code
+- [x] Codex editorial reviews for HD, WMT, DIS promoted to main (session 18)
+  - All three not activation-ready; phrase sets dominated by generic idioms
+  - Root cause was ai-select prompt — now fixed above
 
 ---
 

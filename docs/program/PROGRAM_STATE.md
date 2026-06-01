@@ -1,6 +1,6 @@
 # There It Is — Program State
 
-**Last updated:** 2026-06-01 (session 17)
+**Last updated:** 2026-06-01 (session 18)
 **Updated by:** Claude Code (Sonnet 4.6)
 
 ---
@@ -8,9 +8,9 @@
 ## Current Phase and Active Work
 
 **Phase:** 2 — Mid-June (Weeks 3–5)
-**Just completed:** Session 17 — Fixed all new-company game breakage: bingo card blank screen (card.js standard→warm tier mapping, Trinity skipped for non-Hilton), company selector was hardcoded to 7 companies (now fully dynamic), trivia options were lowercase (now capitalized), fun_fact fallback added, admin Company Details section hardcoded (now shows all 41). Phrases flipped active for VZ/NKE/WMT/DIS/TRV. CAT/JPM/MRK/SHW migrations applied and phrases activated. Codex Priority 15 trivia rewrite task queued (13 companies, wrong distractors, TRV wrong-company content, missing fun_facts). 5 companies now live: Hilton, HD, MMM, BA, KO.
-**Awaiting human action:** Activate remaining companies via admin panel once trivia rewrite lands; configure Group C automations
-**Awaiting Codex:** Priority 15 — trivia rewrite SQL at `codex/staging/reports/trivia-rewrite-2026-06-01.sql`
+**Just completed:** Session 18 — Applied Codex P15 trivia rewrite SQL (13 companies; 2 MMM patches applied before execution). VZ now has 12 trivia rows. NKE now has 12 trivia rows. TRV fully replaced with insurance-relevant content. All 13 companies now have 100% fun_fact coverage. ai-select.js prompt revised to block generic idioms (Issue #44). HD/WMT/DIS editorial review reports promoted from codex/staging branch to main.
+**Awaiting human action:** Activate NKE, VZ, TRV via Override in admin panel; close GitHub issue #44
+**Awaiting Codex:** Nothing currently assigned
 
 ---
 
@@ -94,16 +94,17 @@
 
 | # | Action | Context |
 |---|---|---|
-| 1 | **Review and apply Codex P15 trivia SQL** | When `codex/staging/reports/trivia-rewrite-2026-06-01.sql` appears, review and apply via Supabase MCP |
-| 2 | **Activate NKE/VZ via Override** | After P15 lands: NKE has 46 phrases (needs 6 more trivia); VZ will have 12 trivia after P15 |
-| 3 | **Activate TRV via Override** | After P15 replaces wrong-company trivia: 20 phrases, 11 trivia — use Override |
-| 4 | **Flip V phrases active** | `UPDATE phrases SET is_active=true WHERE company_id='v' AND is_active=false;` then full trivia rebuild |
-| 5 | **Run pipeline for more companies** | Click "Run Pipeline" in admin Ingestion panel — fetches/extracts/validates companies with official PDFs |
-| 6 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
-| 7 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
-| 8 | **Configure Codex Automations (3)** | content-quality, ingestion-triage, pm-brief-overflow — prompts in `docs/program/prompts/` |
-| 9 | **`npx playwright install-deps` on VPS** | One-time. Unblocks Playwright tests in VPS cron. |
-| 10 | **Review LAUNCH_KIT.md** | Replace placeholder text before publishing any copy. |
+| 1 | **Activate NKE via Override** | 12 trivia rows now live. 46 phrases — use Override in admin panel |
+| 2 | **Activate VZ via Override** | 12 trivia rows now live. 39 phrases — use Override in admin panel |
+| 3 | **Activate TRV via Override** | 11 trivia rows (insurance-relevant). 20 phrases — use Override in admin panel |
+| 4 | **Close GitHub issue #44** | ai-select prompt revision applied in session 18 |
+| 5 | **Flip V phrases active** | `UPDATE phrases SET is_active=true WHERE company_id='v' AND is_active=false;` then full trivia rebuild |
+| 6 | **Run pipeline for more companies** | Click "Run Pipeline" in admin Ingestion panel — fetches/extracts/validates companies with official PDFs |
+| 7 | **Configure Claude Code Routine: Daily PM Brief** | Prompt at `docs/program/prompts/routine-pm-brief.md`. Trigger: 6:15am ET weekdays. |
+| 8 | **Configure Claude Code Routine: GitHub-triggered implementation** | Prompt at `docs/program/prompts/routine-implement.md`. Trigger: `claude-implement` label. |
+| 9 | **Configure Codex Automations (3)** | content-quality, ingestion-triage, pm-brief-overflow — prompts in `docs/program/prompts/` |
+| 10 | **`npx playwright install-deps` on VPS** | One-time. Unblocks Playwright tests in VPS cron. |
+| 11 | **Review LAUNCH_KIT.md** | Replace placeholder text before publishing any copy. |
 
 ---
 
@@ -111,10 +112,10 @@
 
 **Entry point (Claude Code):**
 1. Check enrichment queue: `node scripts/ingestion/process-review-queue.js --list`
-2. Check if Codex P15 trivia SQL has landed: `ls codex/staging/reports/` — if present, review and apply
-3. Run Phase 2 pipeline for more companies via admin Ingestion panel or: `node scripts/ingestion/poller.js --enqueue`
-4. Once trivia rewrite applied: activate NKE, VZ, TRV via Override in admin panel
-5. Plan next phrase batch: CAT/JPM/SHW/MRK all need 20–30 more phrases — either more pipeline runs or enrichment from review-queue
+2. Check Codex inbox for new assignments
+3. Run Phase 2 pipeline for more companies to close phrase gaps: CAT/JPM/SHW/MRK/DIS/WMT all need 20–30+ more phrases
+4. After pipeline runs: enrich via review queue to push companies toward 50-phrase minimum
+5. Consider trivia for DIS (6 rows) and WMT (8 rows) — both need 4–6 more before activation
 
 **Model:** `claude-sonnet-4-6` for all implementation. `claude-opus-4-8` for architectural decisions only.
 

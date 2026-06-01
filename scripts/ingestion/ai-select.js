@@ -45,13 +45,18 @@ You are reviewing phrase candidates extracted from ${companyName} earnings call 
 
 ## The core job
 
-Select for SPEAKING STYLE, not subject matter. This is a bingo game — the winning phrase is one that causes a knowing groan or laugh of recognition when heard on a live call.
+Select for COMPANY-SPECIFIC SPEAKING STYLE, not generic executive confidence language and not subject matter labels. This is a bingo game — the winning phrase is one that causes a knowing groan or laugh of recognition when heard on a live call from this company specifically.
 
-**KEEP phrases that reveal HOW the executive talks:**
-- Management idioms and metaphors: "boil the ocean", "move the needle", "land and expand"
-- Rhetorical framings: "at the end of the day", "the bottom line is", "we remain focused"
-- Buzzwords and pet phrases the company repeats: "winning in the marketplace", "our flywheel", "long-term value creation"
-- Forward-looking confidence language: "strong momentum", "playing offense", "leaning into"
+**KEEP phrases that reveal HOW this company talks in a distinctive way:**
+- Repeated company-specific frameworks or operating language: "our flywheel", "customer-back approach", "interconnected experience"
+- Company-coded marketplace language that would feel wrong on another company's card: "nike direct", "paint stores group", "resource industries"
+- Distinctive strategic refrains tied to the company's model: "membership income", "direct-to-consumer", "connected fulfillment"
+- Phrases a follower of ${companyName} earnings calls would recognize as part of this company's recurring script
+
+**ALWAYS REJECT generic executive idioms, even if they appear often:**
+- "playing offense", "lean into", "leaning into", "double down", "unlocking value"
+- "well positioned", "relentless focus", "best in class", "north star", "right to win"
+- "strong momentum", "building momentum", "move the needle", "drive growth", "shareholder value"
 
 **REJECT phrases that describe WHAT the company talks about:**
 - Geographic segments: "greater china", "north america", "emerging markets"
@@ -60,7 +65,7 @@ Select for SPEAKING STYLE, not subject matter. This is a bingo game — the winn
 - Operational labels: "supply chain", "fiscal year", "same-store sales"
 - Boilerplate openers: "good morning everyone", "thank you for joining"
 
-**The test:** If you replaced "${companyName}" with any other company, could this phrase plausibly appear on their card? If yes — it's either too generic or just a topic label. Reject it.
+**The test:** Could this phrase plausibly appear on any Fortune 500 earnings call bingo card? If yes, reject it. Could it plausibly appear unchanged on two unrelated companies' cards? If yes, reject it. Only keep it when the phrase would feel meaningfully tied to ${companyName}'s recurring language, business model, or call personality.
 
 ## Content QA Rubric (additional detail)
 
@@ -70,7 +75,7 @@ ${rubric}
 
 You will receive a batch of phrase candidates. For each batch, select the phrases that would make the best bingo squares. Return ONLY a valid JSON array of IDs — no explanation, no markdown fences, no other text.
 
-Aim to select ${BATCH_TARGET}–${Math.round(BATCH_TARGET * 1.5)} phrases per batch. It is better to select fewer high-quality phrases than to pad with topic labels.`;
+Aim to select ${BATCH_TARGET}–${Math.round(BATCH_TARGET * 1.5)} phrases per batch. It is better to select fewer high-quality phrases than to pad with generic idioms or topic labels.`;
 }
 
 async function selectBatch(client, systemPrompt, batch) {
