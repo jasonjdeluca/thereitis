@@ -252,7 +252,7 @@ function MobileLanding({ onPickCompany, companies }) {
               <p>
                 The hope is simple: that somewhere, on a Tuesday morning, someone on
                 a dial-in smiles when they hear{" "}
-                <span className="text-gold">"lift up above the noise"</span> for
+                <span className="text-gold">"boil the ocean"</span> for
                 the third time — and quietly taps their card.
               </p>
             </div>
@@ -479,7 +479,7 @@ function DesktopLanding({ onPickCompany, companies }) {
             <p>
               The hope is simple: that somewhere, on a Tuesday morning, someone on
               a dial-in smiles when they hear{" "}
-              <span className="text-gold">"lift up above the noise"</span> for
+              <span className="text-gold">"boil the ocean"</span> for
               the third time — and quietly taps their card.
             </p>
           </div>
