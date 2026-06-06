@@ -223,10 +223,6 @@ function MobileLanding({ onPickCompany, companies }) {
 
           <div className="border-t border-gold/20" />
 
-          <SampleCard />
-
-          <div className="border-t border-gold/20" />
-
           <div className="space-y-4">
             <p className="text-[10px] uppercase tracking-[0.32em] text-gold/60 text-center">
               Where This Came From
@@ -278,10 +274,6 @@ function MobileLanding({ onPickCompany, companies }) {
               Pick a Company &rarr;
             </button>
           </div>
-
-          <div className="border-t border-gold/20" />
-
-          <FAQSection />
 
           <div className="border-t border-gold/20" />
 
@@ -433,31 +425,24 @@ function DesktopLanding({ onPickCompany, companies }) {
         </div>
       </section>
 
-      {/* Available Companies + Sample Card */}
+      {/* Available Companies */}
       {companies.length > 0 && (
         <section className="w-full px-12 py-10 border-b border-gold/10">
-          <div className="flex items-start gap-12">
-            <div className="flex-1">
-              <p className="text-[11px] uppercase tracking-[0.4em] text-gold font-semibold mb-4">
-                Available Now
-              </p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {companies.map((c) => (
-                  <span
-                    key={c.id}
-                    className="flex items-center gap-1.5 rounded-full border border-gold/20 bg-[#111f35] px-3 py-1.5 text-sm text-cream/80"
-                  >
-                    <span>{c.emoji}</span>
-                    <span>{c.name}</span>
-                  </span>
-                ))}
-              </div>
-              <p className="text-xs text-cream/30">More companies added regularly</p>
-            </div>
-            <div className="w-72 shrink-0">
-              <SampleCard />
-            </div>
+          <p className="text-[11px] uppercase tracking-[0.4em] text-gold font-semibold mb-4">
+            Available Now
+          </p>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {companies.map((c) => (
+              <span
+                key={c.id}
+                className="flex items-center gap-1.5 rounded-full border border-gold/20 bg-[#111f35] px-3 py-1.5 text-sm text-cream/80"
+              >
+                <span>{c.emoji}</span>
+                <span>{c.name}</span>
+              </span>
+            ))}
           </div>
+          <p className="text-xs text-cream/30">More companies added regularly</p>
         </section>
       )}
 
@@ -497,21 +482,6 @@ function DesktopLanding({ onPickCompany, companies }) {
               <span className="text-gold">"lift up above the noise"</span> for
               the third time — and quietly taps their card.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="w-full px-12 py-10 border-b border-gold/10">
-        <div className="grid grid-cols-3 gap-12">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.4em] text-gold font-semibold mb-4">FAQ</p>
-            <h3 className="font-display text-2xl font-bold text-cream leading-snug">
-              Questions worth answering.
-            </h3>
-          </div>
-          <div className="col-span-2 space-y-2">
-            <FAQSection />
           </div>
         </div>
       </section>
