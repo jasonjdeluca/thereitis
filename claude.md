@@ -71,7 +71,7 @@ Both `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` must be set in Vercel envi
 
 Supabase project is under the **"There It Is" org** — always confirm before executing any SQL via MCP.
 
-Migrations 001–012 cover the full schema. The migration directory is complete as of 2026-05-28. Every new SQL change must add a new versioned migration file.
+Migration files `001`–`018` exist on disk, while live migration history shows 25 applied migrations. This is confirmed migration drift, including applied changes with no corresponding repo file. Every new SQL change must add a versioned migration file. After this session's migration PRs land, the next migration file number is `023`.
 
 ### Tables
 
@@ -127,9 +127,7 @@ Migrations 001–012 cover the full schema. The migration directory is complete 
 | total_sessions | integer | default 0 |
 | created_at | timestamptz | default now() |
 
-Active companies in DB: **hilton** (🏨), **ko** (🥤 Coca-Cola).
-
-COMPANY_ORDER in `Admin.jsx` and `CompanySelect.jsx`: `["hilton", "ko", "marriott", "hyatt", "ihg", "wyndham", "choice"]`. Companies not yet in the DB (marriott, hyatt, ihg, wyndham, choice) are silently filtered out — they appear in COMPANY_ORDER but have no rows and are not shown.
+Active companies in DB as of the 2026-06-13 Phase 1 verification: **hilton** (51 active phrases), **hd** (58), **mmm** (55), **ba** (51), **ko** (50), **nke** (46), and **vz** (39).
 
 #### `trivia_questions`
 | Column | Type | Notes |
@@ -172,22 +170,24 @@ Currently 0 rows — badges are evaluated client-side only (PostGame/BadgeReveal
 | id | uuid PK | |
 | company_id | text | FK → companies(id) |
 | phrase | text | max 25 chars (DB CHECK constraint) |
-| tier | text | 'hot', 'warm', or 'cold' |
+| tier | text | 'hot', 'warm', 'cold', or 'standard' |
 | points | integer | |
 | ceo_mode | boolean | default true |
 | special_square | text | 'filibuster', 'great_question', 'dont_overcook', or null |
 | is_active | boolean | default true |
 | created_at | timestamptz | |
 
-Live and populated: Hilton (51 phrases seeded via migration 012). Coca-Cola row exists but phrases not yet ingested (phrase_count = 0).
+Live phrase counts are mutable state; see `docs/program/PROGRAM_STATE.md`.
 
 ### RLS Status
 
-All tables have RLS enabled (migration 002). Policies:
-- **SELECT**: public (all tables)
-- **INSERT**: public for sessions, players, marks, call_votes, player_badges
-- **INSERT/UPDATE/DELETE**: `auth.role() = 'authenticated'` for companies, trivia_questions, phrases
-- **DELETE**: `auth.role() = 'authenticated'` for sessions, players, marks, call_votes, player_badges
+Live `phrases` policies use `auth.uid() IS NOT NULL`, not `auth.role()`:
+- `phrases_insert_admin`: `WITH CHECK (auth.uid() IS NOT NULL)`
+- `phrases_update_admin`: `USING (auth.uid() IS NOT NULL)`
+- `phrases_delete_admin`: `USING (auth.uid() IS NOT NULL)`
+- `phrases_select_all`: public SELECT
+
+Live game-state RLS still includes open anonymous-write findings. See `docs/program/PROGRAM_STATE.md` for current remediation status.
 
 ### Functions / RPCs
 
@@ -236,20 +236,21 @@ All tables have RLS enabled (migration 002). Policies:
 - **`Celebration`**: Bingo/blackout animation overlay.
 - **`Toast`**: Floating notifications (local and broadcast).
 - **`TriviaQuiz`**: 6-question quiz from `trivia_questions` table. Randomized per-session, difficulty-mixed (2 easy, 3 medium, 1 hard). 10-second timer per question.
-- **`Admin`**: Auth-gated (Supabase Auth). Manages company earnings dates, call identifiers, active status; trivia question on/off toggles; session stats per company. **Known limitation**: `TriviaSection` is hardcoded to `company_id = "hilton"` — trivia management only works for Hilton until this is generalized.
+- **`Admin`**: Auth-gated (Supabase Auth). Manages company earnings dates, call identifiers, active status; generalized trivia question on/off toggles; session stats per company.
 
 ### Lib Descriptions
 
 - **`supabase.js`**: Supabase client singleton.
 - **`session.js`**: `createSession(displayName, companyId)` and `joinSession(code, displayName)`. Fetches DB phrases via `fetchPhrases(companyId)` before card generation. Writes to `sessions` and `players`. Stores IDs in `sessionStorage`.
-- **`card.js`**: `generateCard(phrases)` and `generateCeoCard(phrases)`. Both accept DB phrase rows (with fallback to hardcoded arrays). Trinity (Brand-Led, Network-Driven, Platform-Enabled) always placed as 3 consecutive cells in a row or column (not through FREE). FREE hardcoded to [2][2]. 1–2 cold phrases per card.
-- **`phrases.js`**: HOT (28), WARM (18), COLD (5) phrase arrays — Hilton fallback bank. Tier point values. CEO_MODE_PHRASES subset. Special exports: TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK, TIER, CEO_TIER, and `tierOf()`.
+- **`card.js`**: `generateCard(phrases)` and `generateCeoCard(phrases)`. Both accept DB phrase rows. Session creation throws when the selected company has no DB phrases; there is no cross-company phrase fallback. Trinity (Brand-Led, Network-Driven, Platform-Enabled) is placed only when all three phrases exist in the company pool. FREE is hardcoded to [2][2].
+- **`phrases.js`**: HOT, WARM, and COLD arrays remain for tier lookup and special-square constants; they are not a fallback phrase source. Special exports: TRINITY, FILIBUSTER, GREAT_QUESTION, DONT_OVERCOOK, TIER, CEO_TIER, and `tierOf()`.
 - **`bingo.js`**: Line detection (5 rows + 5 cols + 2 diagonals), `evaluate()` returns completed lines + nearMiss, `isBlackout()`.
 - **`badges.js`**: 12 badge definitions, `evaluateBadges()` evaluates all conditions against end-of-game state.
 
 ### Program Docs (added May 2026)
 - `docs/program/PROGRAM_CHARTER.md` — full architecture, tool roles, agentic PM loop, company readiness rules, build phases
 - `docs/program/AGENT_TASK_BACKLOG.md` — all tasks by workstream group with status markers. Update in-place as work completes.
+- `docs/program/PROGRAM_STATE.md` — the single mutable state file. Do not maintain state in `claude.md`.
 
 ### Realtime Channels
 
@@ -278,15 +279,17 @@ All tables have RLS enabled (migration 002). Policies:
 
 ## Data Pipeline — Transcript Ingest
 
-`scripts/ingest.js` takes PDF transcript URLs from `scripts/companies.json`, sends them to Claude Haiku via the Anthropic API, and outputs SQL files to `scripts/pending/`. The SQL populates `companies`, `phrases`, and `trivia_questions` tables.
+**RETIRED:** `scripts/ingest.js` and its Anthropic-API pipeline must not be used.
 
-- Model: `claude-haiku-4-5-20251001`
-- Budget cap: $8.00 per run
-- Requires `ANTHROPIC_API_KEY` in shell environment (NOT a Vite env var — never included in the browser bundle)
-- Output SQL files must be reviewed before executing against the live DB
-- `scripts/companies.json` contains ingest candidates: Coca-Cola (KO), Home Depot (HD), Citigroup (C), JPMorgan Chase (JPM)
-  - Coca-Cola (`ko`) is **active** in the DB but phrases not yet ingested (phrase_count = 0)
-  - Home Depot (`hd`), Citigroup (`c`), JPMorgan Chase (`jpm`) are **not yet in the DB** — run ingest + toggle active at `/gate` to activate
+The active pipeline lives under `scripts/ingestion/` and follows a five-stage architecture:
+
+1. Build the source queue.
+2. Fetch transcripts.
+3. Extract and deterministically validate candidates.
+4. Hand candidates to the subscription enrichment queue for phrase selection and trivia writing.
+5. Validate/finalize generated output for review and migration.
+
+The subscription enrichment queue is processed with `scripts/ingestion/process-review-queue.js`. Output must be reviewed before any live migration.
 
 ---
 
@@ -301,7 +304,7 @@ Admin can:
 - Set next earnings date, time, timezone
 - Set call identifier string
 - View per-company session stats (24h sessions, total games, total players, most-marked phrase)
-- Toggle trivia questions active/inactive (**Hilton only** — TriviaSection hardcoded to `company_id = "hilton"`)
+- Toggle trivia questions active/inactive for the selected company
 
 ---
 
@@ -312,16 +315,16 @@ Admin can:
 - Security headers applied globally: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 
 Claude Code Routines use the `claude/` branch prefix (e.g. `claude/fix-fallback`).
-Always include `gh pr create` as the final step rather than asking Jason to open the PR manually.
+Always include `gh pr create` as the final step rather than asking a human to open the PR manually.
 
 ---
 
-## Security Posture (Hardened)
+## Security Posture Reference
 
-These findings are resolved — do not re-audit or re-open:
+Do not infer current remediation status from this reference list; use `docs/program/PROGRAM_STATE.md`.
 
 1. **Admin gate**: Supabase Auth `signInWithPassword`. `VITE_ADMIN_PASSWORD` and all sessionStorage bypass logic are gone.
-2. **RLS**: Enabled on all 8 tables with appropriate policies (migration 002).
+2. **RLS**: Enabled, but confirmed game-state and `phrase_staging` policy findings remain open. Live `phrases` policies use `auth.uid() IS NOT NULL`.
 3. **Atomic player count**: `increment_player_count` RPC prevents race conditions on simultaneous joins (migration 003).
 4. **Display name constraint**: DB-level `CHECK (char_length(display_name) <= 30)` (migration 004).
 5. **Phrase length constraint**: DB-level `CHECK (char_length(phrase) <= 25)` on `phrases` table (migration 011).
@@ -334,9 +337,8 @@ These findings are resolved — do not re-audit or re-open:
 ## Known Bugs / Technical Debt
 
 - **`player_badges` unused**: Table exists with full RLS, but the app never writes badge data. Badges are evaluated client-side only (PostGame/BadgeReveal). If server-side badge persistence is desired, wire `evaluateBadges()` output to an insert at game end.
-- **TriviaSection hardcoded to Hilton**: `Admin.jsx` `TriviaSection` component fetches `trivia_questions` filtered to `company_id = "hilton"` only. Trivia management for other companies requires generalizing this component.
-- **Coca-Cola phrases not ingested**: `ko` company row exists and is active, but `phrase_count = 0` and no rows in `phrases` for `company_id = 'ko'`. Games started for Coca-Cola silently fall back to Hilton hardcoded phrases. Fix: run ingest pipeline for KO.
-- **`README.md` is outdated**: Describes a single-player no-backend prototype. This file is authoritative.
+- Current verified bugs, remediation status, and live company state belong only in `docs/program/PROGRAM_STATE.md`.
+- **`README.md` is outdated**: Describes a single-player no-backend prototype. Use this file for stable technical reference and `PROGRAM_STATE.md` for mutable state.
 
 ---
 
@@ -344,13 +346,13 @@ These findings are resolved — do not re-audit or re-open:
 
 1. **No individual person names** — not in code, UI, comments, variable names, copy, or toast messages. Role references ("the CEO") are OK.
 2. **No company logos or trademark assets** — emoji icons only (🏨 for hotels). This is a non-affiliated hobby project.
-3. **25 character max on all phrase tiles** — enforced by `ingest.js` validation and DB constraint on `phrases.phrase`; must be respected in any manual phrase additions.
+3. **25 character max on all phrase tiles** — enforced by the active ingestion validators and DB constraint on `phrases.phrase`; must be respected in any manual phrase additions.
 4. **Mobile first** — the 5×5 card is sacred. Nothing overlaps the card. Max width `430px` on desktop (`lg:max-w-[430px] lg:mx-auto`).
 5. **Dark navy (#0A1628) + gold (#D4AF37) throughout** — use Tailwind tokens `navy`, `gold`, `cream`. Never introduce new color schemes.
 6. **Tailwind CSS only** — no additional styling libraries. No inline styles except where Tailwind cannot express the value.
 7. **CEO Mode only in phrase content** — all extracted phrases must be executive-level catchphrases, corporate buzzwords, or verbal tics. No operational minutiae.
 8. **Supabase MCP**: Always confirm the active project is under the **"There It Is" org** before executing any SQL. Never connect to another org.
-9. **Migration files**: Every SQL change executed via MCP must also be written to `supabase/migrations/` as a new versioned file (e.g., `013_add_X.sql`). Next migration number is 013.
+9. **Migration files**: Every SQL change executed via MCP must also be written to `supabase/migrations/` as a new versioned file. Files `001`–`018` exist on disk while live history shows 25 applied migrations. After this session's migration PRs land, the next migration file number is `023`.
 10. **Vercel auto-deploys on push to `main`** — any push is a production deploy.
 11. **VITE_ADMIN_PASSWORD is retired** — must never be re-introduced in any form.
-12. **README.md is outdated** (describes a no-backend single-player prototype) — do not use it as a reference; this file is authoritative.
+12. **README.md is outdated** (describes a no-backend single-player prototype) — do not use it as a reference. `PROGRAM_STATE.md` is the single mutable state file.
