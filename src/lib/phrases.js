@@ -70,6 +70,7 @@ export const FREE_LABEL = "FREE";
 export const TIER = {
   hot: { dot: "🔥", points: 50, label: "hot" },
   warm: { dot: "⚡", points: 75, label: "warm" },
+  standard: { dot: "⚡", points: 75, label: "standard" },
   cold: { dot: "❄️", points: 150, label: "cold" },
   free: { dot: "", points: 0, label: "free" },
 };
@@ -97,6 +98,7 @@ export const CEO_MODE_PHRASES = [
 export const CEO_TIER = {
   hot: { dot: "🔥", points: 50, label: "hot" },
   warm: { dot: "⚡", points: 75, label: "warm" },
+  standard: { dot: "⚡", points: 75, label: "standard" },
   cold: { dot: "❄️", points: 150, label: "cold" },
   free: { dot: "", points: 0, label: "free" },
 };
