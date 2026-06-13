@@ -7,6 +7,7 @@ import Lobby from "./components/Lobby";
 import Game from "./components/Game";
 import Predictions from "./components/Predictions";
 import TriviaQuiz from "./components/TriviaQuiz";
+import { supabase } from "./lib/supabase";
 
 const Admin = lazy(() => import("./components/Admin"));
 
@@ -36,6 +37,26 @@ export default function App() {
     const id = getInitialCompanyId();
     return id ? { id } : null;
   });
+
+  // On a deep link (e.g. /play/hd) the company starts as a bare { id }, with no
+  // emoji/name/call_identifier. Hydrate the full row so the FREE tile shows the
+  // company's own emoji instead of falling back to the hotel default.
+  useEffect(() => {
+    if (!company?.id || company.emoji) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("companies")
+        .select("*")
+        .eq("id", company.id)
+        .single();
+      if (cancelled || !data) return;
+      setCompany((prev) => (prev?.id === data.id ? { ...prev, ...data } : prev));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [company?.id, company?.emoji]);
 
   useEffect(() => {
     function handlePopState() {
