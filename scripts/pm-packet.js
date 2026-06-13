@@ -6,6 +6,7 @@
 import { readFileSync, writeFileSync, mkdirSync, statSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { createClient } from "@supabase/supabase-js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPORTS_DIR = join(__dirname, "../reports");
@@ -56,7 +57,32 @@ function loadOptionalReport(filepath) {
   }
 }
 
-function run() {
+async function writeHeartbeat(details) {
+  try {
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) {
+      console.warn("[heartbeat] SUPABASE_SERVICE_ROLE_KEY not set — skipping heartbeat write");
+      return;
+    }
+
+    const serviceSupabase = createClient(
+      process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL,
+      serviceRoleKey,
+      { auth: { persistSession: false } },
+    );
+    const { error } = await serviceSupabase.from("system_health").upsert({
+      id: 1,
+      last_heartbeat_at: new Date().toISOString(),
+      source: "cron:pm-packet",
+      details,
+    });
+    if (error) throw error;
+  } catch (err) {
+    console.warn(`WARNING: Could not write system health heartbeat: ${err.message}`);
+  }
+}
+
+async function run() {
   const cr = loadReport("company_readiness", REPORT_FILES.company_readiness);
   const cv = loadReport("content_validation", REPORT_FILES.content_validation);
   const mc = loadReport("migration_check", REPORT_FILES.migration_check);
@@ -195,11 +221,10 @@ function run() {
   mkdirSync(REPORTS_DIR, { recursive: true });
   writeFileSync(join(REPORTS_DIR, "pm-packet.json"), JSON.stringify(report, null, 2));
   console.log(`pm-packet: ${critical_issues.length} critical, ${warnings.length} warnings, ${healthy_companies.length} healthy companies`);
+  await writeHeartbeat({ reports_written: 1 });
 }
 
-try {
-  run();
-} catch (err) {
+run().catch((err) => {
   console.error("FATAL:", err.message);
   process.exit(1);
-}
+});
