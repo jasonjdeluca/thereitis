@@ -57,6 +57,7 @@ export default function Game({
   phrases,
   companyId,
   companyName,
+  companyEmoji,
   callIdentifier,
   onExit,
   onPlayAgain,
@@ -968,6 +969,7 @@ export default function Game({
                   isPrediction={predictions && predictions.includes(cell.phrase) && !cell.marked}
                   predictionHit={predictions && predictions.includes(cell.phrase) && cell.marked}
                   isGreatQuestion={cell.phrase === GREAT_QUESTION && cell.marked}
+                  companyEmoji={companyEmoji}
                 />
               )),
             )}

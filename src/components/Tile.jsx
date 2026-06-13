@@ -16,7 +16,15 @@ function sizeClass(phrase) {
   return "text-[9px] leading-snug";
 }
 
-export default function Tile({ cell, onTap, onLine, isPrediction, predictionHit, isGreatQuestion }) {
+export default function Tile({
+  cell,
+  onTap,
+  onLine,
+  isPrediction,
+  predictionHit,
+  isGreatQuestion,
+  companyEmoji,
+}) {
   const { phrase, tier, isFree, marked } = cell;
   const dot = TIER[tier]?.dot || "";
 
@@ -54,7 +62,7 @@ export default function Tile({ cell, onTap, onLine, isPrediction, predictionHit,
       )}
       {isFree ? (
         <span className="flex flex-col items-center justify-center leading-tight">
-          <span className="text-2xl" aria-hidden>🏨</span>
+          <span className="text-2xl" aria-hidden>{companyEmoji || "🏨"}</span>
           <span className="text-[11px] font-bold tracking-wider mt-0.5">FREE</span>
         </span>
       ) : (

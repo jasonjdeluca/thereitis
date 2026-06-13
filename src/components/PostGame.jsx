@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import html2canvas from "html2canvas";
 import { TIER } from "../lib/phrases";
 import { evaluateBadges } from "../lib/badges";
 import { supabase } from "../lib/supabase";
@@ -126,6 +125,7 @@ export default function PostGame({
     setBusy(true);
     setError(null);
     try {
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: "#0A1628",
         scale: 2,
