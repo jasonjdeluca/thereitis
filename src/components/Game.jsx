@@ -71,9 +71,16 @@ export default function Game({
   const blackoutTimerRef = useRef(null);
   const silenceTimerRef = useRef(null);
   const silenceFiredRef = useRef(false);
-  const markTimestampsRef = useRef([]);
+  const gridRef = useRef(initialCard);
+  const everyoneHeardMarksRef = useRef([]);
+  const inSyncMarksRef = useRef([]);
+  const inSyncFiredRef = useRef(false);
   const maxStreakRef = useRef(0);
   const lastBroadcastToastRef = useRef(0);
+
+  useEffect(() => {
+    gridRef.current = grid;
+  }, [grid]);
 
   useEffect(() => {
     playersRef.current = players;
@@ -149,8 +156,8 @@ export default function Game({
 
         resetSilenceTimer();
 
-        checkEveryoneHeardThat(mark.phrase, mark.marked_at || new Date().toISOString());
-        checkInSync(mark.phrase, mark.player_id, mark.marked_at || new Date().toISOString());
+        checkEveryoneHeardThat(mark.phrase, mark.player_id);
+        checkInSync(mark.phrase, mark.player_id);
 
         if (mark.player_id === playerId) return;
 
@@ -317,10 +324,14 @@ export default function Game({
     }
   }
 
-  function checkEveryoneHeardThat(phrase, timestamp) {
+  function checkEveryoneHeardThat(phrase, markPlayerId) {
     const now = Date.now();
-    markTimestampsRef.current.push({ phrase, time: now });
-    markTimestampsRef.current = markTimestampsRef.current.filter(
+    everyoneHeardMarksRef.current.push({
+      phrase,
+      playerId: markPlayerId,
+      time: now,
+    });
+    everyoneHeardMarksRef.current = everyoneHeardMarksRef.current.filter(
       (m) => now - m.time <= EVERYONE_HEARD_WINDOW_MS,
     );
 
@@ -328,28 +339,33 @@ export default function Game({
     if (activeCount < 2) return;
 
     const threshold = Math.ceil(activeCount * 0.75);
-    const recentForPhrase = markTimestampsRef.current.filter(
+    const recentForPhrase = everyoneHeardMarksRef.current.filter(
       (m) => m.phrase === phrase,
     );
 
     const uniquePlayers = new Set();
-    recentForPhrase.forEach(() => uniquePlayers.add(phrase));
+    recentForPhrase.forEach((m) => uniquePlayers.add(m.playerId));
 
-    if (recentForPhrase.length >= threshold) {
+    if (uniquePlayers.size >= threshold) {
       broadcastToast("Everyone heard that one 👀");
-      markTimestampsRef.current = markTimestampsRef.current.filter(
+      everyoneHeardMarksRef.current = everyoneHeardMarksRef.current.filter(
         (m) => m.phrase !== phrase,
       );
     }
   }
 
-  function checkInSync(phrase, markPlayerId, timestamp) {
-    if (inSyncFired) return;
+  function checkInSync(phrase, markPlayerId) {
+    if (inSyncFiredRef.current) return;
     const now = Date.now();
+    inSyncMarksRef.current.push({ phrase, playerId: markPlayerId, time: now });
+    inSyncMarksRef.current = inSyncMarksRef.current.filter(
+      (m) => now - m.time <= IN_SYNC_WINDOW_MS,
+    );
+
     const myMarked = [];
     for (let r = 0; r < 5; r++) {
       for (let c = 0; c < 5; c++) {
-        const cell = grid[r][c];
+        const cell = gridRef.current[r][c];
         if (cell.marked && cell.markedAt && now - cell.markedAt <= IN_SYNC_WINDOW_MS) {
           myMarked.push(cell.phrase);
         }
@@ -357,10 +373,12 @@ export default function Game({
     }
 
     if (myMarked.includes(phrase)) {
-      const recentMarks = markTimestampsRef.current.filter(
+      const recentMarks = inSyncMarksRef.current.filter(
         (m) => m.phrase === phrase && now - m.time <= IN_SYNC_WINDOW_MS,
       );
-      if (recentMarks.length >= IN_SYNC_THRESHOLD) {
+      const uniquePlayers = new Set(recentMarks.map((m) => m.playerId));
+      if (uniquePlayers.size >= IN_SYNC_THRESHOLD) {
+        inSyncFiredRef.current = true;
         setInSyncFired(true);
       }
     }
