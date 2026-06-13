@@ -3,19 +3,24 @@ import { generateCard } from "./card";
 
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
+export const PHRASE_ERROR_MESSAGES = {
+  connection: "Connection error — unable to load phrases",
+  empty: "No phrases configured for this company",
+};
 
 async function fetchPhrases(companyId) {
-  if (!companyId) return null;
+  if (!companyId) return { status: "empty", phrases: [] };
   try {
     const { data, error } = await supabase
       .from("phrases")
       .select("phrase, tier, ceo_mode, special_square")
       .eq("company_id", companyId)
       .eq("is_active", true);
-    if (error || !data || data.length === 0) return null;
-    return data;
+    if (error) return { status: "error", phrases: [] };
+    if (!data || data.length === 0) return { status: "empty", phrases: [] };
+    return { status: "ok", phrases: data };
   } catch {
-    return null;
+    return { status: "error", phrases: [] };
   }
 }
 
@@ -28,21 +33,33 @@ function generateCode() {
 }
 
 export async function createSession(displayName, companyId) {
-  const code = generateCode();
-  const phrases = await fetchPhrases(companyId);
-  if (!phrases) throw new Error("This company has no phrases yet — the game cannot be started");
+  const phraseResult = await fetchPhrases(companyId);
+  if (phraseResult.status === "error") {
+    throw new Error(PHRASE_ERROR_MESSAGES.connection);
+  }
+  if (phraseResult.status === "empty") {
+    throw new Error(PHRASE_ERROR_MESSAGES.empty);
+  }
+  const phrases = phraseResult.phrases;
   const card = generateCard(phrases);
 
-  const row = { session_code: code, status: "active", player_count: 1 };
-  if (companyId) row.company_id = companyId;
+  let session;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const row = { session_code: generateCode(), status: "active", player_count: 1 };
+    if (companyId) row.company_id = companyId;
 
-  const { data: session, error: sessionError } = await supabase
-    .from("sessions")
-    .insert(row)
-    .select()
-    .single();
+    const { data, error } = await supabase
+      .from("sessions")
+      .insert(row)
+      .select()
+      .single();
 
-  if (sessionError) throw sessionError;
+    if (!error) {
+      session = data;
+      break;
+    }
+    if (error.code !== "23505" || attempt === 1) throw error;
+  }
 
   const { data: player, error: playerError } = await supabase
     .from("players")
@@ -78,8 +95,14 @@ export async function joinSession(code, displayName) {
     return { error: "This session has expired — start a new one" };
   }
 
-  const phrases = await fetchPhrases(session.company_id);
-  if (!phrases) return { error: "This company has no phrases yet — the game cannot be joined" };
+  const phraseResult = await fetchPhrases(session.company_id);
+  if (phraseResult.status === "error") {
+    return { error: PHRASE_ERROR_MESSAGES.connection };
+  }
+  if (phraseResult.status === "empty") {
+    return { error: PHRASE_ERROR_MESSAGES.empty };
+  }
+  const phrases = phraseResult.phrases;
   const card = generateCard(phrases);
 
   const { data: player, error: playerError } = await supabase

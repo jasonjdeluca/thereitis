@@ -22,6 +22,31 @@ const SILENCE_TIMEOUT_MS = 5 * 60 * 1000;
 const IN_SYNC_WINDOW_MS = 30 * 1000;
 const IN_SYNC_THRESHOLD = 5;
 const EVERYONE_HEARD_WINDOW_MS = 30 * 1000;
+const RECONNECT_DELAYS_MS = [3000, 6000, 12000];
+
+function ConnectionNotice({ status }) {
+  if (status === "connected") return null;
+
+  const connectionLost = status === "lost";
+
+  return (
+    <div
+      className="fixed top-2 inset-x-0 z-[60] flex justify-center px-3 pointer-events-none"
+      role="status"
+      aria-live="polite"
+    >
+      <div
+        className={`max-w-sm border border-gold/60 bg-navy-2/95 px-3 py-1.5 text-center text-xs font-semibold text-gold shadow-gold ${
+          connectionLost ? "rounded-xl" : "rounded-full"
+        }`}
+      >
+        {connectionLost
+          ? "Connection lost — refresh to rejoin"
+          : "Reconnecting…"}
+      </div>
+    </div>
+  );
+}
 
 export default function Game({
   sessionId,
@@ -32,6 +57,7 @@ export default function Game({
   phrases,
   companyId,
   companyName,
+  companyEmoji,
   callIdentifier,
   onExit,
   onPlayAgain,
@@ -59,6 +85,7 @@ export default function Game({
   const [ceoMode, setCeoMode] = useState(false);
   const [inSyncFired, setInSyncFired] = useState(false);
   const [ceoTooltip, setCeoTooltip] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState("connected");
 
   const toastIdRef = useRef(0);
   const trinityTimesRef = useRef({});
@@ -71,9 +98,18 @@ export default function Game({
   const blackoutTimerRef = useRef(null);
   const silenceTimerRef = useRef(null);
   const silenceFiredRef = useRef(false);
-  const markTimestampsRef = useRef([]);
+  const gridRef = useRef(initialCard);
+  const everyoneHeardMarksRef = useRef([]);
+  const inSyncMarksRef = useRef([]);
+  const inSyncFiredRef = useRef(false);
   const maxStreakRef = useRef(0);
   const lastBroadcastToastRef = useRef(0);
+  const reconnectTimerRef = useRef(null);
+  const reconnectAttemptRef = useRef(0);
+
+  useEffect(() => {
+    gridRef.current = grid;
+  }, [grid]);
 
   useEffect(() => {
     playersRef.current = players;
@@ -116,6 +152,8 @@ export default function Game({
   }
 
   useEffect(() => {
+    let disposed = false;
+
     async function fetchPlayers() {
       const { data } = await supabase
         .from("players")
@@ -128,147 +166,200 @@ export default function Game({
     }
     fetchPlayers();
 
-    const channel = supabase.channel(`game:${sessionId}`);
+    function clearReconnectTimer() {
+      if (!reconnectTimerRef.current) return;
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
 
-    channel.on("presence", { event: "sync" }, () => {
-      const state = channel.presenceState();
-      const count = Object.values(state).flat().length;
-      if (count > 0) setPlayerCount(count);
-    });
+    function handleSubscriptionStatus(channel, status) {
+      if (disposed || channelRef.current !== channel) return;
 
-    channel.on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "marks",
-        filter: `session_id=eq.${sessionId}`,
-      },
-      (payload) => {
-        const mark = payload.new;
-
-        resetSilenceTimer();
-
-        checkEveryoneHeardThat(mark.phrase, mark.marked_at || new Date().toISOString());
-        checkInSync(mark.phrase, mark.player_id, mark.marked_at || new Date().toISOString());
-
-        if (mark.player_id === playerId) return;
-
-        const now = Date.now();
-        const lastTime = lastFeedTimeRef.current[mark.player_id] || 0;
-        if (now - lastTime < 8000) return;
-        lastFeedTimeRef.current[mark.player_id] = now;
-
-        const player = playersRef.current.find(
-          (p) => p.id === mark.player_id,
-        );
-        const name = player?.display_name || "Someone";
-
-        setFeedEntries((prev) =>
-          [
-            {
-              id: mark.id,
-              playerName: name,
-              phrase: mark.phrase,
-              type: "mark",
-              timestamp: now,
-            },
-            ...prev,
-          ].slice(0, 8),
-        );
-      },
-    );
-
-    channel.on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "players",
-        filter: `session_id=eq.${sessionId}`,
-      },
-      (payload) => {
-        const updated = payload.new;
-        setPlayers((prev) =>
-          prev.map((p) =>
-            p.id === updated.id
-              ? {
-                  ...p,
-                  score: updated.score,
-                  bingo_count: updated.bingo_count,
-                  blackout: updated.blackout,
-                }
-              : p,
-          ),
-        );
-
-        if (updated.id !== playerId) {
-          const old = playersRef.current.find((p) => p.id === updated.id);
-          if (old && updated.bingo_count > (old.bingo_count || 0)) {
-            const name = old.display_name || "Someone";
-            setFeedEntries((prev) =>
-              [
-                {
-                  id: `bingo-${updated.id}-${updated.bingo_count}`,
-                  playerName: name,
-                  phrase: "",
-                  type: "bingo",
-                  timestamp: Date.now(),
-                },
-                ...prev,
-              ].slice(0, 8),
-            );
-          }
-        }
-      },
-    );
-
-    channel.on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "players",
-        filter: `session_id=eq.${sessionId}`,
-      },
-      (payload) => {
-        const newPlayer = payload.new;
-        setPlayers((prev) => {
-          if (prev.find((p) => p.id === newPlayer.id)) return prev;
-          return [
-            ...prev,
-            {
-              id: newPlayer.id,
-              display_name: newPlayer.display_name,
-              score: newPlayer.score || 0,
-              bingo_count: newPlayer.bingo_count || 0,
-              blackout: newPlayer.blackout || false,
-            },
-          ];
-        });
-      },
-    );
-
-    channel.on("broadcast", { event: "toast" }, (payload) => {
-      const now = Date.now();
-      if (now - lastBroadcastToastRef.current < 5000) return;
-      lastBroadcastToastRef.current = now;
-      pushToast(payload.payload.text);
-    });
-
-    channel.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
-        await channel.track({
+        clearReconnectTimer();
+        reconnectAttemptRef.current = 0;
+        setConnectionStatus("connected");
+        channel.track({
           display_name: displayName,
           player_id: playerId,
         });
+        return;
       }
-    });
 
-    channelRef.current = channel;
+      setConnectionStatus("reconnecting");
+
+      if (reconnectTimerRef.current) return;
+
+      if (reconnectAttemptRef.current >= RECONNECT_DELAYS_MS.length) {
+        channelRef.current = null;
+        channel.unsubscribe();
+        setConnectionStatus("lost");
+        return;
+      }
+
+      const delay = RECONNECT_DELAYS_MS[reconnectAttemptRef.current];
+      reconnectTimerRef.current = setTimeout(async () => {
+        reconnectTimerRef.current = null;
+        if (disposed || channelRef.current !== channel) return;
+
+        reconnectAttemptRef.current += 1;
+        channelRef.current = null;
+        try {
+          await channel.unsubscribe();
+        } finally {
+          if (!disposed) subscribeToChannel();
+        }
+      }, delay);
+    }
+
+    function subscribeToChannel() {
+      if (disposed) return;
+
+      const channel = supabase.channel(`game:${sessionId}`);
+
+      channel.on("presence", { event: "sync" }, () => {
+        const state = channel.presenceState();
+        const count = Object.values(state).flat().length;
+        if (count > 0) setPlayerCount(count);
+      });
+
+      channel.on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "marks",
+          filter: `session_id=eq.${sessionId}`,
+        },
+        (payload) => {
+          const mark = payload.new;
+
+          resetSilenceTimer();
+
+          checkEveryoneHeardThat(mark.phrase, mark.player_id);
+          checkInSync(mark.phrase, mark.player_id);
+
+          if (mark.player_id === playerId) return;
+
+          const now = Date.now();
+          const lastTime = lastFeedTimeRef.current[mark.player_id] || 0;
+          if (now - lastTime < 8000) return;
+          lastFeedTimeRef.current[mark.player_id] = now;
+
+          const player = playersRef.current.find(
+            (p) => p.id === mark.player_id,
+          );
+          const name = player?.display_name || "Someone";
+
+          setFeedEntries((prev) =>
+            [
+              {
+                id: mark.id,
+                playerName: name,
+                phrase: mark.phrase,
+                type: "mark",
+                timestamp: now,
+              },
+              ...prev,
+            ].slice(0, 8),
+          );
+        },
+      );
+
+      channel.on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "players",
+          filter: `session_id=eq.${sessionId}`,
+        },
+        (payload) => {
+          const updated = payload.new;
+          setPlayers((prev) =>
+            prev.map((p) =>
+              p.id === updated.id
+                ? {
+                    ...p,
+                    score: updated.score,
+                    bingo_count: updated.bingo_count,
+                    blackout: updated.blackout,
+                  }
+                : p,
+            ),
+          );
+
+          if (updated.id !== playerId) {
+            const old = playersRef.current.find((p) => p.id === updated.id);
+            if (old && updated.bingo_count > (old.bingo_count || 0)) {
+              const name = old.display_name || "Someone";
+              setFeedEntries((prev) =>
+                [
+                  {
+                    id: `bingo-${updated.id}-${updated.bingo_count}`,
+                    playerName: name,
+                    phrase: "",
+                    type: "bingo",
+                    timestamp: Date.now(),
+                  },
+                  ...prev,
+                ].slice(0, 8),
+              );
+            }
+          }
+        },
+      );
+
+      channel.on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "players",
+          filter: `session_id=eq.${sessionId}`,
+        },
+        (payload) => {
+          const newPlayer = payload.new;
+          setPlayers((prev) => {
+            if (prev.find((p) => p.id === newPlayer.id)) return prev;
+            return [
+              ...prev,
+              {
+                id: newPlayer.id,
+                display_name: newPlayer.display_name,
+                score: newPlayer.score || 0,
+                bingo_count: newPlayer.bingo_count || 0,
+                blackout: newPlayer.blackout || false,
+              },
+            ];
+          });
+        },
+      );
+
+      channel.on("broadcast", { event: "toast" }, (payload) => {
+        const now = Date.now();
+        if (now - lastBroadcastToastRef.current < 5000) return;
+        lastBroadcastToastRef.current = now;
+        pushToast(payload.payload.text);
+      });
+
+      channelRef.current = channel;
+      channel.subscribe((status) => {
+        handleSubscriptionStatus(channel, status);
+      });
+    }
+
+    reconnectAttemptRef.current = 0;
+    subscribeToChannel();
 
     return () => {
-      channel.unsubscribe();
+      disposed = true;
+      clearReconnectTimer();
+      reconnectAttemptRef.current = 0;
+
+      const channel = channelRef.current;
+      channelRef.current = null;
+      if (channel) channel.unsubscribe();
     };
   }, [sessionId, playerId, displayName]);
 
@@ -317,10 +408,14 @@ export default function Game({
     }
   }
 
-  function checkEveryoneHeardThat(phrase, timestamp) {
+  function checkEveryoneHeardThat(phrase, markPlayerId) {
     const now = Date.now();
-    markTimestampsRef.current.push({ phrase, time: now });
-    markTimestampsRef.current = markTimestampsRef.current.filter(
+    everyoneHeardMarksRef.current.push({
+      phrase,
+      playerId: markPlayerId,
+      time: now,
+    });
+    everyoneHeardMarksRef.current = everyoneHeardMarksRef.current.filter(
       (m) => now - m.time <= EVERYONE_HEARD_WINDOW_MS,
     );
 
@@ -328,28 +423,33 @@ export default function Game({
     if (activeCount < 2) return;
 
     const threshold = Math.ceil(activeCount * 0.75);
-    const recentForPhrase = markTimestampsRef.current.filter(
+    const recentForPhrase = everyoneHeardMarksRef.current.filter(
       (m) => m.phrase === phrase,
     );
 
     const uniquePlayers = new Set();
-    recentForPhrase.forEach(() => uniquePlayers.add(phrase));
+    recentForPhrase.forEach((m) => uniquePlayers.add(m.playerId));
 
-    if (recentForPhrase.length >= threshold) {
+    if (uniquePlayers.size >= threshold) {
       broadcastToast("Everyone heard that one 👀");
-      markTimestampsRef.current = markTimestampsRef.current.filter(
+      everyoneHeardMarksRef.current = everyoneHeardMarksRef.current.filter(
         (m) => m.phrase !== phrase,
       );
     }
   }
 
-  function checkInSync(phrase, markPlayerId, timestamp) {
-    if (inSyncFired) return;
+  function checkInSync(phrase, markPlayerId) {
+    if (inSyncFiredRef.current) return;
     const now = Date.now();
+    inSyncMarksRef.current.push({ phrase, playerId: markPlayerId, time: now });
+    inSyncMarksRef.current = inSyncMarksRef.current.filter(
+      (m) => now - m.time <= IN_SYNC_WINDOW_MS,
+    );
+
     const myMarked = [];
     for (let r = 0; r < 5; r++) {
       for (let c = 0; c < 5; c++) {
-        const cell = grid[r][c];
+        const cell = gridRef.current[r][c];
         if (cell.marked && cell.markedAt && now - cell.markedAt <= IN_SYNC_WINDOW_MS) {
           myMarked.push(cell.phrase);
         }
@@ -357,10 +457,12 @@ export default function Game({
     }
 
     if (myMarked.includes(phrase)) {
-      const recentMarks = markTimestampsRef.current.filter(
+      const recentMarks = inSyncMarksRef.current.filter(
         (m) => m.phrase === phrase && now - m.time <= IN_SYNC_WINDOW_MS,
       );
-      if (recentMarks.length >= IN_SYNC_THRESHOLD) {
+      const uniquePlayers = new Set(recentMarks.map((m) => m.playerId));
+      if (uniquePlayers.size >= IN_SYNC_THRESHOLD) {
+        inSyncFiredRef.current = true;
         setInSyncFired(true);
       }
     }
@@ -700,51 +802,60 @@ export default function Game({
 
   if (endLeaderboard) {
     return (
-      <EndGameLeaderboard
-        players={players}
-        currentPlayerId={playerId}
-        onContinue={() => {
-          setEndLeaderboard(false);
-          setVoting(true);
-        }}
-      />
+      <>
+        <ConnectionNotice status={connectionStatus} />
+        <EndGameLeaderboard
+          players={players}
+          currentPlayerId={playerId}
+          onContinue={() => {
+            setEndLeaderboard(false);
+            setVoting(true);
+          }}
+        />
+      </>
     );
   }
 
   if (voting) {
     return (
-      <WordOfTheCall
-        sessionId={sessionId}
-        playerId={playerId}
-        playerCount={playerCount}
-        onComplete={() => {
-          setVoting(false);
-          setPostGame(true);
-        }}
-      />
+      <>
+        <ConnectionNotice status={connectionStatus} />
+        <WordOfTheCall
+          sessionId={sessionId}
+          playerId={playerId}
+          playerCount={playerCount}
+          onComplete={() => {
+            setVoting(false);
+            setPostGame(true);
+          }}
+        />
+      </>
     );
   }
 
   if (postGame) {
     return (
-      <PostGame
-        grid={grid}
-        score={score}
-        didBingo={didBingo}
-        didBlackout={didBlackout}
-        onPlayAgain={onPlayAgain}
-        players={players}
-        currentPlayerId={playerId}
-        maxStreak={maxStreak}
-        predictions={predictions}
-        trinityFired={trinityFiredRef.current}
-        inSyncFired={inSyncFired}
-        ceoMode={ceoMode}
-        sessionId={sessionId}
-        companyId={companyId}
-        companyName={companyName}
-        callIdentifier={callIdentifier}
-      />
+      <>
+        <ConnectionNotice status={connectionStatus} />
+        <PostGame
+          grid={grid}
+          score={score}
+          didBingo={didBingo}
+          didBlackout={didBlackout}
+          onPlayAgain={onPlayAgain}
+          players={players}
+          currentPlayerId={playerId}
+          maxStreak={maxStreak}
+          predictions={predictions}
+          trinityFired={trinityFiredRef.current}
+          inSyncFired={inSyncFired}
+          ceoMode={ceoMode}
+          sessionId={sessionId}
+          companyId={companyId}
+          companyName={companyName}
+          callIdentifier={callIdentifier}
+        />
+      </>
     );
   }
 
@@ -753,6 +864,7 @@ export default function Game({
 
   return (
     <div className="bg-radial-navy min-h-full flex flex-col pb-24">
+      <ConnectionNotice status={connectionStatus} />
       <Toast toasts={toasts} />
       <Celebration kind={celebration} onClose={() => setCelebration(null)} />
       {showLeaderboard && (
@@ -857,6 +969,7 @@ export default function Game({
                   isPrediction={predictions && predictions.includes(cell.phrase) && !cell.marked}
                   predictionHit={predictions && predictions.includes(cell.phrase) && cell.marked}
                   isGreatQuestion={cell.phrase === GREAT_QUESTION && cell.marked}
+                  companyEmoji={companyEmoji}
                 />
               )),
             )}

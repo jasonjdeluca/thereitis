@@ -42,8 +42,8 @@ also accepts `--limit <N>` (default 50; the orchestrator runs it with no limit).
 
 - `.env` at the repo root with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
   (already present; not committed). Scripts load it via `dotenv`.
-- npm packages: `better-sqlite3`, `pdf-parse`, `cheerio`, `node-fetch`,
-  `dotenv` (all in `devDependencies`).
+- npm packages: `better-sqlite3`, `pdf-parse`, `cheerio`, `dotenv` (all in
+  `devDependencies`).
 - The `phrase_staging` table must exist before `staging-writer.js` can write.
   Run the Task 1 migration SQL in the Supabase dashboard first (output is in the
   PR description). Until then `staging-writer` reports a clear notice and the

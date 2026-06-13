@@ -7,7 +7,6 @@
 import { fileURLToPath } from "url";
 import path from "path";
 import { mkdirSync, writeFileSync } from "fs";
-import fetch from "node-fetch";
 import { load } from "cheerio";
 import { PDFParse } from "pdf-parse";
 import { getDb, log, logError, RAW_DIR } from "./lib/common.js";

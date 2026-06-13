@@ -5,7 +5,6 @@
 // Env: DELAY_MS (default 2000), COMPANY_LIMIT (default 5), TICKER (optional)
 
 import Database from 'better-sqlite3';
-import fetch from 'node-fetch';
 import { mkdirSync, writeFileSync, readdirSync, existsSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
