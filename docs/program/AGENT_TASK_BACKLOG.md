@@ -9,7 +9,7 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 ## Group A — Live Game Stability
 *Claude Code · Phase 1 · ⚠️ Blocks all other groups*
 
-- [x] Remove silent fallback behavior — the code path that serves another company's phrases when the selected company has none
+- [x] Remove cross-company phrase fallback behavior — the code path that serves another company's phrases when the selected company has none
 - [x] Fix or deactivate any company with active status and zero phrases
 - [x] Generalize `TriviaSection` component so it is not hardcoded to a single company
 - [x] Add active company readiness gate — prevent game session creation for companies below minimum readiness threshold
@@ -23,6 +23,8 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ## Group B — Deterministic Truth Layer
 *Claude Code (build) · Docker/VPS cron (run) · Phase 1 · Depends on: Group A complete*
+
+**Group B is not complete.** C-2 confirmed the cron layer never ran. The configuration fix is fixed-in-this-session, but Group B must remain incomplete until fresh scheduled output is verified in `logs/cron.log`.
 
 - [x] Create `scripts/company-readiness.js`
   - Input: Supabase companies, phrases, trivia tables
@@ -42,8 +44,8 @@ Update status in-place as work progresses. This file is read by Claude Code sess
   - Aggregates exception counts and top issues from each report into a single AI-readable packet
 - [x] Add `reports/` to `.gitignore`
 - [x] Create `reports/.gitkeep` so the directory exists in the repo
-- [x] Add VPS cron entry: 6:00am ET — runs all four scripts in sequence
-- [x] Add VPS cron entry: 9:00pm ET — runs all four scripts in sequence
+- [~] Fix and verify VPS morning cron entry — configuration fixed-in-this-session; verify fresh scheduled output in `logs/cron.log`
+- [~] Fix and verify VPS evening cron entry — configuration fixed-in-this-session; verify fresh scheduled output in `logs/cron.log`
 
 ---
 
@@ -328,6 +330,42 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
+## Group L — Audit Remediation
+*Post-audit remediation · Named Group L because Group K is already used for Analytics and Launch*
+
+- [~] **C-1 · Live game correctness — pipeline-ingested companies score 0 points per mark**
+  - Status: **pending-human**
+  - PR #50 is open on `fix/standard-tier-scoring`; Phase 1 confirms 6 of 7 active companies are affected.
+- [~] **C-2 · Operations — the VPS cron layer has never executed because cron's shell does not support `source`**
+  - Status: **fixed-in-this-session; verification pending**
+  - Do not mark done until a scheduled run produces fresh `logs/cron.log` output.
+- [~] **C-3 · Security — anonymous clients can rewrite any player and any session**
+  - Status: **pending-human**
+  - PR #51 is open on `migration/rls-game-state-lockdown`; Phase 1 confirms open `players`, `sessions`, and `marks` policies.
+- [ ] **H-1 · Schema drift — applied migrations exist with no migration files**
+  - Status: **open**
+  - Phase 1 confirms 18 files on disk versus 25 applied migrations, plus an untracked live unique constraint.
+- [x] **H-2 · Program state is materially wrong and stale**
+  - Status: **fixed-in-this-session**
+  - Reconciled `PROGRAM_STATE.md`, `claude.md`, and this backlog; `PROGRAM_STATE.md` is now the single mutable state file.
+- [ ] **H-3 · Realtime social features are broken by stale closures**
+  - Status: **open**
+  - Code-side fix is not verified by Phase 1.
+- [ ] **H-4 · No realtime failure handling, no error boundary, and no observability**
+  - Status: **open**
+  - Code-side fix is not verified by Phase 1.
+- [~] **H-5 · `phrase_staging` is publicly writable with no length constraint**
+  - Status: **pending-human**
+  - PR #51 is open on `migration/rls-game-state-lockdown`; Phase 1 confirms public policies and no phrase-length check.
+- [ ] **H-6 · The activation readiness gate counts the wrong thing**
+  - Status: **open**
+  - Phase 1 confirms the live-data hazard; code-side fix is not verified.
+- [ ] **X4 · Monitoring has no out-of-band heartbeat and shares cron's failure domain**
+  - Status: **open**
+  - Phase 1 confirms `system_health` does not exist.
+
+---
+
 ## Deferred — Phase 3 and Post-Launch
 
 - [-] Full Docker containerization of all 11 ops workers into `thereitis-ops-worker` container
@@ -363,4 +401,4 @@ Update status in-place as work progresses. This file is read by Claude Code sess
 
 ---
 
-*Last updated: 2026-06-01 (session 17). Update status markers in-place as work completes. This file is the working task list for all Claude Code sessions, Routines, and Codex Automations.*
+*Last updated: 2026-06-13. Update status markers in-place as work completes. Mutable program state belongs in `PROGRAM_STATE.md`.*
