@@ -200,8 +200,8 @@ function CompanyReadinessTable() {
       supabase
         .from("companies")
         .select("id, name, emoji, is_active, next_earnings_date"),
-      supabase.from("phrases").select("company_id"),
-      supabase.from("trivia_questions").select("company_id"),
+      supabase.from("phrases").select("company_id").eq("is_active", true),
+      supabase.from("trivia_questions").select("company_id").eq("is_active", true),
     ]);
 
     const companies = companiesRes.data || [];
