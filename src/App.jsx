@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import Landing from "./components/Landing";
 import CompanySelect from "./components/CompanySelect";
 import ModeSelect from "./components/ModeSelect";
 import NameEntry from "./components/NameEntry";
 import Lobby from "./components/Lobby";
 import Game from "./components/Game";
-import Admin from "./components/Admin";
 import Predictions from "./components/Predictions";
 import TriviaQuiz from "./components/TriviaQuiz";
+
+const Admin = lazy(() => import("./components/Admin"));
 
 function getInitialView() {
   const path = window.location.pathname;
@@ -128,7 +129,19 @@ export default function App() {
   }
 
   if (view === "admin") {
-    return <Admin />;
+    return (
+      <Suspense
+        fallback={
+          <div className="min-h-full bg-navy flex items-center justify-center px-6">
+            <p className="text-gold text-sm font-semibold tracking-wide">
+              Loading admin...
+            </p>
+          </div>
+        }
+      >
+        <Admin />
+      </Suspense>
+    );
   }
 
   if (view === "landing") {
@@ -197,6 +210,7 @@ export default function App() {
           phrases={session.phrases}
           companyId={company?.id}
           companyName={company?.name}
+          companyEmoji={company?.emoji}
           callIdentifier={company?.call_identifier}
           onExit={handleExit}
           onPlayAgain={handlePlayAgain}

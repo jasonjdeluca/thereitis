@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createSession, joinSession } from "../lib/session";
+import { createSession, joinSession, PHRASE_ERROR_MESSAGES } from "../lib/session";
 
 export default function NameEntry({ companyId, onSessionCreated, onSessionJoined, onBack }) {
   const [name, setName] = useState(
@@ -27,8 +27,13 @@ export default function NameEntry({ companyId, onSessionCreated, onSessionJoined
         displayName: name.trim(),
         card: result.card,
       });
-    } catch {
-      setError("Failed to create session. Try again.");
+    } catch (error) {
+      const phraseErrors = Object.values(PHRASE_ERROR_MESSAGES);
+      setError(
+        phraseErrors.includes(error.message)
+          ? error.message
+          : "Failed to create session. Try again.",
+      );
     } finally {
       setLoading(null);
     }
