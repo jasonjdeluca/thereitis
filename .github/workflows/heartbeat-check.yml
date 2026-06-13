@@ -1,0 +1,57 @@
+name: Heartbeat Check
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check-heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check truth-layer cron heartbeat
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          node <<'NODE'
+          // Wrapped in an async IIFE so top-level await works regardless of the
+          // runner's Node version (stdin can be parsed as CommonJS on older Node).
+          (async () => {
+          // Twice-daily writes are about 15 hours apart; 26 hours means one full missed cycle.
+          const maxAgeMs = 26 * 60 * 60 * 1000;
+          const url = `${process.env.SUPABASE_URL}/rest/v1/system_health?id=eq.1&select=last_heartbeat_at`;
+          const response = await fetch(url, {
+            headers: {
+              apikey: process.env.SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.error(`Heartbeat check failed: Supabase returned ${response.status} ${response.statusText}`);
+            process.exit(1);
+          }
+
+          const rows = await response.json();
+          const lastHeartbeat = rows[0]?.last_heartbeat_at;
+          const heartbeatAt = Date.parse(lastHeartbeat);
+          if (!lastHeartbeat || Number.isNaN(heartbeatAt)) {
+            console.error("Heartbeat check failed: system_health row id=1 has no valid last_heartbeat_at");
+            process.exit(1);
+          }
+
+          const ageMs = Date.now() - heartbeatAt;
+          const ageHours = ageMs / (60 * 60 * 1000);
+          if (ageMs > maxAgeMs) {
+            console.error(`Heartbeat check failed: last heartbeat is ${ageHours.toFixed(1)} hours old (maximum 26 hours)`);
+            process.exit(1);
+          }
+
+          console.log(`Heartbeat is healthy: last heartbeat is ${ageHours.toFixed(1)} hours old`);
+          })();
+          NODE
